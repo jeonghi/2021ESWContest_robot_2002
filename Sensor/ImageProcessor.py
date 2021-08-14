@@ -8,8 +8,11 @@ from imutils.video import FPS
 
 class ImageProcessor:
     # cam = WebcamVideoStream(0).start()  # 이미지 공급 쓰레드 인자값 무적권 -1 줘야해 ! ( 라이브 용, 라즈베리파이 캠 용)
-    video_path = "src/black_area.mp4"
+    #video_path = "src/black_area.mp4"
     #video_path = "src/green_area.mp4"
+    #video_path = "src/alphabet_test1.mp4"
+    #video_path = "src/alphabet_test2.mp4"
+    video_path = "src/ewsn.mp4"
     _cam = FileVideoStream(path=video_path).start()
 
     def __init__(self):
@@ -45,7 +48,7 @@ if __name__ == "__main__":
     imageProcessor = ImageProcessor()
     imageProcessor.fps.start()
     # time.sleep(2)
-    # while imageProcessor.fps._numFrames < 200:
+    #while imageProcessor.fps._numFrames < 200:
     while True:
         _ = imageProcessor.get_image(visualization=True)
         imageProcessor.fps.update()
