@@ -12,7 +12,8 @@ class ImageProcessor:
     #video_path = "src/green_area.mp4"
     #video_path = "src/alphabet_test1.mp4"
     #video_path = "src/alphabet_test2.mp4"
-    video_path = "src/ewsn.mp4"
+    #video_path = "src/ewsn.mp4"
+    video_path = "src/N.h264"
     _cam = FileVideoStream(path=video_path).start()
 
     def __init__(self):
@@ -24,9 +25,9 @@ class ImageProcessor:
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
         # time.sleep(2)  # 카메라 포트 여는 시간 반영해서 슬립 조금 줌.
 
-    @staticmethod
-    def get_image(visualization=False):
-        src = ImageProcessor._cam.read().copy()
+    #@staticmethod
+    def get_image(self, visualization=False):
+        src = self._cam.read().copy()
         if visualization:
             cv2.imshow("Src", src)
             cv2.waitKey(1)
@@ -41,6 +42,9 @@ class ImageProcessor:
             cv2.waitKey(1)
         return dst
 
+    def feature_matching(self, src):
+        pass
+
 
 
 if __name__ == "__main__":
@@ -50,7 +54,13 @@ if __name__ == "__main__":
     # time.sleep(2)
     #while imageProcessor.fps._numFrames < 200:
     while True:
-        _ = imageProcessor.get_image(visualization=True)
+        src = imageProcessor.get_image(visualization=False)
+        ret, mask = cv2.threshold(cv2.cvtColor(src,cv2.COLOR_BGR2GRAY), 50, 255, cv2.THRESH_BINARY_INV)
+
+        src = cv2.bitwise_and(src, src, mask=mask)
+        cv2.imshow("src", src)
+        #cv2.imshow("mask", mask)
+        cv2.waitKey(1)
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
