@@ -1,57 +1,69 @@
 import cv2
 import numpy as np
 
+
 class Target:
-    def __init__(self, img : np.ndarray, color : str = None, target : str = None) -> None:
-        self.img = img
-        self.color = color
-        self.target = target
-    
-    def get_target_roi(self, pad = 0) -> np.ndarray:
-        #self.img = cv2.resize(self.img, None)
-        img_gray = cv2.cvtColor(self.img, cv2.COLOR_BGR2GRAY)
-        _, img_binary = cv2.threshold(img_gray, 40, 255, cv2.THRESH_BINARY_INV)
-        
-        _, _, stats, centrois = cv2.connectedComponentsWithStats(img_binary, connectivity=4, ltype=cv2.CV_32S)
-        
-        stats = sorted(stats, key=lambda x : x[4], reverse=True)
-        if stats is None:
-            cv2.imshow("asd", self.img)
-        
-        x, y, w, h, area = stats[1]
-        
-        min_x = x - pad
-        max_x = x + w + pad
-        min_y = y - pad
-        max_y = y + h + pad
-        if min_x <= 0:
-            min_x = 0
-        if max_x >= w-1:
-            max_x = w-1
-        if min_y <= 0:
-            min_y = 0
-        if max_y >= h-1:
-            max_y = h-1
-            
-        #cv2.rectangle(self.img, (x, y), (x + w, y + h), (255, 0, 0))
-        #print(x, y, w, h, area)
-    
-        return self.img[min_y : y + h + pad, min_x : x + w + pad]
-        
-    
+
+    def __init__(self, color=None, stats=None, centroid=None):
+        self._stats = (self._x, self._y, self._width, self._height, self._area) = stats
+        self._center_pos = (self._center_x, self._center_y) = int(centroid[0]), int(centroid[1])
+        self._color = color
+
+    def get_target_roi(self, src, pad=0, visualization=False) -> np.ndarray:
+        shape = (h,w,_) = src.shape
+        min_x = self._x - pad
+        max_x = self._x + self._width + pad
+        min_y = self._y - pad
+        max_y = self._y + self._height + pad
+
+        min_x = 0 if min_x <= 0 else min_x
+        max_x = w-1 if max_x >= w-1 else max_x
+        min_y = 0 if min_y <= 0 else min_y
+        max_y = h-1 if max_y >= h-1 else max_y
+
+        roi = src[min_y:max_y, min_x:max_x]
+
+        if visualization:
+            dst = cv2.circle(src, self._center_pos, 10, (0, 0, 255), 10)
+            cv2.rectangle(dst, (self._x, self._y), (self._x + self._width, self._y + self._height), (0, 0, 255))
+            if pad > 0: cv2.rectangle(dst, (min_x, min_y), (max_x, max_y), (0, 255, 0))
+            cv2.imshow("target", dst)
+            cv2.imshow("target_roi", roi)
+            cv2.waitKey(1)
+
+        return roi
+
+    def get_center_pos(self):
+        return self._center_pos
+
+    def get_area(self):
+        return self._area
+
+def setLabel(src, pts, label):
+    (x, y, w, h) = cv2.boundingRect(pts)
+    pt1 = (x, y)
+    pt2 = (x+w, y+h)
+    cv2.rectangle(src, pt1, pt2, (0,255,0), 2)
+    cv2.putText(src, label, (pt1[0], pt1[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255))
 
 if __name__ == "__main__":
-    cap = cv2.VideoCapture("src/E.h264")
+    from Sensor.ImageProcessor import ImageProcessor
+    from imutils import auto_canny
+    imageProcessor = ImageProcessor(video_path='src/N.h264')
     while True:
-        ret, frame = cap.read()
-        #frame = cv2.imread("src/labeling_sample.jpg")
-        
-        if not ret:
-            break
-        
-        target = Target(frame, "red")
-        roi = target.get_target_roi(pad = 10)
-        cv2.imshow("frame", roi)
-        
-        if cv2.waitKey(1) == 27:
-            break
+        src = imageProcessor.get_image()
+        src = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        _, mask = cv2.threshold(src, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        #_, mask = cv2.threshold(src, 50, 255, cv2.THRESH_BINARY_INV)
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_NONE)
+        for cnt in cnts:
+            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True)*0.02, True)
+            vertice = len(approx)
+
+            if vertice == 4 and cv2.contourArea(cnt)> 2500:
+                setLabel(src, cnt, 'Rec')
+        cv2.imshow("src", src)
+        cv2.imshow("mask", mask)
+        cv2.waitKey(1)
+
+
