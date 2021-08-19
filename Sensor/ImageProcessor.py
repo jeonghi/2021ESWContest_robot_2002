@@ -30,7 +30,7 @@ class ImageProcessor:
         if visualization:
             cv2.imshow("Src", src)
             cv2.waitKey(1)
-        return src
+        return src.copy()
 
 
 
