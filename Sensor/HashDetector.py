@@ -37,22 +37,33 @@ class HashDetector:
         result = hdist_list.index(min(hdist_list))
         
         return direction_list[result]
-        
-if __name__ == '__main__':
-    cap = cv2.VideoCapture(0)
+
+
+if __name__ == "__main__":
+    from Sensor.ImageProcessor import ImageProcessor
+    from imutils import auto_canny
+    from Sensor.Target import Target
+    imageProcessor = ImageProcessor(video_path='src/N.h264')
     hashDetector = HashDetector()
-    
     while True:
-        ret, frame = cap.read()
-        
-        if not ret:
-            break
-        
-        cv2.imshow('frame', frame)
-        
-        print(hashDetector.detect_direction_hash(frame))
-        
-        if cv2.waitKey(1) == 27:
-            break
-        
-    cv2.destroyAllWindows()
+        targets = []
+        src = imageProcessor.get_image()
+        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        _, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        mask = auto_canny(mask)
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in cnts:
+            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True)*0.02, True)
+            vertice = len(approx)
+
+            if vertice == 4 and cv2.contourArea(cnt)> 2500:
+                targets.append(Target(contour=cnt))
+        if targets:
+            targets.sort(key= lambda x: x.get_area)
+            roi = targets[0].get_target_roi(src = src, pad=10, visualization=True)
+            roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            _, mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+            mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
+            cv2.imshow("roi thresh", mask)
+            cv2.waitKey(1)
+            print(hashDetector.detect_direction_hash(roi))
