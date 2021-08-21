@@ -23,6 +23,7 @@ class ImageProcessor:
                 self._cam = WebcamVideoStream(src=0).start()
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
+        self.hash_detector = HashDetector(file_path='./Sensor/EWSN/')
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
         time.sleep(2)
