@@ -1,13 +1,19 @@
 import cv2
+import os
 import numpy as np
 
 class HashDetector:
     def __init__(self) -> None:
-        self.east_hash = self.image_to_hash(cv2.imread('EWSN/E.png'))
-        self.west_hash = self.image_to_hash(cv2.imread('EWSN/W.png'))
-        self.north_hash = self.image_to_hash(cv2.imread('EWSN/N.png'))
-        self.south_hash = self.image_to_hash(cv2.imread('EWSN/S.png'))
-    
+        file_path = './Sensor/EWSN/'
+        
+        self.directions_hash = []
+        self.directions = []
+        for direction in os.listdir(file_path):
+            self.directions_hash.append(self.image_to_hash(cv2.imread(file_path + direction)))
+            self.directions.append(direction.rsplit('.')[0])
+        print(file_path + direction)
+        print(self.directions)
+            
     @staticmethod
     def image_to_hash(img : np.ndarray) -> list:        
         if len(img.shape) == 3:
@@ -27,16 +33,14 @@ class HashDetector:
     
     def detect_direction_hash(self, img : np.ndarray) -> str:
         img_hash = self.image_to_hash(img)
-        direction_list = ['E', 'W', 'S', 'N']
-        hash_list = [self.east_hash, self.west_hash, self.south_hash, self.north_hash]
         hdist_list = []
         
-        for hash in hash_list:
+        for hash in self.directions_hash:
             hdist_list.append(self.hamming_distance(img_hash, hash))
             
         result = hdist_list.index(min(hdist_list))
         
-        return direction_list[result]
+        return self.directions[result]
 
 
 if __name__ == "__main__":
