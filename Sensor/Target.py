@@ -50,7 +50,7 @@ class Target:
     def get_area(self):
         return self.area
 
-def IoU(box1:Target, box2:Target)->float:
+def IoU(box1:Target, box2:Target) -> float:
         # box = (x1, y1, x2, y2)
         box1_area = (box1.width + 1) * (box1.height + 1)
         box2_area = (box2.width + 1) * (box2.height + 1)
@@ -67,7 +67,7 @@ def IoU(box1:Target, box2:Target)->float:
 
         inter = w * h
         iou = inter / (box1_area + box2_area - inter)
-        return iou*100
+        return iou
 
 def setLabel(src, pts, label):
     (x, y, w, h) = cv2.boundingRect(pts)
