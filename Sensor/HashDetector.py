@@ -1,17 +1,19 @@
 import cv2
 import os
 import numpy as np
+import glob
 
 class HashDetector:
     def __init__(self, file_path) -> None:        
         self.directions_hash = []
         self.directions = []
+        self.check_file_type(file_path)
         for direction in os.listdir(file_path):
             self.directions_hash.append(self.image_to_hash(cv2.imread(file_path + direction)))
             self.directions.append(direction.rsplit('.')[0])
         print(file_path + direction)
         print(self.directions)
-            
+     
     @staticmethod
     def image_to_hash(img : np.ndarray) -> list:        
         if len(img.shape) == 3:
@@ -29,16 +31,33 @@ class HashDetector:
         distance = (src_hash != cmp_hash).sum()
         return distance
     
+    @staticmethod
+    def check_file_type(image_folder_path, allowed_extensions=None):
+        if allowed_extensions is None:
+            allowed_extensions = ['.jpg', '.png', '.jpeg']
+        no_files_in_folder = len(glob.glob(image_folder_path+"/*")) 
+        extension_type = ""
+        no_files_allowed = 0
+        for ext in allowed_extensions:
+          no_files_allowed = len(glob.glob(image_folder_path+"/*"+ext))
+          if no_files_allowed > 0:
+            extension_type = ext
+            break
+        assert no_files_in_folder == no_files_allowed, "The extension in the folder should all be the same, but found more than one extensions"
+        return extension_type
+
     def detect_direction_hash(self, img : np.ndarray) -> str:
         img_hash = self.image_to_hash(img)
-        hdist_list = []
+        hdist_dict = {}
         
-        for hash in self.directions_hash:
-            hdist_list.append(self.hamming_distance(img_hash, hash))
-            
-        result = hdist_list.index(min(hdist_list))
+        for i in range(len(self.directions)):
+            direction = self.directions[i]
+            hash = self.directions_hash[i]
+            hdist_dict[direction] = self.hamming_distance(img_hash, hash)
         
-        return self.directions[result]
+        result = min(hdist_dict.keys(), key=(lambda k:hdist_dict[k]))
+        
+        return result
 
 
 if __name__ == "__main__":
