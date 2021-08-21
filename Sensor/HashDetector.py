@@ -9,13 +9,14 @@ class HashDetector:
         self.south_hash = self.image_to_hash(cv2.imread('EWSN/S.png'))
     
     @staticmethod
-    def image_to_hash(img : np.ndarray) -> list:
-        gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        gray = cv2.resize(gray, (16, 16))
-        avg = gray.mean()
-        bin = 1 * (gray > avg)
+    def image_to_hash(img : np.ndarray) -> list:        
+        if len(img.shape) == 3:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+        img = cv2.resize(img, (16, 16))
+        avg = img.mean()
+        bin = 1 * (img > avg)
         return bin
-    
+         
     @staticmethod
     def hamming_distance(src_hash : list, cmp_hash : list) -> int:
         src_hash = src_hash.reshape(1,-1)
@@ -24,7 +25,6 @@ class HashDetector:
         distance = (src_hash != cmp_hash).sum()
         return distance
     
-     
     def detect_direction_hash(self, img : np.ndarray) -> str:
         img_hash = self.image_to_hash(img)
         direction_list = ['E', 'W', 'S', 'N']
