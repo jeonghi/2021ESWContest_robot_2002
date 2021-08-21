@@ -7,14 +7,15 @@ class Target:
     def __init__(self, color=None, stats=None, centroid=None, contour=None):
 
         if centroid is not None and stats is not None:
-            (self.x, self.y, self.width, self.height, self.area) = stats
+            (self.x, self.y, self.width, self.height, self._area) = stats
             self._center_pos = (self._center_x, self._center_y) = int(centroid[0]), int(centroid[1])
         elif contour is not None:
             (self.x, self.y, self.width, self.height) = cv2.boundingRect(contour)
-            self.area = cv2.contourArea(contour)
+            self._area = cv2.contourArea(contour)
             self._center_pos = (self._center_x, self._center_y) = (
             self.x + (self.width // 2), self.y + (self.height // 2))
         self._color = color
+        self._pts = (self.x, self.y, self.width, self.height)
 
 
     def get_target_roi(self, src, pad:int=0, visualization:bool=False, label:str=None) -> np.ndarray:
@@ -48,7 +49,10 @@ class Target:
         return self._center_pos
 
     def get_area(self):
-        return self.area
+        return self._area
+
+    def get_pts(self):
+        return self._pts
 
 def IoU(box1:Target, box2:Target) -> float:
         # box = (x1, y1, x2, y2)
@@ -69,12 +73,12 @@ def IoU(box1:Target, box2:Target) -> float:
         iou = inter / (box1_area + box2_area - inter)
         return iou
 
-def setLabel(src, pts, label):
+def setLabel(src, pts, label, color=(0,255,0)):
     (x, y, w, h) = cv2.boundingRect(pts)
     pt1 = (x, y)
     pt2 = (x+w, y+h)
-    cv2.rectangle(src, pt1, pt2, (0,255,0), 2)
-    cv2.putText(src, label, (pt1[0], pt1[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0,0,255))
+    cv2.rectangle(src, pt1, pt2, color, 2)
+    cv2.putText(src, label, (pt1[0], pt1[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color)
 
 if __name__ == "__main__":
     from Sensor.ImageProcessor import ImageProcessor
