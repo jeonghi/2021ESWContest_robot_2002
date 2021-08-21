@@ -3,9 +3,7 @@ import os
 import numpy as np
 
 class HashDetector:
-    def __init__(self) -> None:
-        file_path = './Sensor/EWSN/'
-        
+    def __init__(self, file_path) -> None:        
         self.directions_hash = []
         self.directions = []
         for direction in os.listdir(file_path):
