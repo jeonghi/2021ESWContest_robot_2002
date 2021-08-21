@@ -8,12 +8,12 @@ from imutils.video import FileVideoStream
 from imutils.video import FPS
 from imutils import auto_canny
 from Sensor.HashDetector import HashDetector
-from Sensor.Target import Target, IoU
+from Sensor.Target import Target, IoU, setLabel
 
 
 class ImageProcessor:
 
-    def __init__(self, video_path: str = "") -> None:
+    def __init__(self, video_path : str = ""):
         if video_path and os.path.exists(video_path):
             self._cam = FileVideoStream(path=video_path).start()
         else:
@@ -22,14 +22,13 @@ class ImageProcessor:
             else:
                 self._cam = WebcamVideoStream(src=0).start()
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
-        self.hash_detector = HashDetector()
         self.fps = FPS()
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
         time.sleep(2)
 
-    def get_image(self, visualization: bool = False) -> np.array:
-        src: np.array = self._cam.read()
+    def get_image(self, visualization=False):
+        src = self._cam.read()
         if src is None:
             exit()
         if visualization:
@@ -47,19 +46,26 @@ class ImageProcessor:
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-
+        cv2.imshow("mask", mask)
+        cv2.imshow("canny", canny)
         for cnt in cnts1:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
             if vertice == 4 and cv2.contourArea(cnt) > 2500:
-                targets.append(Target(contour=cnt))
+                target = Target(contour=cnt)
+                targets.append(target)
+                setLabel(src, cnt, "no_canny")
 
         for cnt in cnts2:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
             if vertice == 4 and cv2.contourArea(cnt) > 2500:
-                targets.append(Target(contour=cnt))
+                target = Target(contour=cnt)
+                targets.append(target)
+                setLabel(src, cnt, "canny", color=(0,0,255))
 
+        cv2.imshow("target", src)
+        cv2.waitKey(30)
         if len(targets)>=2:
             targets.sort(key=lambda x: x.get_area())
             iou = IoU(targets[0],targets[1])
@@ -87,12 +93,12 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/E.h264")
+    imageProcessor = ImageProcessor(video_path="src/W.h264")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
         src = imageProcessor.get_image(visualization=False)
-        print(imageProcessor.get_door_alphabet(visualization=True))
+        print(imageProcessor.get_door_alphabet(visualization=False))
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
