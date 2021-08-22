@@ -2066,22 +2066,7 @@ GOSUB_RX_EXIT2:
     GOTO MAIN
 
     '******************************************
-전방하향80도:
 
-    SPEED 3
-    SERVO 16, 80
-    ETX 4800,35
-    RETURN
-    '******************************************
-전방하향60도:
-
-    SPEED 3
-    SERVO 16, 65
-    ETX 4800,36
-    RETURN
-
-    '******************************************
-    '******************************************
 앞뒤기울기측정:
     FOR i = 0 TO COUNT_MAX
         A = AD(앞뒤기울기AD포트)	'기울기 앞뒤
@@ -3265,6 +3250,116 @@ Number_Play: '  BUTTON_NO = 숫자대입
     DELAY 10
     GOSUB 기본자세2
     RETURN
+    '******************************************
+
+전방하향100도:
+    SPEED 3
+    SERVO 16, 100
+
+    RETURN
+    '******************************************
+전방하향97도:
+    SPEED 3
+    SERVO 16, 97
+
+    RETURN
+    '******************************************
+전방하향95도:
+    SPEED 3
+    SERVO 16, 95
+
+    RETURN
+    '******************************************
+
+전방하향90도:
+
+    SPEED 3
+    SERVO 16, 92
+
+    RETURN
+    '******************************************
+전방하향85도:
+
+    SPEED 3
+    SERVO 16, 85
+
+    RETURN
+    '******************************************
+
+전방하향80도:
+
+    SPEED 3
+    SERVO 16, 80
+
+    RETURN
+    '******************************************
+전방하향75도:
+    SPEED 3
+    SERVO 16, 76
+
+    RETURN
+    '******************************************
+전방하향70도:
+    SPEED 3
+    SERVO 16, 73
+
+    RETURN
+    '******************************************
+전방하향60도:
+
+    SPEED 3
+    SERVO 16, 65
+
+    RETURN
+
+    '******************************************
+전방하향54도:
+
+    SPEED 3
+    SERVO 16, 58
+
+    RETURN
+
+    '******************************************
+
+전방하향45도:
+
+    SPEED 3
+    SERVO 16, 50
+    RETURN
+
+    '******************************************
+전방하향35도:
+
+    SPEED 3
+    SERVO 16, 40
+    RETURN
+
+    '******************************************
+
+전방하향30도:
+
+    SPEED 3
+    SERVO 16, 30
+
+    RETURN
+
+    '******************************************
+전방하향18도:
+
+    SPEED 3
+    SERVO 16, 22
+    ETX 4800,40
+    RETURN
+
+    '******************************************
+
+전방하향10도:
+
+    SPEED 3
+    SERVO 16, 10
+    ETX 4800,41
+    RETURN
 
 
 
@@ -3285,7 +3380,7 @@ MAIN_2:
 
     '**** 입력된 A값이 0 이면 MAIN 라벨로 가고
     '**** 1이면 KEY1 라벨, 2이면 key2로... 가는문
-    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36
+    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54
 
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
@@ -3633,3 +3728,80 @@ KEY36:
     GOSUB 북쪽
     GOTO RX_EXIT
     '***************
+
+KEY37:
+    ETX 4800, 37
+    GOSUB 전방하향10도
+    GOTO RX_EXIT
+KEY38:
+    ETX 4800, 38
+    GOSUB 전방하향18도
+    GOTO RX_EXIT
+KEY39:
+    ETX 4800, 39
+    GOSUB 전방하향30도
+    GOTO RX_EXIT
+KEY40:
+    ETX 4800, 40
+    GOSUB 전방하향45도
+    GOTO RX_EXIT
+KEY41:
+    ETX 4800, 41
+    GOSUB 전방하향60도
+    GOTO RX_EXIT
+KEY42:
+    ETX 4800, 42
+    GOSUB 전방하향75도
+    GOTO RX_EXIT
+KEY43:
+    ETX 4800, 43
+    GOSUB 전방하향90도
+    GOTO RX_EXIT
+KEY44:
+    ETX 4800, 44
+    GOSUB 전방하향100도
+    GOTO RX_EXIT
+KEY45:
+    ETX 4800, 45
+    GOSUB 머리상하정면
+    GOTO RX_EXIT
+KEY46:
+    ETX 4800, 46
+    GOSUB 머리왼쪽30도
+    GOTO RX_EXIT
+KEY47:
+    ETX 4800, 47
+    GOSUB 머리왼쪽45도
+    GOTO RX_EXIT
+KEY48:
+    ETX 4800, 48
+    GOSUB 머리왼쪽60도
+    GOTO RX_EXIT
+KEY49:
+    ETX 4800, 49
+    GOSUB 머리왼쪽90도
+    GOTO RX_EXIT
+KEY50:
+    ETX 4800, 50
+    GOSUB 머리오른쪽30도
+    GOTO RX_EXIT
+KEY51:
+    ETX 4800, 51
+    GOSUB 머리오른쪽45도
+    GOTO RX_EXIT
+KEY52:
+    ETX 4800, 52
+    GOSUB 머리오른쪽60도
+    GOTO RX_EXIT
+KEY53:
+    ETX 4800, 53
+    GOSUB 머리오른쪽90도
+    GOTO RX_EXIT
+KEY54:
+    ETX 4800, 54
+    GOSUB 머리좌우중앙
+    GOTO RX_EXIT
+
+
+
+
