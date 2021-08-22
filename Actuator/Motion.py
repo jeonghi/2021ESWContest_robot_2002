@@ -84,8 +84,34 @@ class Motion:
     
     def notice_direction(self, dir):
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
-        print(dir_list[dir])
-        self.TX_data_py2(dir_list[dir])        
+        self.TX_data_py2(dir_list[dir])
+
+    def head_angle(self, dir, angle=0):
+        """parameter 설명
+        dir: {down, left, right, updown_center, leftright_center}
+        angle: {down:{10,20,30,45,60,75,90,100},
+        left:{30,45,60,90},
+        right:{30,45,60,90}
+        }
+        """
+        center_list = {'updown_center':45, 'leftright_center':54}
+        dir_list = {
+            'down':{
+            10:37, 20:38, 30:39, 45:40, 60:41, 75:42, 90:43, 100:44
+            },
+            'left':{
+                30:46, 45:47, 60:48, 90:49
+            },
+            'right':{
+                30:50, 45:51, 60:52, 90:53
+            }
+        }
+        if dir in center_list:
+            self.TX_data_py2(center_list[dir])
+            return
+        self.TX_data_py2(dir_list[dir][angle])
+
+
 #
 
 # **************************************************
@@ -94,8 +120,8 @@ class Motion:
 if __name__ == '__main__':
     motion = Motion()
 #    motion.TX_data_py2(33)
-    motion.notice_direction('N')
-   
+#     motion.notice_direction('N')
+    motion.head_angle('down', 10)
     pass
 
 
