@@ -36,11 +36,15 @@ class Target:
             dst = cv2.circle(src.copy(), self._center_pos, 10, color, 10)
             cv2.rectangle(dst, (self.x, self.y), (self.x + self.width, self.y + self.height), color, 3)
             if pad > 0: cv2.rectangle(dst, (min_x, min_y), (max_x, max_y), color, 1)
-            cv2.imshow("target", dst)
             if label:
+                pt1 = (self.x, self.y)
+                pt2 = (self.x + self.width, self.y + self.height)
+                cv2.rectangle(dst, pt1, pt2, color, 2)
+                cv2.putText(dst, label, (pt1[0], pt1[1] - 3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color)
                 cv2.imshow(label, roi)
             else:
                 cv2.imshow("roi", roi)
+            cv2.imshow("target", dst)
             cv2.waitKey(1)
 
         return roi
