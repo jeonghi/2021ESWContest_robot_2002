@@ -3705,30 +3705,30 @@ KEY32: ' F
     GOTO RX_EXIT
     '***************
 
+
+'KEY33 ~ KEY36: 동서남북 말하고 손들기
 KEY33:
     ETX 4800, 33
     GOSUB 동쪽
     GOTO RX_EXIT
-    '***************
 
 KEY34:
     ETX 4800, 34
     GOSUB 서쪽
     GOTO RX_EXIT
-    '***************
 
 KEY35:
     ETX 4800, 35
     GOSUB 남쪽
     GOTO RX_EXIT
-    '***************
 
 KEY36:
     ETX 4800, 36
     GOSUB 북쪽
     GOTO RX_EXIT
-    '***************
+	'***************
 
+'KEY37 ~ KEY54: 머리 각도 조절
 KEY37:
     ETX 4800, 37
     GOSUB 전방하향10도
