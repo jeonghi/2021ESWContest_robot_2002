@@ -18,7 +18,7 @@ class Target:
         self._pts = (self.x, self.y, self.width, self.height)
 
 
-    def get_target_roi(self, src, pad:int=0, visualization:bool=False, label:str=None) -> np.ndarray:
+    def get_target_roi(self, src, pad:int=0, visualization:bool=False, label:str=None, color=(255,255,255)) -> np.ndarray:
         shape = (h,w) = src.shape[:2]
         min_x = self.x - pad
         max_x = self.x + self.width + pad
@@ -33,9 +33,9 @@ class Target:
         roi = src[min_y:max_y, min_x:max_x]
 
         if visualization:
-            dst = cv2.circle(src.copy(), self._center_pos, 10, (255, 255, 255), 10)
-            cv2.rectangle(dst, (self.x, self.y), (self.x + self.width, self.y + self.height), (0, 0, 255))
-            if pad > 0: cv2.rectangle(dst, (min_x, min_y), (max_x, max_y), (255, 255, 255))
+            dst = cv2.circle(src.copy(), self._center_pos, 10, color, 10)
+            cv2.rectangle(dst, (self.x, self.y), (self.x + self.width, self.y + self.height), color, 3)
+            if pad > 0: cv2.rectangle(dst, (min_x, min_y), (max_x, max_y), color, 1)
             cv2.imshow("target", dst)
             if label:
                 cv2.imshow(label, roi)
@@ -45,6 +45,8 @@ class Target:
 
         return roi
 
+    def get_color(self):
+        return self._color
     def get_center_pos(self):
         return self._center_pos
 
@@ -54,7 +56,7 @@ class Target:
     def get_pts(self):
         return self._pts
 
-def IoU(box1:Target, box2:Target) -> float:
+def compute_iou4target(box1:Target, box2:Target) -> float:
         # box = (x1, y1, x2, y2)
         box1_area = (box1.width + 1) * (box1.height + 1)
         box2_area = (box2.width + 1) * (box2.height + 1)
@@ -63,7 +65,7 @@ def IoU(box1:Target, box2:Target) -> float:
         x1 = max(box1.x, box2.x)
         y1 = max(box1.y, box2.y)
         x2 = min(box1.x+box1.width, box2.x+box2.width)
-        y2 = min(box1.y+box1.height, box2.y+box1.height)
+        y2 = min(box1.y+box1.height, box2.y+box2.height)
 
         # compute the width and height of the intersection
         w = max(0, x2 - x1 + 1)
@@ -72,6 +74,38 @@ def IoU(box1:Target, box2:Target) -> float:
         inter = w * h
         iou = inter / (box1_area + box2_area - inter)
         return iou
+
+def non_maximum_suppression4targets(targets1:list, targets2:list, threshold:float) -> Target:
+
+    maximum_set = None
+    if targets1 and targets2:
+        for target1 in targets1:
+            for target2 in targets2:
+                iou = compute_iou4target(target1, target2)
+                if iou > threshold:
+                    threshold = iou
+                    maximum_set = (target1, target2)
+
+    if maximum_set :
+        t1: Target = maximum_set[0]
+        t2: Target = maximum_set[1]
+        # obtain x1, y1, x2, y2 of the intersection
+        x1 = max(t1.x, t2.x)
+        y1 = max(t1.y, t2.y)
+        x2 = min(t1.x + t1.width, t2.x + t2.width)
+        y2 = min(t1.y + t1.height, t2.y + t2.height)
+
+        # compute the width and height of the intersection
+        width = max(0, x2 - x1 + 1)
+        height = max(0, y2 - y1 + 1)
+        area = width * height
+        centroid = (center_x, center_y) = (x1 + (width//2), y1 + (height//2))
+        stats = (x1, y1, width, height, area)
+
+        return Target(color=t1.get_color(), stats=stats, centroid=centroid)
+    else:
+        return None
+
 
 def setLabel(src, pts, label, color=(0,255,0)):
     (x, y, w, h) = cv2.boundingRect(pts)
