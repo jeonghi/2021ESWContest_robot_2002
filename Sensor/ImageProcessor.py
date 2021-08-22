@@ -78,7 +78,7 @@ class ImageProcessor:
 
         if target is None:
             return None
-        roi = target.get_target_roi(src=src, visualization=visualization, color=(255,0,0))
+        roi = target.get_target_roi(src=src, visualization=visualization, color=(255,0,0), label="roi")
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return self.hash_detector.detect_direction_hash(roi_mask)
