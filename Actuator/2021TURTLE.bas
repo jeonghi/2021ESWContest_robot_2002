@@ -2215,9 +2215,9 @@ Number_Play: '  BUTTON_NO = 숫자대입
     GOSUB NUM_1_9
     PRINT " !"
 
-    GOSUB SOUND_PLAY_CHK
+    'GOSUB SOUND_PLAY_CHK
     PRINT "SND 16 !"
-    GOSUB SOUND_PLAY_CHK
+    'GOSUB SOUND_PLAY_CHK
     RETURN
     '************************************************
 
@@ -3290,7 +3290,7 @@ MAIN_2:
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
         GOSUB Number_Play
-        GOSUB SOUND_PLAY_CHK
+        'GOSUB SOUND_PLAY_CHK
         GOSUB GOSUB_RX_EXIT
 
 
@@ -3349,7 +3349,7 @@ KEY5:
     J = AD(적외선AD포트)	'적외선거리값 읽기
     BUTTON_NO = J
     GOSUB Number_Play
-    GOSUB SOUND_PLAY_CHK
+    'GOSUB SOUND_PLAY_CHK
     GOSUB GOSUB_RX_EXIT
 
     GOTO RX_EXIT
@@ -3453,7 +3453,7 @@ KEY16_1:
     '**** RX DATA Number Sound ********
     BUTTON_NO = A
     GOSUB Number_Play
-    GOSUB SOUND_PLAY_CHK
+    'GOSUB SOUND_PLAY_CHK
 
 
     IF  A = 16 THEN 	'다시 파워버튼을 눌러야만 복귀
@@ -3626,7 +3626,7 @@ KEY35:
     ETX 4800, 35
     GOSUB 남쪽
     GOTO RX_EXIT
-    '***************   
+    '***************
 
 KEY36:
     ETX 4800, 36
