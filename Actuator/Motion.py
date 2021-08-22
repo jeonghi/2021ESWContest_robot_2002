@@ -108,8 +108,9 @@ class Motion:
         }
         if dir in center_list:
             self.TX_data_py2(center_list[dir])
-            return
-        self.TX_data_py2(dir_list[dir][angle])
+        else:
+            print(dir_list[dir][angle])
+            self.TX_data_py2(dir_list[dir][angle])
 
 
 #
@@ -119,9 +120,9 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-#    motion.TX_data_py2(33)
-#     motion.notice_direction('N')
-    motion.head_angle('down', 10)
+    #motion.TX_data_py2(38)
+    #motion.notice_direction('N')
+    motion.head_angle('leftright_center')
     pass
 
 
