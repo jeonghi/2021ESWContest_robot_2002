@@ -94,15 +94,15 @@ class Motion:
         right:{30,45,60,90}
         }
         """
-        center_list = {'updown_center':45, 'leftright_center':54}
+        center_list = {'UPDOWN_CENTER':45, 'LEFTRIGHT_CENTER':54}
         dir_list = {
-            'down':{
+            'DOWN':{
             10:37, 20:38, 30:39, 45:40, 60:41, 75:42, 90:43, 100:44
             },
-            'left':{
+            'LEFT':{
                 30:46, 45:47, 60:48, 90:49
             },
-            'right':{
+            'RIGHT':{
                 30:50, 45:51, 60:52, 90:53
             }
         }
@@ -112,8 +112,17 @@ class Motion:
             print(dir_list[dir][angle])
             self.TX_data_py2(dir_list[dir][angle])
 
+    def walk(self, dir, loop=1):
+        dir_list = {'FORWARD':55, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
+        for _ in range(loop):
+            self.TX_data_py2(dir_list[dir])
 
-#
+    def turn(self, dir, loop=1):
+        dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
+        for _ in range(loop):
+            self.TX_data_py2(dir_list[dir])
+
+
 
 # **************************************************
 # **************************************************
@@ -122,7 +131,8 @@ if __name__ == '__main__':
     motion = Motion()
     #motion.TX_data_py2(38)
     #motion.notice_direction('N')
-    motion.head_angle('leftright_center')
+    motion.head_angle('LEFTRIGHT_CENTER')
+    
     pass
 
 
