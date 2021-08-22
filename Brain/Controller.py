@@ -7,9 +7,9 @@ import sys
 
 class Robot:
 
-    def __init__(self, file_path =""):
+    def __init__(self, video_path =""):
         self._motion = Motion()
-        self._image_processor = ImageProcessor(file_path)
+        self._image_processor = ImageProcessor(video_path=video_path)
 
     def detect_alphabet(self):
         alphabet = self._image_processor.get_door_alphabet()
