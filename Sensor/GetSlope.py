@@ -56,15 +56,15 @@ lines = line_arr[:,None]
 #대표선 구하기
 fit_line = get_fitline(image, lines)
 # 대표선 그리기
-draw_fit_line(temp, fit_line)
+#draw_fit_line(temp, fit_line)
 
 slope_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] -   fit_line[2]) * 180) / np.pi
 
-result = weighted_img(temp, image) # 원본 이미지에 검출된 선 overlap
+#result = weighted_img(temp, image) # 원본 이미지에 검출된 선 overlap
 
 #print(line_arr)
 print(slope_degree)
-cv2.imshow('result',result) # 결과 이미지 출력
+#cv2.imshow('result',result) # 결과 이미지 출력
 #cv2.imshow('temp', temp)
 
 #cv2.imshow('yellowedges', yellowmask)
