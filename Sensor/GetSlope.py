@@ -66,7 +66,6 @@ slope_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] -   fit_line[2
 print(slope_degree)
 #cv2.imshow('result',result) # 결과 이미지 출력
 #cv2.imshow('temp', temp)
-print("TEST")
 #cv2.imshow('yellowedges', yellowmask)
 cv2.waitKey(0)
 
