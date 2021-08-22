@@ -106,6 +106,7 @@ class Motion:
                 30:50, 45:51, 60:52, 90:53
             }
         }
+        print(dir_list[dir][angle])
         if dir in center_list:
             self.TX_data_py2(center_list[dir])
             return
