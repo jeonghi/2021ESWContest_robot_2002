@@ -1,22 +1,17 @@
-from .Sensor.ImageProcessor import ImageProcessor
-from .Actuator.Motion import Motion
-from .Sensor.HashDetector import HashDetector
-from .Sensor.Target import Target
+from Sensor.ImageProcessor import ImageProcessor
+from Actuator.Motion import Motion
 import numpy as np
 import cv2
 import time
 import sys
 
-dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
+class Robot:
 
-imageProcessor = ImageProcessor()
-img = imageProcessor.get_image()
+    def __init__(self, file_path =""):
+        self._motion = Motion()
+        self._image_processor = ImageProcessor(file_path)
 
-target = Target(img)
-roi = target.get_target_roi()
-
-hashDetector = HashDetector()
-direct = hashDetector.detect_direction_hash(roi)
-
-motion = Motion
-motion.notice_direction(dir_list[direct])
+    def detect_alphabet(self):
+        alphabet = self._image_processor.get_door_alphabet()
+        self._motion.notice_direction(dir=alphabet)
+        exit()
