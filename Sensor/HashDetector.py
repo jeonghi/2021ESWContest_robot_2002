@@ -13,7 +13,7 @@ class HashDetector:
             self.directions.append(direction.rsplit('.')[0])
         print(file_path + direction)
         print(self.directions)
-     
+         
     @staticmethod
     def image_to_hash(img : np.ndarray) -> list:        
         if len(img.shape) == 3:
@@ -22,14 +22,14 @@ class HashDetector:
         avg = img.mean()
         bin = 1 * (img > avg)
         return bin
-         
+    
     @staticmethod
-    def hamming_distance(src_hash : list, cmp_hash : list) -> int:
+    def hamming_distance(src_hash : list, cmp_hash : list, threshold : float = 0.5) -> int:
         src_hash = src_hash.reshape(1,-1)
         cmp_hash = cmp_hash.reshape(1,-1)
         # 같은 자리의 값이 서로 다른 것들의 합
         distance = (src_hash != cmp_hash).sum()
-        return distance
+        return distance / (16 * 16)
     
     @staticmethod
     def check_file_type(image_folder_path, allowed_extensions=None):
@@ -56,7 +56,7 @@ class HashDetector:
             hdist_dict[direction] = self.hamming_distance(img_hash, hash)
         
         result = min(hdist_dict.keys(), key=(lambda k:hdist_dict[k]))
-        
+        print(hdist_dict[result], result)
         return result
 
 
