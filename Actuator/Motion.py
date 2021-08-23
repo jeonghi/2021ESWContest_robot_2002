@@ -31,10 +31,11 @@ class Motion:
         time.sleep(0.1)
 
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
-        #self.lock.acquire()
-        with self.lock:
-            self.serial_port.write(serial.to_bytes([one_byte]))  # python3
-            time.sleep(0.01)
+        self.lock.acquire()
+        #with self.lock:
+        
+        self.serial_port.write(serial.to_bytes([one_byte]))  # python3
+        time.sleep(0.01)
         
     def RX_data(self):
         if self.serial_port.inWaiting() > 0:
@@ -60,12 +61,12 @@ class Motion:
                 RX = ord(result)
                 print ("RX=" + str(RX))
                 
-                print("RX=" + str(RX))
-                
                 # -----  remocon 16 Code  Exit ------
                 if RX == 16:
                     self.receiving_exit = 0
                     break
+                elif RX == 200:
+                    self.lock.release()
     
     def notice_direction(self, dir):
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
@@ -91,24 +92,21 @@ class Motion:
                 30:50, 45:51, 60:52, 90:53
             }
         }
-        print(dir_list[dir][angle])
         if dir in center_list:
             self.TX_data_py2(center_list[dir])
         else:
-            print(dir_list[dir][angle])
             self.TX_data_py2(dir_list[dir][angle])
 
     def walk(self, dir, loop=1):
-        dir_list = {'FORWARD':55, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
+        dir_list = {'FORWARD':2, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
-            time.sleep(0.3)
+            
 
     def turn(self, dir, loop=1):
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
-            time.sleep(0.7)
 
 
 
@@ -117,9 +115,11 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    #motion.TX_data_py2(38)
+    #motion.TX_data_py2(61)
     #motion.notice_direction('N')
-    motion.head_angle('LEFTRIGHT_CENTER')
+    motion.head_angle('DOWN',10)
+    motion.walk(dir='LEFT', loop=10)
+    #motion.turn('RIGHT', loop=10)
     
     pass
 
