@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import platform
-import numpy as np
 import argparse
 import cv2
 import serial
@@ -67,20 +66,6 @@ class Motion:
                 if RX == 16:
                     self.receiving_exit = 0
                     break
-
-    def init(self):
-        if not self.lock:
-            self.TX_data_py2(MOTION["SIGNAL"]["INIT"])
-            while self.getRx():
-                continue
-        pass
-
-    def init2(self):
-        if not self.lock:
-            self.TX_data_py2(MOTION["SIGNAL"]["INIT2"])
-            while self.getRx():
-                continue
-        pass
     
     def notice_direction(self, dir):
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
@@ -117,11 +102,13 @@ class Motion:
         dir_list = {'FORWARD':55, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
+            time.sleep(0.3)
 
     def turn(self, dir, loop=1):
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
+            time.sleep(0.7)
 
 
 
