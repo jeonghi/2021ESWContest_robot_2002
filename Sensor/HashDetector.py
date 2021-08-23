@@ -24,7 +24,7 @@ class HashDetector:
         return bin
     
     @staticmethod
-    def hamming_distance(src_hash : list, cmp_hash : list, threshold : float = 0.5) -> int:
+    def hamming_distance(src_hash : list, cmp_hash : list, threshold : float = 0.1) -> int:
         src_hash = src_hash.reshape(1,-1)
         cmp_hash = cmp_hash.reshape(1,-1)
         # 같은 자리의 값이 서로 다른 것들의 합
@@ -56,7 +56,10 @@ class HashDetector:
             hdist_dict[direction] = self.hamming_distance(img_hash, hash)
         
         result = min(hdist_dict.keys(), key=(lambda k:hdist_dict[k]))
-        print(hdist_dict[result], result)
+        
+        if hdist_dict[result] > 0.1:
+            return None
+        
         return result
 
 
