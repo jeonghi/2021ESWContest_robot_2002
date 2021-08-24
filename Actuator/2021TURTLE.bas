@@ -1021,8 +1021,8 @@ GOSUB_RX_EXIT2:
         넘어진확인 = 0
         GOTO RX_EXIT
     ENDIF
-    ' 보행COUNT = 보행COUNT + 1
-    ' IF 보행COUNT > 보행횟수 THEN  GOTO 후진종종걸음_3_stop
+    보행COUNT = 보행COUNT + 1
+    IF 보행COUNT > 보행횟수 THEN  GOTO 후진종종걸음_3_stop
     ERX 4800,A, 후진종종걸음_4
     IF A <> A_old THEN
 후진종종걸음_3_stop:
@@ -1061,8 +1061,8 @@ GOSUB_RX_EXIT2:
         GOTO RX_EXIT
     ENDIF
 
-    ' 보행COUNT = 보행COUNT + 1
-    'IF 보행COUNT > 보행횟수 THEN  GOTO 후진종종걸음_6_stop
+    보행COUNT = 보행COUNT + 1
+    IF 보행COUNT > 보행횟수 THEN  GOTO 후진종종걸음_6_stop
 
     ERX 4800,A, 후진종종걸음_1
     IF A <> A_old THEN  'GOTO 후진종종걸음_멈춤
@@ -3411,7 +3411,9 @@ MAIN_2:
 
 KEY1:
     ETX  4800,1
-    GOTO 연속전진_1
+
+    보행횟수 = 1
+    GOTO 후진종종걸음
 
 
     GOTO RX_EXIT
@@ -3811,8 +3813,12 @@ KEY55:
     GOTO RX_EXIT
     '***************
 KEY56:
-    ETX 4800, 56
-    GOSUB 연속후진_1
+    ETX  4800,56
+
+    보행횟수 = 1
+    GOTO 후진종종걸음
+
+
     GOTO RX_EXIT
 KEY57:
     ETX 4800, 57
