@@ -114,6 +114,11 @@ class Motion:
         self.TX_data_py2(5)
         return self.distance
 
+    def open_door(self):
+        self.turn('LEFT', loop=5)
+        self.TX_data_py2(63)
+        self.walk('RIGHT', loop=10)
+
 
 
 # **************************************************
