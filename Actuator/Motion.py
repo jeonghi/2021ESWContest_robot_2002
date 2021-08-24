@@ -111,6 +111,7 @@ class Motion:
 
     def get_IR(self) -> int:
         self.TX_data_py2(5)
+        self.TX_data_py2(5)
         return self.distance
 
 
@@ -120,12 +121,15 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    #motion.TX_data_py2(61)
+    #motion.TX_data_py2(16)
     #motion.notice_direction('N')
-    motion.head_angle('DOWN',10)
-    motion.walk(dir='LEFT', loop=10)
+    #motion.head_angle('DOWN',10)
+    #motion.walk(dir='LEFT', loop=10)
     #motion.turn('RIGHT', loop=10)
-    
+    for _ in range(10):
+        x = motion.get_IR()
+        print('IR value: ', x)
+        time.sleep(3)
     pass
 
 
