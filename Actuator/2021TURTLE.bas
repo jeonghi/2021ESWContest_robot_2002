@@ -3217,6 +3217,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     WAIT
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 0 !"
+    'GOSUB SOUND_PLAY_CHK
     DELAY 10
     GOSUB 기본자세2
     RETURN
@@ -3227,6 +3228,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     WAIT
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 1 !"
+    'GOSUB SOUND_PLAY_CHK
     DELAY 10
     GOSUB 기본자세2	
     RETURN
@@ -3237,6 +3239,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     WAIT
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 2 !"
+    'GOSUB SOUND_PLAY_CHK
     DELAY 10
     GOSUB 기본자세2
     RETURN
@@ -3247,6 +3250,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     WAIT
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 3 !"
+    'GOSUB SOUND_PLAY_CHK
     DELAY 10
     GOSUB 기본자세2
     RETURN
@@ -3360,6 +3364,16 @@ Number_Play: '  BUTTON_NO = 숫자대입
     SERVO 16, 10
     ETX 4800,41
     RETURN
+    
+양팔벌리기:
+    'MOVE G6A, 101,  83, 128,  96,  99, 100
+    'MOVE G6D, 100,  79, 128, 100,  99, 100
+    MOVE G6B, 101,  91,  99, 100, 100, 101
+    MOVE G6C, 107, 101, 100, 100,  99, 100
+    WAIT
+
+
+    RETURN
 
 
 
@@ -3444,6 +3458,7 @@ KEY5:
     ETX  4800,5
 
     J = AD(적외선AD포트)	'적외선거리값 읽기
+    ETX 4800, J
     BUTTON_NO = J
     GOSUB Number_Play
     'GOSUB SOUND_PLAY_CHK
@@ -3844,7 +3859,9 @@ KEY62:
     ETX 4800, 62
     GOSUB 오른쪽턴3_LOOP
     GOTO RX_EXIT
-
-
+KEY63:
+    ETX 4800, 63
+    GOSUB 양팔벌리기
+    GOTO RX_EXIT
 
 
