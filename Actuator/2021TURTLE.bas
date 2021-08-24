@@ -1417,7 +1417,7 @@ GOSUB_RX_EXIT2:
     'GOSUB 기본자세2
     MOVE G6A,100,  76, 145,  93, 100, 100
     MOVE G6D,100,  76, 145,  93, 100, 100
-   	WAIT
+    WAIT
     GOSUB All_motor_mode3
     GOTO RX_EXIT
     '*************
@@ -1450,57 +1450,6 @@ GOSUB_RX_EXIT2:
 
     '**********************************************
     '******************************************
-양팔벌리고오른쪽옆으로: '****
-    MOTORMODE G6A,3,3,3,3,2
-    MOTORMODE G6D,3,3,3,3,2
-
-    SPEED 12
-    MOVE G6D, 95,  90, 125, 100, 104, 100
-    MOVE G6A,105,  76, 146,  93, 104, 100
-    WAIT
-
-    SPEED 12
-    MOVE G6D, 102,  77, 145, 93, 100, 100
-    MOVE G6A,90,  80, 140,  95, 107, 100
-    WAIT
-
-    SPEED 10
-    MOVE G6D,95,  76, 145,  93, 102, 100
-    MOVE G6A,95,  76, 145,  93, 102, 100
-    WAIT
-
-    SPEED 8
-    'GOSUB 양팔벌리기 
-    GOSUB All_motor_mode3
-    GOTO RX_EXIT
-    '*************
-
-양팔벌리고왼쪽옆으로: '****
-    MOTORMODE G6A,3,3,3,3,2
-    MOTORMODE G6D,3,3,3,3,2
-
-    SPEED 12
-    MOVE G6A, 95,  90, 125, 100, 104, 100
-    MOVE G6D,105,  76, 145,  93, 104, 100
-    WAIT
-
-    SPEED 12
-    MOVE G6A, 102,  77, 145, 93, 100, 100
-    MOVE G6D,90,  80, 140,  95, 107, 100
-    WAIT
-
-    SPEED 10
-    MOVE G6A,95,  76, 145,  93, 102, 100
-    MOVE G6D,95,  76, 145,  93, 102, 100
-    WAIT
-
-    SPEED 8
-    GOSUB 양팔벌리기 
-    GOSUB All_motor_mode3
-    GOTO RX_EXIT
-
-
-
 오른쪽옆으로70연속:
     MOTORMODE G6A,3,3,3,3,2
     MOTORMODE G6D,3,3,3,3,2
@@ -3423,7 +3372,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
 양팔벌리기:
     'MOVE G6A, 101,  83, 128,  96,  99, 100
-    ' MOVE G6D, 100,  79, 128, 100,  99, 100
+    'MOVE G6D, 100,  79, 128, 100,  99, 100
     MOVE G6B, 101,  91,  99, 100, 100, 101
     MOVE G6C, 107, 101, 100, 100,  99, 100
     WAIT
@@ -3450,7 +3399,7 @@ MAIN_2:
 
     '**** 입력된 A값이 0 이면 MAIN 라벨로 가고
     '**** 1이면 KEY1 라벨, 2이면 key2로... 가는문
-    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63
+    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62
 
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
@@ -3483,7 +3432,7 @@ KEY1:
     ETX  4800,1
 
     보행횟수 = 1
-    GOTO 후진종종걸음
+    GOTO 횟수_전진종종걸음
 
 
     GOTO RX_EXIT
@@ -3491,23 +3440,19 @@ KEY1:
 KEY2:
     ETX  4800,2
 
-    보행횟수 = 6
-    GOTO 횟수_전진종종걸음
+    보행횟수 = 1
+    GOTO 후진종종걸음
 
 
     GOTO RX_EXIT
     '***************
 KEY3:
-    ETX  4800,3
-
-    GOTO 오른쪽턴10
-
+    ETX 4800, 3
+    GOSUB 왼쪽옆으로20
     GOTO RX_EXIT
-    '***************
 KEY4:
-    ETX  4800,4
-    GOTO 왼쪽턴3
-
+    ETX 4800, 4
+    GOSUB 오른쪽옆으로20
     GOTO RX_EXIT
     '***************
 KEY5:
@@ -3523,16 +3468,12 @@ KEY5:
     GOTO RX_EXIT
     '***************
 KEY6:
-    ETX  4800,6
-    GOTO 오른쪽턴3
-
-
+    ETX 4800, 5
+    GOSUB 왼쪽턴20
     GOTO RX_EXIT
-    '***************
 KEY7:
-    ETX  4800,7
-    GOTO 왼쪽턴20
-
+    ETX 4800, 6
+    GOSUB 오른쪽턴20
     GOTO RX_EXIT
     '***************
 KEY8:
@@ -3549,16 +3490,13 @@ KEY9:
     GOTO RX_EXIT
     '***************
 KEY10: '0
-    ETX  4800,10
-    GOTO 전진달리기50
-
+    ETX 4800, 10
+    GOSUB 머리좌우중앙
     GOTO RX_EXIT
     '***************
 KEY11: ' ▲
-    ETX  4800,11
-
-    GOTO 연속전진
-
+    ETX 4800, 11
+    GOSUB 전방하향18도
     GOTO RX_EXIT
     '***************
 KEY12: ' ▼
@@ -3581,11 +3519,9 @@ KEY14: ' ◀
 
     GOTO RX_EXIT
     '***************
-KEY15: ' A
-    ETX  4800,15
-    GOTO 왼쪽옆으로20
-
-
+KEY15: 'A
+    ETX 4800, 15
+    GOSUB 전방하향10도
     GOTO RX_EXIT
     '***************
 KEY16: ' POWER
@@ -3645,43 +3581,23 @@ KEY16_1:
     GOTO RX_EXIT
     '***************
 KEY17: ' C
-    ETX  4800,17
-    GOTO 머리왼쪽90도
-
-
+    ETX 4800, 17
+    GOSUB 전방하향90도
     GOTO RX_EXIT
     '***************
 KEY18: ' E
-    ETX  4800,18	
-
-    GOSUB 자이로OFF
-    GOSUB 에러음
-KEY18_wait:
-
-    ERX 4800,A,KEY18_wait	
-
-    IF  A = 26 THEN
-        GOSUB 시작음
-        GOSUB 자이로ON
-        GOTO RX_EXIT
-    ENDIF
-
-    GOTO KEY18_wait
-
-
+    ETX 4800, 18
+    GOSUB 머리왼쪽30도
     GOTO RX_EXIT
     '***************
-KEY19: ' P2
-    ETX  4800,19
-    GOTO 오른쪽턴60
-
+KEY19: 'P2
+    ETX 4800, 19
+    GOSUB 양팔벌리기
     GOTO RX_EXIT
     '***************
-KEY20: ' B	
-    ETX  4800,20
-    GOTO 오른쪽옆으로20
-
-
+KEY20: 'B
+    ETX 4800, 20
+    GOSUB 전방하향30도
     GOTO RX_EXIT
     '***************
 KEY21: ' △
@@ -3690,42 +3606,24 @@ KEY21: ' △
 
     GOTO RX_EXIT
     '***************
-KEY22: ' *	
-    ETX  4800,22
-    GOTO 왼쪽턴45
-
+KEY22: ' *
+    ETX 4800, 22
+    GOSUB 머리오른쪽60도
     GOTO RX_EXIT
     '***************
-KEY23: ' G
-    ETX  4800,23
-    GOSUB 에러음
-    GOSUB All_motor_mode2
-KEY23_wait:
-
-
-    ERX 4800,A,KEY23_wait	
-
-    IF  A = 26 THEN
-        GOSUB 시작음
-        GOSUB All_motor_mode3
-        GOTO RX_EXIT
-    ENDIF
-
-    GOTO KEY23_wait
-
-
+KEY23: 'G
+    ETX 4800, 23
+    GOSUB 머리오른쪽30도
     GOTO RX_EXIT
     '***************
-KEY24: ' #
-    ETX  4800,24
-    GOTO 오른쪽턴45
-
+KEY24: '#
+    ETX 4800, 24
+    GOSUB 왼쪽턴3_LOOP
     GOTO RX_EXIT
     '***************
-KEY25: ' P1
-    ETX  4800,25
-    GOTO 왼쪽턴60
-
+KEY25: 'P1
+    ETX 4800, 25
+    GOSUB 오른쪽턴3_LOOP
     GOTO RX_EXIT
     '***************
 KEY26: ' ■
@@ -3739,42 +3637,34 @@ KEY26: ' ■
     GOTO RX_EXIT
     '***************
 KEY27: ' D
-    ETX  4800,27
-    GOTO 머리오른쪽90도
-
-
+    ETX 4800, 27
+    GOSUB 머리상하정면
     GOTO RX_EXIT
     '***************
 KEY28: ' ◁
-    ETX  4800,28
-    GOTO 머리왼쪽45도
-
-
+    ETX 4800, 28
+    GOSUB 전방하향45도
     GOTO RX_EXIT
     '***************
 KEY29: ' □
-    ETX  4800,29
-
-    GOSUB 전방하향80도
-
+    ETX 4800, 29
+    GOSUB 전방하향60도
     GOTO RX_EXIT
     '***************
 KEY30: ' ▷
-    ETX  4800,30
-    GOTO 머리오른쪽45도
-
+    ETX 4800, 30
+    GOSUB 전방하향75도
     GOTO RX_EXIT
     '***************
 KEY31: ' ▽
-    ETX  4800,31
-    GOSUB 전방하향60도
-
+    ETX 4800, 31
+    GOSUB 전방하향100도
     GOTO RX_EXIT
     '***************
 
 KEY32: ' F
-    ETX  4800,32
-    GOTO 후진종종걸음
+    ETX 4800, 32
+    GOSUB 머리왼쪽60도
     GOTO RX_EXIT
     '***************
 
