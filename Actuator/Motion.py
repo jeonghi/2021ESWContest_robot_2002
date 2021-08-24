@@ -67,6 +67,8 @@ class Motion:
                     break
                 elif RX == 200:
                     self.lock.release()
+                elif RX != 200:
+                     self.distance = RX
     
     def notice_direction(self, dir):
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
@@ -102,11 +104,14 @@ class Motion:
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             
-
     def turn(self, dir, loop=1):
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
+
+    def get_IR(self) -> int:
+        self.TX_data_py2(5)
+        return self.distance
 
 
 
