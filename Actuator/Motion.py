@@ -115,9 +115,9 @@ class Motion:
         return self.distance
 
     def open_door(self):
-        self.turn('LEFT', loop=5)
+        self.turn('LEFT', loop=7)
         self.TX_data_py2(63)
-        self.walk('RIGHT', loop=10)
+        self.walk('RIGHT', loop=20)
 
 
 
@@ -126,15 +126,12 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    #motion.TX_data_py2(16)
+    #motion.TX_data_py2(63)
     #motion.notice_direction('N')
     #motion.head_angle('DOWN',10)
-    #motion.walk(dir='LEFT', loop=10)
+    
     #motion.turn('RIGHT', loop=10)
-    for _ in range(10):
-        x = motion.get_IR()
-        print('IR value: ', x)
-        time.sleep(3)
+    motion.open_door()
     pass
 
 
