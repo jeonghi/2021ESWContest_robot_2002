@@ -41,3 +41,10 @@ class LineDetector:
         
         result = [x1, y1, x2, y2]
         return result
+    
+    def get_slope_degree(self, img):
+        src = img
+        lines = self.get_line(src)
+        fit_line = self.get_fitline(src, lines)
+        
+        return (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
