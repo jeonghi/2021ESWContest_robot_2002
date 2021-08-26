@@ -84,6 +84,10 @@ class ImageProcessor:
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return self.hash_detector.detect_direction_hash(roi_mask)
+    
+    def get_slope_degree(self):
+        src = self.get_image()
+        return self.line_detector.get_slope_degree(src)
 
 if __name__ == "__main__":
 

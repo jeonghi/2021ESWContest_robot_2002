@@ -33,5 +33,5 @@ if __name__ == "__main__":
         src = cv2.resize(src, dsize=(480, 640))
         cv2.imshow('src', src)
         cv2.waitKey(30)
-        print(lineDetector.get_slope_degree(src))
+        print(imageProcessor.get_slope_degree())
         imageProcessor.fps.update()
