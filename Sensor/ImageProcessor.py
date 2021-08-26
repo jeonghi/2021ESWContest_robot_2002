@@ -9,7 +9,7 @@ from imutils.video import FPS
 from imutils import auto_canny
 from Sensor.HashDetector import HashDetector
 from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
-
+from Sensor.LineDetector import LineDetector
 
 class ImageProcessor:
 
@@ -23,7 +23,9 @@ class ImageProcessor:
                 self._cam = WebcamVideoStream(src=0).start()
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
-        self.hash_detector = HashDetector(file_path='./EWSN/')
+        self.hash_detector = HashDetector(file_path='Sensor/EWSN/')
+        self.line_detector = LineDetector()
+        
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
         time.sleep(2)
@@ -82,10 +84,13 @@ class ImageProcessor:
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         return self.hash_detector.detect_direction_hash(roi_mask)
-
-
-
-
+    
+    def get_slope_degree(self):
+        src = self.get_image()
+        lines = self.line_detector.get_line(src)
+        fit_line = self.line_detector.get_fitline(src, lines)
+        
+        return (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
 
 if __name__ == "__main__":
 
@@ -94,7 +99,8 @@ if __name__ == "__main__":
     #while imageProcessor.fps._numFrames < 200:
     while True:
         src = imageProcessor.get_image(visualization=False)
-        print(imageProcessor.get_door_alphabet(visualization=True))
+        #print(imageProcessor.get_door_alphabet(visualization=True))
+        print(imageProcessor.get_slope_degree())
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
