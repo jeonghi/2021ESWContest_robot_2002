@@ -31,7 +31,10 @@ if __name__ == "__main__":
     while True:
         src = imageProcessor.get_image(visualization=False)
         src = cv2.resize(src, dsize=(480, 640))
+        answer, src = lineDetector.get_all_lines(src)
+        print(answer)
+        
         cv2.imshow('src', src)
-        cv2.waitKey(30)
-        print(imageProcessor.get_slope_degree())
+        cv2.waitKey(100)
+        #print(imageProcessor.get_slope_degree())
         imageProcessor.fps.update()
