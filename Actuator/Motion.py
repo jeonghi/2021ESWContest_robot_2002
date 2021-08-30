@@ -119,6 +119,12 @@ class Motion:
         self.TX_data_py2(63)
         self.walk('RIGHT', loop=20)
 
+    def grab(self, switch=True):
+        if switch:
+            self.TX_data_py2(64)
+        else:
+            self.TX_data_py2(65)
+
 
 
 # **************************************************
