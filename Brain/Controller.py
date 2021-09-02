@@ -29,6 +29,10 @@ class Robot:
         if ans[1] != 'None' and ans[3] == 'None': #직진
             if 80< ans[0]<100: # 각도가 80~100 이도록
                 self._motion.walk(dir='FORWARD', loop=1) # 일정 y좌표때 멈추기
+            elif ans[0] < 80:
+                self._motion.turn(dir='RIGHT', loop=1)
+            elif ans[0] > 100:
+                self._motion.turn(dir='LEFT', loop=1)
         elif ans[1] != 'None' and ans[3] != 'None':
             # ans[5] 수평선의 마지막 x좌표 - 중앙보다 작으면 ㄱ , 중앙보다 크면 T 
             if 200 < ans[4]:
