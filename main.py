@@ -22,7 +22,8 @@ def test():
     print("[INFO] FPS : " + str(imageProcessor.fps.fps()))
 
 if __name__ == "__main__":
-    main()
+    while True:
+        main()
     #test()
     
     # imageProcessor = ImageProcessor(video_path="Sensor/src/t.mp4")
