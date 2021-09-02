@@ -3381,6 +3381,92 @@ Number_Play: '  BUTTON_NO = 숫자대입
     RETURN
 
 
+물건집기:
+    GOSUB All_motor_mode3
+    GOSUB 자이로OFF
+    'SPEED 2
+    MOVE G6A, 100, 150, 30,   150, 100,	
+    MOVE G6D, 100, 150, 30,   150, 100,
+    MOVE G6B, 160, 30, 80,	  ,	  ,
+    MOVE G6C, 160, 30, 80,	  ,   ,
+    WAIT
+
+    DELAY 50
+    GOTO 물건집기_2
+
+물건집기_2:
+    ETX 4800, 46
+    SPEED 4
+    'DELAY 20
+    MOVE G6A, 100, 150, 30,   150, 100,	
+    MOVE G6D, 100, 150, 30,   150, 100,
+    MOVE G6B, 150, 10, 60,	  ,	  ,
+    MOVE G6C, 150, 10, 60,	  ,   ,
+    WAIT
+
+    DELAY 20
+    GOTO 물건집기_3
+물건집기_3:
+    ETX 4800, 46
+    SPEED 4
+    MOVE G6A,100, 76,  145,    93,  100, 100
+    MOVE G6D,100, 76,  145,    93,  100, 100
+    MOVE G6B, 150, 10, 60,	  ,	  ,
+    MOVE G6C, 150, 10, 60,	  ,   ,
+    WAIT
+
+    'DELAY 20
+    GOTO 물건집기_4
+물건집기_4:
+    ETX 4800, 46
+    SPEED 4
+    MOVE G6A,100, 76,  145,    93,  100, 100
+    MOVE G6D,100, 76,  145,    93,  100, 100
+    MOVE G6B, 160
+    MOVE G6C, 160
+    WAIT
+
+    RETURN
+    '******************************************
+    
+물건놓기:
+    GOSUB All_motor_mode3
+    GOSUB 자이로OFF
+    MOVE G6B, 145, , ,
+    MOVE G6C, 145, , ,
+    WAIT
+
+    MOVE G6B, 140, 10, 60,	  ,	  ,
+    MOVE G6C, 140, 10, 60,	  ,   ,
+    WAIT
+
+    GOTO 물건놓기_2	
+물건놓기_2:
+    ETX 4800, 47
+    MOVE G6A, 100, 150, 30,   150, 100,	
+    MOVE G6D, 100, 150, 30,   150, 100,
+    MOVE G6B, 150, , ,
+    MOVE G6C, 150, , ,
+    WAIT
+
+    GOTO 물건놓기_3
+물건놓기_3:
+    ETX 4800, 47
+    MOVE G6B, , 30, 90
+    MOVE G6C, , 30, 90
+    WAIT
+
+    GOTO 물건놓기_4
+물건놓기_4:
+    ETX 4800, 47
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 145,  93, 100, 100
+    WAIT
+
+    GOSUB 기본자세
+    RETURN
+    '******************************************
+
 
 MAIN: '라벨설정
 
@@ -3399,7 +3485,7 @@ MAIN_2:
 
     '**** 입력된 A값이 0 이면 MAIN 라벨로 가고
     '**** 1이면 KEY1 라벨, 2이면 key2로... 가는문
-    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62
+    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65
 
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
@@ -3491,7 +3577,7 @@ KEY9:
     '***************
 KEY10: '0
     ETX 4800, 10
-    GOSUB 머리좌우중앙
+    GOSUB 기본자세2
     GOTO RX_EXIT
     '***************
 KEY11: ' ▲
@@ -3809,5 +3895,9 @@ KEY63:
     ETX 4800, 63
     GOSUB 양팔벌리기
     GOTO RX_EXIT
-
-
+KEY64:
+    ETX 4800,  64
+    GOSUB 물건집기
+KEY65:
+    ETX 4800, 65
+    GOSUB 물건놓기

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from Actuator.Motion import Motion
 
 class LineDetector:
     def __init__(self):
@@ -77,7 +78,8 @@ class LineDetector:
             result = [x1,y1,x2,y2]
         else:
             middle=int(lines.mean(axis=0)[1])
-            result = [src.shape[1]-1, middle, 0, middle]
+            max_x = int(lines.max(axis=0)[0])
+            result = [max_x, middle, 0, middle]
         return result
     
     def get_fitline__(self, img, f_lines): # 대표선 구하기   
@@ -96,7 +98,7 @@ class LineDetector:
 
 
     def get_all_lines(self, src):
-        answer = [None, 0, None, 0, 0] # vertical, vertical-x, horizontal, horizontal-y, 현재 방향(동작 보정 각도)
+        answer = [0, None, 0, None, 0, 0] # 현재 방향(동작 보정 각도), vertical, vertical-x, horizontal, horizontal-y, horizontal-endx
         lines, horizontal_lines, vertical_lines = self.get_lines(src)
 
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
@@ -106,14 +108,14 @@ class LineDetector:
             fit_line = self.get_fitline__(src, lines)
             self.draw_lines(temp, fit_line, 'lines', 'fit')
             robot_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
-            answer[4] = robot_degree
+            answer[0] = robot_degree
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
     
         if len(vertical_lines)!=0:
             size = int(vertical_lines.shape[0]*vertical_lines.shape[2]/2)
             vertical_fit_line = self.get_fitline(src, vertical_lines, size, 'vertical')
-            answer[0] = 'vertical'
-            answer[1] = vertical_fit_line[0]
+            answer[1] = 'vertical'
+            answer[2] = vertical_fit_line[0]
             self.draw_lines(temp, vertical_lines, 'vertical')
             self.draw_lines(temp, vertical_fit_line, 'vertical', 'fit')
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
@@ -121,8 +123,9 @@ class LineDetector:
         if len(horizontal_lines)!=0:
             size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
             horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
-            answer[2] = 'horizontal'
-            answer[3] = horizontal_fit_line[1]
+            answer[3] = 'horizontal'
+            answer[4] = horizontal_fit_line[1]
+            answer[5] = horizontal_fit_line[0]
             self.draw_lines(temp, horizontal_lines, 'horizontal')
             self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
             src = cv2.addWeighted(src, 1, temp, 1., 0.)

@@ -114,10 +114,22 @@ class Motion:
         self.TX_data_py2(5)
         return self.distance
 
-    def open_door(self):
+    def open_door_1(self):
         self.turn('LEFT', loop=7)
         self.TX_data_py2(63)
         self.walk('RIGHT', loop=20)
+
+    def grab(self, switch=True):
+        if switch:
+            self.TX_data_py2(64)
+        else:
+            self.TX_data_py2(65)
+
+    def open_door_2(self, loop=1):
+        for _ in range(loop):
+            self.TX_data_py2(66)
+
+
 
 
 
@@ -129,6 +141,8 @@ if __name__ == '__main__':
     #motion.TX_data_py2(63)
     #motion.notice_direction('N')
     #motion.head_angle('DOWN',10)
+
+    #motion.walk('FORWARD', loop=6)
     
     #motion.turn('RIGHT', loop=10)
     motion.open_door()
