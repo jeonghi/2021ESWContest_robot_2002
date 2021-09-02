@@ -6,7 +6,7 @@ import cv2
 def main():
     robot = Robot(video_path='./Sensor/src/S.h264')
     #robot.detect_alphabet()
-    robot.line_trace()
+    robot.line_tracing()
 
 def test():
     imageProcessor = ImageProcessor(video_path="Sensor/src/ewsn.mp4")
@@ -22,19 +22,19 @@ def test():
     print("[INFO] FPS : " + str(imageProcessor.fps.fps()))
 
 if __name__ == "__main__":
-    #main()
+    main()
     #test()
     
-    imageProcessor = ImageProcessor(video_path="Sensor/src/t.mp4")
-    lineDetector = LineDetector()
+    # imageProcessor = ImageProcessor(video_path="Sensor/src/t.mp4")
+    # lineDetector = LineDetector()
 
-    while True:
-        src = imageProcessor.get_image(visualization=False)
-        src = cv2.resize(src, dsize=(480, 640))
-        answer, src = lineDetector.get_all_lines(src)
-        print(answer)
+    # while True:
+    #     src = imageProcessor.get_image(visualization=False)
+    #     src = cv2.resize(src, dsize=(480, 640))
+    #     answer, src = lineDetector.get_all_lines(src)
+    #     print(answer)
         
-        cv2.imshow('src', src)
-        cv2.waitKey(100)
-        #print(imageProcessor.get_slope_degree())
-        imageProcessor.fps.update()
+    #     cv2.imshow('src', src)
+    #     cv2.waitKey(100)
+    #     #print(imageProcessor.get_slope_degree())
+    #     imageProcessor.fps.update()

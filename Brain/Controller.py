@@ -32,10 +32,10 @@ class Robot:
         elif ans[1] != 'None' and ans[3] != 'None':
             # ans[5] 수평선의 마지막 x좌표 - 중앙보다 작으면 ㄱ , 중앙보다 크면 T 
             if 200 < ans[4]:
-                if ans[5] == 0 and ans[6] < 340:
+                if ans[5] < 50 and ans[6] < 340:
                     # ㄱ자
                     print('ㄱ자')
-                elif ans[5] > 300 and ans[6] == 640:
+                elif ans[5] > 300 and ans[6]>600:
                     # ㄴ자
                     print('ㄴ자')
                 else:
