@@ -39,12 +39,15 @@ class Robot:
                 if ans[5] < 50 and ans[6] < 340:
                     # ㄱ자
                     print('ㄱ자')
+                    self._motion.turn('LEFT', loop=4)
                 elif ans[5] > 300 and ans[6]>600:
                     # ㄴ자
                     print('ㄴ자')
+                    self._motion.turn('RIGHT', loop=4)
                 else:
                     # T자
                     print('T자')
+                    return 0
             else:
                 self._motion.walk(dir='FORWARD')
         
