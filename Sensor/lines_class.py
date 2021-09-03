@@ -79,7 +79,8 @@ class LineDetector:
         else:
             middle=int(lines.mean(axis=0)[1])
             max_x = int(lines.max(axis=0)[0])
-            result = [max_x, middle, 0, middle]
+            min_x = int(lines.min(axis=0)[0])
+            result = [max_x, middle, min_x, middle]
         return result
     
     def get_fitline__(self, img, f_lines): # 대표선 구하기   
@@ -98,7 +99,7 @@ class LineDetector:
 
 
     def get_all_lines(self, src):
-        answer = [0, None, 0, None, 0, 0] # 현재 방향(동작 보정 각도), vertical, vertical-x, horizontal, horizontal-y, horizontal-endx
+        answer = [0, None, 0, None, 0, 0, 0] # 현재 방향(동작 보정 각도), vertical, vertical-x, horizontal, horizontal-y, horizontal-minx, horizontal-max
         lines, horizontal_lines, vertical_lines = self.get_lines(src)
 
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
@@ -122,10 +123,11 @@ class LineDetector:
     
         if len(horizontal_lines)!=0:
             size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
-            horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
+            horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal') # [max_x, middle, min_x, middle]
             answer[3] = 'horizontal'
-            answer[4] = horizontal_fit_line[1]
-            answer[5] = horizontal_fit_line[0]
+            answer[4] = horizontal_fit_line[1] #horizontal-y
+            answer[5] = horizontal_fit_line[2] #horizontal-minx
+            answer[6] = horizontal_fit_line[0] #horizontal-maxx
             self.draw_lines(temp, horizontal_lines, 'horizontal')
             self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
