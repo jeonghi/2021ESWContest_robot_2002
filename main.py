@@ -4,9 +4,9 @@ from Sensor.ImageProcessor import ImageProcessor
 import cv2
 
 def main():
-    robot = Robot(video_path="./Sensor/src/ewsn.mp4")
+    robot = Robot()
     #robot.detect_alphabet()
-    robot.line_tracing()
+    robot.line_tracing_sol()
 
 def test():
     imageProcessor = ImageProcessor(video_path="Sensor/src/ewsn.mp4")
