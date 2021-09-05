@@ -85,11 +85,11 @@ class Robot:
                     self._motion.walk(dir='FORWARD', loop=1) # 일정 y좌표때 멈추기
                 else:
                     if ans[2] < 280:
-                        print('MODIFY walk --RIGHT', ans)
-                        self._motion.walk(dir='RIGHT', loop=1)
-                    elif ans[2] > 360:
                         print('MODIFY walk --LEFT', ans)
                         self._motion.walk(dir='LEFT', loop=1)
+                    elif ans[2] > 360:
+                        print('MODIFY walk --RIGHT', ans)
+                        self._motion.walk(dir='RIGHT', loop=1)
 
 
             elif ans[1] is None and ans[3] is not None: # 수평만 검출, ㄱ자랑 T자 앞에 있다는 뜻
@@ -110,6 +110,7 @@ class Robot:
                         self._motion.walk('LEFT', 4)
                         self._motion.turn('LEFT', 8)
                 else:
+                    self._motion.walk('FORWARD')
                     print(ans[4], 'low then 150')
 
             elif ans[1] is not None and ans[3] is not None: # 수직 수평 둘다 검출
@@ -129,16 +130,17 @@ class Robot:
                         self._motion.walk('LEFT', 4)
                         self._motion.turn('LEFT', 8)
                 else:
+                    self._motion.walk('FORWARD')
                     print(ans[4], 'low then 150')
 
 
             elif ans[1] is None and ans[3] is None: # 아무 직선도 검출 안됨(수직, 수평선 검출될 때까지 계속 회전)
                 if ans[0] < 80:
-                    print('MODIFY angle --RIGHT', ans)
-                    self._motion.turn(dir='RIGHT', loop=1)
-                elif ans[0] > 100:
                     print('MODIFY angle --LEFT', ans)
                     self._motion.turn(dir='LEFT', loop=1)
+                elif ans[0] > 100:
+                    print('MODIFY angle --RIGHT', ans)
+                    self._motion.turn(dir='RIGHT', loop=1)
 
             else:
                 print("else")
