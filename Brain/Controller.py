@@ -80,7 +80,6 @@ class Robot:
 
             if ans[1] is not None and ans[3] is None: #직선만 검출
                 if 280 < ans[2] <360:
-
                     print('FORWARD', ans)
                     self._motion.walk(dir='FORWARD', loop=1) # 일정 y좌표때 멈추기
                 else:

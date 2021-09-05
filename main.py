@@ -14,8 +14,7 @@ def test():
     #while imageProcessor.fps._numFrames < 200:
     while True:
         src = imageProcessor.get_image(visualization=True)
-        #print(imageProcessor.get_door_alphabet(visualization=True))
-        print(imageProcessor.get_slope_degree())
+        print(imageProcessor.get_door_alphabet(visualization=True))
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
