@@ -100,7 +100,7 @@ class Motion:
             self.TX_data_py2(dir_list[dir][angle])
 
     def walk(self, dir, loop=1):
-        dir_list = {'FORWARD':2, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
+        dir_list = {'FORWARD':55, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             
