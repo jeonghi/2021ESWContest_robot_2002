@@ -4,7 +4,7 @@ from Sensor.ImageProcessor import ImageProcessor
 import cv2
 
 def main():
-    robot = Robot(video_path='./Sensor/src/S.h264')
+    robot = Robot(video_path="./Sensor/src/ewsn.mp4")
     #robot.detect_alphabet()
     robot.line_tracing()
 
@@ -18,11 +18,10 @@ def test():
         print(imageProcessor.get_slope_degree())
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
-    print("[INFO] time : " + str(imageProcessor.fps.elapsed())
+    print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
     print("[INFO] FPS : " + str(imageProcessor.fps.fps()))
 
 if __name__ == "__main__":
-    while True:
         main()
     #test()
     
