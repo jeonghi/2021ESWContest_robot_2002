@@ -79,8 +79,18 @@ class Robot:
             # ans list : [0]현재 방향(동작 보정 각도), [1]vertical, [2]vertical-x, [3]horizontal, [4]horizontal-y, [5]horizontal-minx, [6]horizontal-max
 
             if ans[1] is not None and ans[3] is None: #직선만 검출
-                print('FORWARD', ans)
-                self._motion.walk(dir='FORWARD', loop=1) # 일정 y좌표때 멈추기
+                if 280 < ans[2] <360:
+
+                    print('FORWARD', ans)
+                    self._motion.walk(dir='FORWARD', loop=1) # 일정 y좌표때 멈추기
+                else:
+                    if ans[2] < 280:
+                        print('MODIFY walk --RIGHT', ans)
+                        self._motion.walk(dir='RIGHT', loop=1)
+                    elif ans[2] > 360:
+                        print('MODIFY walk --LEFT', ans)
+                        self._motion.walk(dir='LEFT', loop=1)
+
 
             elif ans[1] is None and ans[3] is not None: # 수평만 검출, ㄱ자랑 T자 앞에 있다는 뜻
                 # 가려는 방향으로 두칸 이동 및 회전
