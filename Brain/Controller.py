@@ -119,11 +119,11 @@ class Robot:
 
             elif ans[1] is None and ans[3] is None: # 아무 직선도 검출 안됨(수직, 수평선 검출될 때까지 계속 회전)
                 if ans[0] < 80:
-                    print('MODIFY angle --RIGHT', ans)
-                    self._motion.turn(dir='RIGHT', loop=1)
-                elif ans[0] > 100:
                     print('MODIFY angle --LEFT', ans)
                     self._motion.turn(dir='LEFT', loop=1)
+                elif ans[0] > 100:
+                    print('MODIFY angle --RIGHT', ans)
+                    self._motion.turn(dir='RIGHT', loop=1)
 
             else:
                 print("else")
