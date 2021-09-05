@@ -6,7 +6,7 @@ import cv2
 def main():
     robot = Robot()
     #robot.detect_alphabet()
-    robot.line_tracing_sol()
+    robot.line_tracing_sol('LEFT')
 
 def test():
     imageProcessor = ImageProcessor(video_path="Sensor/src/ewsn.mp4")

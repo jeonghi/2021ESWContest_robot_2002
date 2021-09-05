@@ -76,10 +76,10 @@ class Motion:
 
     def head_angle(self, dir, angle=0):
         """parameter 설명
-        dir: {down, left, right, updown_center, leftright_center}
-        angle: {down:{10,20,30,45,60,75,90,100},
-        left:{30,45,60,90},
-        right:{30,45,60,90}
+        dir: {DOWN, LEFT, RIGHT, UPDOWN_CENTER, LEFTRIGHT_CENTER}
+        angle: {DOWN:{10,20,30,45,60,75,90,100},
+        LEFT:{30,45,60,90},
+        RIGHT:{30,45,60,90}
         }
         """
         center_list = {'UPDOWN_CENTER':45, 'LEFTRIGHT_CENTER':54}
