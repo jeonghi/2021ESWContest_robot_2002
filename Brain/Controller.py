@@ -139,8 +139,8 @@ class Robot:
 					print(ans[4], 'low then 150')
 
 	def test_green(self):
-		self._motion.head_angle('DOWN', 10)
-		self._motion.head_angle('LEFT', 30)
+		self._motion.head_angle('DOWN', 45)
+		self._motion.head_angle('RIGHT', 30)
 		src = self._image_processor.get_image()
 		get_pixel_rate4green(src)
 		
