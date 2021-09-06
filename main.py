@@ -5,7 +5,7 @@ import cv2
 
 def main():
     robot = Robot()
-    #robot.detect_alphabet()
+    robot.detect_alphabet()
     robot.line_tracing_sol('LEFT')
 
 def test():
