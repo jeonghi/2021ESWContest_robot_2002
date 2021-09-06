@@ -1,6 +1,7 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.lines_class import LineDetector
 from Actuator.Motion import Motion
+from Sensor.ColorChecker import get_pixel_rate4green
 import numpy as np
 import cv2
 import time
@@ -137,39 +138,9 @@ class Robot:
 					self._motion.walk('FORWARD')
 					print(ans[4], 'low then 150')
 
-
-	def line_tracing_jun(self):
-		while True:
-			src = self._image_processor.get_image(visualization=False)
-			src = cv2.resize(src, dsize=(480, 640))
-			ans, src = self._line_detector.get_all_lines(src)
-			cv2.imshow('src', src)
-			cv2.waitKey(1)
-			# ans list : [0]현재 방향(동작 보정 각도), [1]vertical, [2]vertical-x, [3]horizontal, [4]horizontal-y, [5]horizontal-minx, [6]horizontal-max
-			if ans[1] is not None and ans[3] is not None:
-				pass
-			elif ans[3] is not None:
-				if 200 < ans[4]:
-					if ans[5] < 50 and ans[6] < 340:
-						# ㄱ자
-						print('ㄱ자', ans)
-						self._motion.turn('LEFT', loop=7)
-					elif ans[5] > 300 and ans[6]>600:
-						# ㄴ자
-						print('ㄴ자', ans[0])
-						self._motion.turn('RIGHT', loop=7)
-					else:
-						# T자
-						print('T자', ans)
-						return 0
-
-			elif ans[1] is not None:
-				if ans[2] < 200:
-					print('RIGHT', ans)
-					self._motion.walk(dir='RIGHT', loop=1)
-				elif ans[2] > 280:
-					print('LEFT', ans)
-					self._motion.walk(dir='LEFT', loop=1)
-				else:
-					print('FORWARD')
-					self._motion.walk('FORWARD')
+	def test_green(self):
+		self._motion.head_angle('DOWN', 10)
+		self._motion.head_angle('LEFT', 30)
+		src = self._image_processor.get_image()
+		get_pixel_rate4green(src)
+		

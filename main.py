@@ -5,8 +5,9 @@ import cv2
 
 def main():
     robot = Robot()
-    robot.detect_alphabet()
-    robot.line_tracing_sol('LEFT')
+    #robot.detect_alphabet()
+    #robot.line_tracing_sol('LEFT')
+    robot.test_green()
 
 def test():
     imageProcessor = ImageProcessor(video_path="Sensor/src/ewsn.mp4")
@@ -21,7 +22,7 @@ def test():
     print("[INFO] FPS : " + str(imageProcessor.fps.fps()))
 
 if __name__ == "__main__":
-        main()
+    main()
     #test()
     
     # imageProcessor = ImageProcessor(video_path="Sensor/src/t.mp4")
