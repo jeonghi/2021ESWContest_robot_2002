@@ -112,7 +112,10 @@ def non_maximum_suppression4targets(targets1:list, targets2:list, threshold:floa
 
 
 def setLabel(src, pts, label, color=(0,255,0)):
-    (x, y, w, h) = cv2.boundingRect(pts)
+    if type(pts) == type(np.array([])) :
+        (x, y, w, h) = cv2.boundingRect(pts)
+    else:
+        (x, y, w, h) = pts
     pt1 = (x, y)
     pt2 = (x+w, y+h)
     cv2.rectangle(src, pt1, pt2, color, 2)
@@ -145,7 +148,7 @@ if __name__ == "__main__":
             mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("roi thresh", mask)
             cv2.waitKey(1)
-            print(hashDetector.detect_direction_hash(roi))
+            print(hashDetector.detect_alphabet_hash(roi))
 
         #cv2.imshow("src", src)
         #cv2.imshow("mask", mask)
