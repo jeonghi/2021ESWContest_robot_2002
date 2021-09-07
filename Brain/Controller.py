@@ -17,6 +17,8 @@ class Robot:
 		self._motion = Motion()
 		self._image_processor = ImageProcessor(video_path=video_path)
 		self._line_detector = LineDetector()
+		self.mode = None
+		#self.count = 0
 
 	def detect_alphabet(self):
 		self._motion.head_angle('DOWN', 75)
@@ -36,7 +38,6 @@ class Robot:
 		self._motion.notice_direction(dir=alphabet)
 
 	def line_tracing(self):
-		mode = None
 		self._motion.head_angle('DOWN', 10)
 		while True:
 			src = self._image_processor.get_image(visualization=False)
@@ -78,19 +79,35 @@ class Robot:
 					if ans[5] < 50 and ans[6] < 340:
 						# ㄱ자
 						print('ㄱ자', ans)
-						self._motion.turn('LEFT', loop=8)
+						if self.mode == 'LEFT':
+							print(self.mode, "모드여서 좌회전 안하고 직진합니다.")
+							self._motion.walk(dir='FORWARD', loop=4)
+							#self. count += 1
+						elif self.mode == 'RIGHT':
+							self._motion.turn('LEFT', loop=8)
+						else:
+							print("화살표 인식 전입니다.")
+
 					elif ans[5] > 300 and ans[6]>600:
 						# ㄴ자
 						print('ㄴ자', ans)
-						self._motion.turn('RIGHT', loop=8)
+						if self.mode == 'LEFT':
+							self._motion.turn('RIGHT', loop=8)
+						elif self.mode == 'RIGHT':
+							print(self.mode, "모드여서 우회전 안하고 직진합니다.")
+							self._motion.walk(dir='FORWARD', loop=4)
+							#self. count += 1
+						else:
+							print("화살표 인식 전입니다.")
+						
 					else:
 						# T자 :: 가려는 방향으로 두칸 이동 및 회전
 						print('T자 :: INFRONT OF LINE --go WANT mode 4 and trun WANT mode', ans)
 						self._motion.set_head("UPDOWN_CENTER")
-						while mode == None:
-							mode = self._image_processor.get_arrow_direction(src)
-						self._motion.walk(mode, 4)
-						self._motion.turn(mode, 8)
+						while self.mode == None:
+							self.mode = self._image_processor.get_arrow_direction(src)
+						self._motion.walk(self.mode, 4)
+						self._motion.turn(self.mode, 8)
 				else:
 					self._motion.walk('FORWARD')
 					print(ans[4], 'low then 150')
