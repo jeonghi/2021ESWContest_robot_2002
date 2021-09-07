@@ -1,5 +1,5 @@
 from Sensor.ImageProcessor import ImageProcessor
-from Sensor.lines_class import LineDetector
+from Sensor.LineDetector import LineDetector
 from Actuator.Motion import Motion
 from Sensor.ColorChecker import get_pixel_rate4green
 import numpy as np
