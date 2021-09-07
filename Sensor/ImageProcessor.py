@@ -129,8 +129,9 @@ class ImageProcessor:
 
             cv2.waitKey(1)
 
-    def get_arrow_direction(self, img):
-        return self.hash_detector4arrow.detect_arrow(img)
+    def get_arrow_direction(self):
+        src = self.get_image()
+        return self.hash_detector4arrow.detect_arrow(src)
 
 
 
