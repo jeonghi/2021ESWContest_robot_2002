@@ -21,7 +21,7 @@ class Robot:
 		#self.count = 0
 
 	def detect_alphabet(self):
-		self._motion.head_angle('DOWN', 75)
+		self._motion.set_head('DOWN', 75)
 		flag = True
 		alphabet = None
 		while alphabet is None:
@@ -38,7 +38,7 @@ class Robot:
 		self._motion.notice_direction(dir=alphabet)
 
 	def line_tracing(self):
-		self._motion.head_angle('DOWN', 10)
+		self._motion.set_head('DOWN', 10)
 		while True:
 			src = self._image_processor.get_image(visualization=False)
 			src = cv2.resize(src, dsize=(640,480))
