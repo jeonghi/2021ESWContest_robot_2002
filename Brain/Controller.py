@@ -35,14 +35,14 @@ class Robot:
 			flag = not flag
 		self._motion.notice_direction(dir=alphabet)
 
-	def line_tracing(self, mode = 'LEFT'):
-		mode = mode
+	def line_tracing(self):
+		mode = None
 		self._motion.head_angle('DOWN', 10)
 		while True:
 			src = self._image_processor.get_image(visualization=False)
 			src = cv2.resize(src, dsize=(640,480))
-			ans, src = self._line_detector.get_all_lines(src)
-			cv2.imshow('src', src)
+			ans, result_img = self._line_detector.get_all_lines(src)
+			cv2.imshow('src', result_img)
 			cv2.waitKey(1)
 
 			# ans list : [0]현재 방향(동작 보정 각도), [1]vertical, [2]vertical-x, [3]horizontal, [4]horizontal-y, [5]horizontal-minx, [6]horizontal-max
@@ -78,16 +78,19 @@ class Robot:
 					if ans[5] < 50 and ans[6] < 340:
 						# ㄱ자
 						print('ㄱ자', ans)
-						#self._motion.turn('LEFT', loop=8)
+						self._motion.turn('LEFT', loop=8)
 					elif ans[5] > 300 and ans[6]>600:
 						# ㄴ자
 						print('ㄴ자', ans)
-						#self._motion.turn('RIGHT', loop=8)
+						self._motion.turn('RIGHT', loop=8)
 					else:
 						# T자 :: 가려는 방향으로 두칸 이동 및 회전
 						print('T자 :: INFRONT OF LINE --go WANT mode 4 and trun WANT mode', ans)
-						#self._motion.walk(mode, 4)
-						#self._motion.turn(mode, 8)
+						self._motion.set_head("UPDOWN_CENTER")
+						while mode == None:
+							mode = self._image_processor.get_arrow_direction(src)
+						self._motion.walk(mode, 4)
+						self._motion.turn(mode, 8)
 				else:
 					self._motion.walk('FORWARD')
 					print(ans[4], 'low then 150')
