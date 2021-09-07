@@ -11,6 +11,9 @@ from threading import Thread, Lock
 #-----------------------------------------------
 
 class Motion:
+    head_angle1 = 'UPDOWN_CENTER'
+    head_angle2 = 'LEFTRIGHT_CENTER'
+    
     def __init__(self):
         self.serial_use = 1
         self.serial_port = None
@@ -32,10 +35,9 @@ class Motion:
 
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
         self.lock.acquire()
-        #with self.lock:
         
         self.serial_port.write(serial.to_bytes([one_byte]))  # python3
-        time.sleep(0.01)
+        time.sleep(0.02)
         
     def RX_data(self):
         if self.serial_port.inWaiting() > 0:
@@ -74,7 +76,7 @@ class Motion:
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
         self.TX_data_py2(dir_list[dir])
 
-    def head_angle(self, dir, angle=0):
+    def set_head(self, dir, angle=0):
         """parameter 설명
         dir: {DOWN, LEFT, RIGHT, UPDOWN_CENTER, LEFTRIGHT_CENTER}
         angle: {DOWN:{10,20,30,45,60,75,90,100},
@@ -82,6 +84,15 @@ class Motion:
         RIGHT:{30,45,60,90}
         }
         """
+        if dir == 'DOWN':
+            self.head_angle1 = angle
+        elif dir == 'LEFT' and dir == 'RIGHT':
+            self.head_angle2 = angle
+        elif dir == 'UPDOWN_CENTER':
+            self.head_angle1 = dir
+        elif dir == 'LEFTRIGHT_CENTER':
+            self.head_angle2 = dir
+
         center_list = {'UPDOWN_CENTER':45, 'LEFTRIGHT_CENTER':54}
         dir_list = {
             'DOWN':{
@@ -119,15 +130,21 @@ class Motion:
         self.TX_data_py2(63)
         self.walk('RIGHT', loop=20)
 
+    def open_door_2(self, loop=1):
+        for _ in range(loop):
+            self.TX_data_py2(66)
+
     def grab(self, switch=True):
         if switch:
             self.TX_data_py2(64)
         else:
             self.TX_data_py2(65)
 
-    def open_door_2(self, loop=1):
-        for _ in range(loop):
-            self.TX_data_py2(66)
+    def get_head(self):
+        '''
+        Return vertical, horizontal head angle
+        '''
+        return (self.head_angle1, self.head_angle2)
 
 
 
