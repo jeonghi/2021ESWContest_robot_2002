@@ -23,9 +23,10 @@ class ImageProcessor:
                 self._cam = WebcamVideoStream(src=0).start()
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
-        self.hash_detector = HashDetector(file_path='Sensor/EWSN/')
-        self.line_detector = LineDetector()
-        
+        self.hash_detector4door = HashDetector(file_path='./EWSN/')
+        self.hash_detector4room = HashDetector(file_path='./ABCD/')
+        #self.line_detector = LineDetector()
+
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
         time.sleep(2)
@@ -77,27 +78,68 @@ class ImageProcessor:
             cv2.imshow("mask", mask)
             cv2.imshow("canny", canny)
             cv2.imshow("canvas", canvas)
+            cv2.waitKey(3)
 
         if target is None:
             return None
         roi = target.get_target_roi(src=src, visualization=visualization, color=(255,0,0), label="roi")
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        return self.hash_detector.detect_direction_hash(roi_mask)
-    
-    def get_slope_degree(self):
+        return self.hash_detector4door.detect_alphabet_hash(roi_mask)
+
+    def get_slope_degree(self, visualization:bool = False):
         src = self.get_image()
         return self.line_detector.get_slope_degree(src)
 
+    def get_room_alphabet(self, visualization:bool = False):
+        from Sensor.ColorChecker import check_color4roi
+        src = self.get_image()
+        if visualization:
+            canvas = src.copy()
+        canny = auto_canny(src)
+        canny_targets = []
+        cnts, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in cnts:
+            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
+            vertice = len(approx)
+            if vertice == 4 and 3000 <= cv2.contourArea(cnt):
+                target = Target(contour=cnt)
+                canny_targets.append(target)
+
+        for candidate in canny_targets:
+            roi = candidate.get_target_roi(src)
+            roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+            _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            roi_thresholded = cv2.bitwise_and(roi,roi,mask=roi_mask)
+            h_value = check_color4roi(roi_thresholded)
+            #h_value =1
+            print(h_value)
+            result = self.hash_detector4room.detect_alphabet_hash(roi_mask)
+            if result is None:
+                continue
+            if visualization:
+                setLabel(canvas, candidate.get_pts(), str(h_value), color=(0, 0, 255))
+                cv2.imshow("mask", roi_thresholded)
+
+            print(result)
+        if visualization:
+            cv2.imshow("src", canvas)
+            cv2.imshow("canny", canny)
+
+            cv2.waitKey(1)
+
+
+
+
+
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/W.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_area2.h264")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
-        src = imageProcessor.get_image(visualization=False)
-        #print(imageProcessor.get_door_alphabet(visualization=True))
-        print(imageProcessor.get_slope_degree())
+        imageProcessor.get_room_alphabet(visualization=True)
+        #_ = imageProcessor.get_image(visualization=True)
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
