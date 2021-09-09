@@ -24,9 +24,9 @@ class ImageProcessor:
                 self._cam = WebcamVideoStream(src=0).start()
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
-        self.hash_detector4door = HashDetector(file_path='EWSN/')
-        self.hash_detector4room = HashDetector(file_path='ABCD/')
-        self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
+        self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
+        self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
+        self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
         #self.line_detector = LineDetector()
 
         shape = (self.height, self.width, _) = self.get_image().shape
