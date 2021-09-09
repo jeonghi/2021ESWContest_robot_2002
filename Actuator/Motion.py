@@ -75,6 +75,9 @@ class Motion:
     def notice_direction(self, dir):
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
         self.TX_data_py2(dir_list[dir])
+    def notice_area(self,area):
+        area_list = {'GREEN':67,'BLACK':68}
+        self.TX_data_py2(area_list[area])
 
     def set_head(self, dir, angle=0):
         """parameter 설명
