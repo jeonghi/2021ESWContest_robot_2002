@@ -117,9 +117,10 @@ class Robot:
 					self._motion.walk('FORWARD')
 					print(ans[4], 'low then 150')
 
-	def test_green(self):
+	def recognize_area_color(self):
 		self._motion.head_angle('DOWN', 45)
 		self._motion.head_angle('RIGHT', 30)
-		src = self._image_processor.get_image()
-		get_pixel_rate4green(src)
+		color = self._image_processor.get_area_color()
+		self._motion.notice_area(area=color)
+		return
 		
