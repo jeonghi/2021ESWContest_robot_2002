@@ -18,7 +18,8 @@ class HashDetector:
         print(self.directions)
          
     @staticmethod
-    def image_to_hash(img : np.ndarray) -> list:        
+    def image_to_hash(img : np.ndarray) -> list:
+        
         if len(img.shape) == 3:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         img = cv2.resize(img, (16, 16))
@@ -64,6 +65,22 @@ class HashDetector:
             return None
         
         return result
+
+    def detect_arrow(self, img : np.ndarray):
+        img_hash = self.image_to_hash(img)
+
+        distance_1 = self.hamming_distance(img_hash, self.directions_hash[0])
+        distance_2 = self.hamming_distance(img_hash, self.directions_hash[1])
+
+        #print(distance_1, distance_2)
+        if distance_2 > 0.3 and distance_1 > 0.3:
+            return None
+
+        if distance_1 < distance_2:
+            return "LEFT"
+        else:
+            return "RIGHT"
+
 
 
 if __name__ == "__main__":

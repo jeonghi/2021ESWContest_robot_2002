@@ -96,7 +96,7 @@ class Motion:
         elif dir == 'LEFTRIGHT_CENTER':
             self.head_angle2 = dir
 
-        center_list = {'UPDOWN_CENTER':45, 'LEFTRIGHT_CENTER':54}
+        center_list = {'UPDOWN_CENTER':44, 'LEFTRIGHT_CENTER':54}
         dir_list = {
             'DOWN':{
             10:37, 20:38, 30:39, 45:40, 60:41, 75:42, 90:43, 100:44
@@ -158,14 +158,7 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    #motion.TX_data_py2(63)
-    #motion.notice_direction('N')
-    #motion.head_angle('DOWN',10)
-
-    #motion.walk('FORWARD', loop=6)
-    
-    #motion.turn('RIGHT', loop=10)
-    motion.open_door()
+    motion.set_head('UPDOWN_CENTER')
     pass
 
 

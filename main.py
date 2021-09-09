@@ -1,3 +1,5 @@
+from Actuator.Motion import Motion
+from imutils import video
 from Sensor.LineDetector import LineDetector
 from Brain.Controller import Robot
 from Sensor.ImageProcessor import ImageProcessor
@@ -6,8 +8,8 @@ import cv2
 def main():
     robot = Robot()
     #robot.detect_alphabet()
-    #robot.line_tracing_sol('LEFT')
-    robot.test_green()
+    robot.line_tracing()
+    
 
 def test():
     imageProcessor = ImageProcessor(video_path="Sensor/src/ewsn.mp4")
@@ -23,18 +25,3 @@ def test():
 
 if __name__ == "__main__":
     main()
-    #test()
-    
-    # imageProcessor = ImageProcessor(video_path="Sensor/src/t.mp4")
-    # lineDetector = LineDetector()
-
-    # while True:
-    #     src = imageProcessor.get_image(visualization=False)
-    #     src = cv2.resize(src, dsize=(480, 640))
-    #     answer, src = lineDetector.get_all_lines(src)
-    #     print(answer)
-        
-    #     cv2.imshow('src', src)
-    #     cv2.waitKey(100)
-    #     #print(imageProcessor.get_slope_degree())
-    #     imageProcessor.fps.update()
