@@ -10,7 +10,7 @@ from imutils import auto_canny
 from Sensor.HashDetector import HashDetector
 from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
 from Sensor.LineDetector import LineDetector
-from Sensor.ColorChecker import check_color4roi, get_pixel_rate4green
+from Sensor.ColorChecker import check_color4roi, get_green_pixel_rate
 
 class ImageProcessor:
 
