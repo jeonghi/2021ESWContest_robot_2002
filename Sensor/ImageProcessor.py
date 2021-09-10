@@ -10,7 +10,7 @@ from imutils import auto_canny
 from Sensor.HashDetector import HashDetector
 from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
 from Sensor.LineDetector import LineDetector
-from Sensor.ColorChecker import check_color4roi, get_green_pixel_rate
+from Sensor.ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
 
 class ImageProcessor:
 
@@ -166,14 +166,61 @@ class ImageProcessor:
 
     def get_area_color(self, threshold: float = 0.5, visualization: bool = False):
         src = self.get_image()
-        area_color = get_green_pixel_rate(src=src, threshold=threshold, visualization=visualization)
-        return area_color
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+        h = h.astype(v.dtype)
+
+        # red mask
+        red_mask = get_red_mask(h)
+
+        # blue mask
+        blue_mask = get_blue_mask(h)
+
+        # mask denoise
+        mask = cv2.bitwise_or(red_mask, blue_mask)
+        mask = cv2.GaussianBlur(mask, (5, 5), 0)
+        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
+        mask = cv2.bitwise_not(mask)
+
+        # background : white, target : green, red, blue, black
+        # ostu thresholding inverse : background -> black, target -> white
+        _, roi_mask = cv2.threshold(v, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_OPEN, kernel)
+        roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_CLOSE, kernel)
+
+        # subtract blue and red mask to ostu thresholded mask
+        # masking
+        roi_mask = cv2.bitwise_and(mask, roi_mask)
+        h = cv2.bitwise_and(h, h, mask=roi_mask)
+
+        # get mean value about non_zero value
+        h_mean = get_mean_value_for_non_zero(h)
+
+        # green
+        green_upper = 85
+        green_lower = 35
+        green = np.where(h > green_lower, h, 0)
+        green = np.where(green < green_upper, green, 0)
+
+        pixel_rate = np.count_nonzero(green) / np.count_nonzero(h)
+
+        if visualization:
+            dst = cv2.bitwise_and(src, src, mask=roi_mask)
+            cv2.imshow("dst", dst)
+            cv2.waitKey(1)
+
+        if green_lower <= h_mean <= green_upper and pixel_rate >= threshold:
+            return "GREEN"
+        else:
+            return "BLACK"
 
         
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
