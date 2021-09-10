@@ -10,7 +10,7 @@ from imutils import auto_canny
 from Sensor.HashDetector import HashDetector
 from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
 from Sensor.LineDetector import LineDetector
-from Sensor.ColorChecker import check_color4roi, get_green_pixel_rate
+from Sensor.ColorChecker import check_color4roi, get_pixel_rate4green
 
 class ImageProcessor:
 
@@ -173,15 +173,14 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
         imageProcessor.get_image(visualization=True)
-
         #imageProcessor.ostu_thresholding(visualization=True)
         #imageProcessor.get_room_alphabet(visualization=True)
-        print(imageProcessor.get_area_color(visualization=True))
+        print(imageProcessor.get_area_color())
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
