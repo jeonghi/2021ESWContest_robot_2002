@@ -10,7 +10,7 @@ from imutils import auto_canny
 from Sensor.HashDetector import HashDetector
 from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
 from Sensor.LineDetector import LineDetector
-from Sensor.ColorChecker import check_color4roi, get_pixel_rate4green
+from Sensor.ColorChecker import check_color4roi, get_green_pixel_rate
 
 class ImageProcessor:
 
@@ -24,9 +24,15 @@ class ImageProcessor:
                 self._cam = WebcamVideoStream(src=0).start()
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
-        self.hash_detector4door = HashDetector(file_path='EWSN/')
-        self.hash_detector4room = HashDetector(file_path='ABCD/')
-        self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
+        if __name__ == "__main__":
+            self.hash_detector4door = HashDetector(file_path='EWSN/')
+            self.hash_detector4room = HashDetector(file_path='ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
+        else:
+
+            self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
+            self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
         #self.line_detector = LineDetector()
 
         shape = (self.height, self.width, _) = self.get_image().shape
@@ -98,11 +104,11 @@ class ImageProcessor:
             cv2.waitKey(1)
         return self.hash_detector4door.detect_alphabet_hash(roi_mask)
 
-    def get_slope_degree(self, visualization:bool = False):
+    def get_slope_degree(self, visualization: bool = False):
         src = self.get_image()
         return self.line_detector.get_slope_degree(src)
 
-    def get_room_alphabet(self, visualization:bool = False):
+    def get_room_alphabet(self, visualization: bool = False):
 
         src = self.get_image()
         if visualization:
@@ -145,7 +151,7 @@ class ImageProcessor:
         src = self.get_image()
         return self.hash_detector4arrow.detect_arrow(src)
 
-    def ostu_thresholding(self, visualization:bool =False):
+    def ostu_thresholding(self, visualization: bool = False):
         src = self.get_image()
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         _, roi_mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
@@ -158,23 +164,24 @@ class ImageProcessor:
             cv2.imshow("src", cv2.hconcat([src, cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)]))
             cv2.waitKey(1)
 
-    def get_area_color(self):
+    def get_area_color(self, threshold: float = 0.5, visualization: bool = False):
         src = self.get_image()
-        area_color = get_pixel_rate4green(src=src)
+        area_color = get_green_pixel_rate(src=src, threshold=threshold, visualization=visualization)
         return area_color
 
         
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
         imageProcessor.get_image(visualization=True)
+
         #imageProcessor.ostu_thresholding(visualization=True)
         #imageProcessor.get_room_alphabet(visualization=True)
-        print(imageProcessor.get_area_color())
+        print(imageProcessor.get_area_color(visualization=True))
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))

@@ -9,7 +9,7 @@ def check_color4roi(src:np.array) -> int:
     return int(np.mean(h_mean))
 
 # background 가 흰색이라 hue 값만으로 pixel rate 판단하면 위험할 수 있기때문에 테스트 해보고 수정할 것
-def get_pixel_rate4green(src:np.array) -> int:
+def get_green_pixel_rate(src: np.array, threshold:float, visualization: bool = False) -> int:
     # ostu threshold 적용 background: White target: Black, Green
     # white -> true 가 되므로 inv 해줘야함
     hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
@@ -47,22 +47,31 @@ def get_pixel_rate4green(src:np.array) -> int:
     mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
     mask = cv2.bitwise_not(mask)
 
-    # ostu thresholding
+    # background : white, target : green, red, blue, black
+    # ostu thresholding inverse : background -> black, target -> white
     _, roi_mask = cv2.threshold(v, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
     roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_OPEN, kernel)
     roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_CLOSE, kernel)
 
+    # subtract blue and red mask to ostu thresholded mask
     # masking
     roi_mask = cv2.bitwise_and(mask, roi_mask)
-
     h = cv2.bitwise_and(h, h, mask=roi_mask)
+    # get mean value about non_zero value
     h_mean = np.true_divide(h.sum(), (h != 0).sum())
-    # pixel_rate = int(np.count_nonzero(h)/(width*height)*100)
-    # return pixel_rate
-    #dst = cv2.bitwise_and(src, src, mask=roi_mask)
-    #cv2.imshow("dst", dst)
-    #cv2.waitKey(1)
-    if green_lower <= h_mean <= green_upper:
+
+    # green mask
+    green_mask = np.where(h > green_lower, h, 0)
+    green_mask = np.where(green_mask < green_upper, green_mask, 0)
+
+    pixel_rate = np.count_nonzero(green_mask)/np.count_nonzero(h)
+    #print(pixel_rate)
+
+    if visualization:
+        dst = cv2.bitwise_and(src, src, mask=roi_mask)
+        cv2.imshow("dst", dst)
+        cv2.waitKey(1)
+    if green_lower <= h_mean <= green_upper and pixel_rate >= threshold :
         return "GREEN"
     else:
         return "BLACK"
@@ -84,4 +93,4 @@ if __name__ == "__main__":
     imageProcessor = ImageProcessor(video_path="src/old/green_area.mp4")
     while True:
         src = imageProcessor.get_image(visualization=True)
-        get_pixel_rate4green(src)
+        get_green_pixel_rate(src)
