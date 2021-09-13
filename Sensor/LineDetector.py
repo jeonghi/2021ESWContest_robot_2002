@@ -96,9 +96,10 @@ class LineDetector:
         result = [x1,y1,x2,y2]
         return result
 
-
     def get_all_lines(self, src):
-        answer = [0, None, 0, None, 0, 0, 0] # 현재 방향(동작 보정 각도), vertical, vertical-x, horizontal, horizontal-y, horizontal-minx, horizontal-max
+        #answer = [0, None, 0, None, 0, 0, 0] # 현재 방향(동작 보정 각도), vertical, vertical-x, horizontal, horizontal-y, horizontal-minx, horizontal-max
+        line_info = {"DEGREE" : 0, "V" : False, "VPOS" : 0, "H" : False, "HPOS" : 0, "H_MIN_X" : 0, "H_MAX_X" : 0}
+        
         lines, horizontal_lines, vertical_lines = self.get_lines(src)
 
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
@@ -108,14 +109,14 @@ class LineDetector:
             fit_line = self.get_fitline__(src, lines)
             self.draw_lines(temp, fit_line, 'lines', 'fit')
             robot_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
-            answer[0] = robot_degree
+            line_info["DEGREE"] = robot_degree
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
     
         if len(vertical_lines)!=0:
             size = int(vertical_lines.shape[0]*vertical_lines.shape[2]/2)
             vertical_fit_line = self.get_fitline(src, vertical_lines, size, 'vertical')
-            answer[1] = 'vertical'
-            answer[2] = vertical_fit_line[0]
+            line_info["V"] = True
+            line_info["VPOS"] = vertical_fit_line[0]
             self.draw_lines(temp, vertical_lines, 'vertical')
             self.draw_lines(temp, vertical_fit_line, 'vertical', 'fit')
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
@@ -123,13 +124,13 @@ class LineDetector:
         if len(horizontal_lines)!=0:
             size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
             horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal') # [max_x, middle, min_x, middle]
-            answer[3] = 'horizontal'
-            answer[4] = horizontal_fit_line[1] #horizontal-y
-            answer[5] = horizontal_fit_line[2] #horizontal-minx
-            answer[6] = horizontal_fit_line[0] #horizontal-maxx
+            line_info["H"] = False
+            line_info["HPOS"] = horizontal_fit_line[1] #horizontal-y
+            line_info["H_MIN_X"] = horizontal_fit_line[2] #horizontal-minx
+            line_info["H_MAX_X"] = horizontal_fit_line[0] #horizontal-maxx
             self.draw_lines(temp, horizontal_lines, 'horizontal')
             self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
-        return answer, src
+        return line_info, src
 
 
