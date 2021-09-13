@@ -360,7 +360,11 @@ Arm_motor_mode3:
     GYROSENSE G6A,200,100,30,100,0
     GYROSENSE G6D,200,100,30,100,0
     RETURN
-    '***********************************************
+    '******************ZERO G6A,100, 101, 102, 106, 100, 100
+    ZERO G6B,102, 101, 100, 100, 100, 100
+    ZERO G6C, 97, 100,  96, 100, 100, 100
+    ZERO G6D,100, 103, 103, 104, 103, 100
+    '*****************************
 자이로ON:
 
     GYROSET G6A, 4, 3, 3, 3, 0
@@ -754,7 +758,7 @@ GOSUB_RX_EXIT2:
     '**********************
 
 횟수_전진종종걸음_1:
-    MOVE G6A,95,  90, 125, 100, 104
+    MOVE G6A,90,  90, 125, 100, 104
     MOVE G6D,104,  77, 147,  93,  102
     MOVE G6B, 85
     MOVE G6C,115
@@ -763,7 +767,7 @@ GOSUB_RX_EXIT2:
 
 횟수_전진종종걸음_2:
 
-    MOVE G6A,103,   73, 140, 103,  100
+    MOVE G6A,98,   73, 140, 103,  100
     MOVE G6D, 95,  85, 147,  85, 102
     WAIT
 
@@ -798,7 +802,7 @@ GOSUB_RX_EXIT2:
     '*********************************
 
 횟수_전진종종걸음_4:
-    MOVE G6D,95,  95, 120, 100, 104
+    MOVE G6D,90,  95, 120, 100, 104
     MOVE G6A,104,  77, 147,  93,  102
     MOVE G6C, 85
     MOVE G6B,115
@@ -806,7 +810,7 @@ GOSUB_RX_EXIT2:
 
 
 횟수_전진종종걸음_5:
-    MOVE G6D,103,    73, 140, 103,  100
+    MOVE G6D,98,    73, 140, 103,  100
     MOVE G6A, 95,  85, 147,  85, 102
     WAIT
 
@@ -961,6 +965,9 @@ GOSUB_RX_EXIT2:
         'DELAY 400
         GOTO RX_EXIT
     ENDIF
+
+걷기:
+
 
     '*************************************
 
@@ -3215,6 +3222,17 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     '******************************************
     '******************************************	
+안전구역:
+    PRINT "OPEN 20GongMo.mrs !"
+    PRINT "SOUND 4 !"
+    'GOSUB SOUND_PLAY_CHK
+    RETURN
+
+확진구역:
+    PRINT "OPEN 20GongMo.mrs !"
+    PRINT "SOUND 5 !"
+    'GOSUB SOUND_PLAY_CHK
+    RETURN
 
 동쪽:
     SPEED 10
@@ -3380,6 +3398,17 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     RETURN
 
+양팔앞으로:
+    SPEED 4
+    MOVE G6B, 190, 20, 60
+    MOVE G6C, 190, 2/0, 60
+    WAIT
+
+    'DELAY 10
+    'GOSUB 기본자세2
+    RETURN
+
+
 
 물건집기:
     GOSUB All_motor_mode3
@@ -3428,7 +3457,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     RETURN
     '******************************************
-    
+
 물건놓기:
     GOSUB All_motor_mode3
     GOSUB 자이로OFF
@@ -3465,6 +3494,98 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     GOSUB 기본자세
     RETURN
+
+집고전진:
+    보행속도 = 8
+    좌우속도 = 4
+    넘어진확인 = 0
+
+    'GOSUB 전방하향18도
+    'DELAY 20
+    SPEED 6
+    GOSUB All_motor_mode3
+    MOVE G6B, 190, 10, 50
+    MOVE G6C, 190, 10, 50
+    WAIT
+
+    DELAY 20
+    'HIGHSPEED SETON
+
+    SPEED 6
+    MOVE G6D,  90,  74, 144,  95, 110
+    MOVE G6A, 108,  76, 146,  93, 96
+    WAIT
+
+    SPEED 8
+    MOVE G6D,90, 90, 120, 102, 110,100
+    MOVE G6A,108,  76, 147,  93,  96,100
+    WAIT
+
+    'HIGHSPEED SETOFF
+    GOTO 집고전진_2	
+
+집고전진_2:
+    MOVE G6A,110,  76, 147,  93, 100,100
+    MOVE G6D,96, 90, 120, 102, 107,100
+    WAIT
+
+집고전진_3:
+    'ETX 4800,13 '진행코드를 보냄
+
+    SPEED 보행속도
+
+    MOVE G6D, 90,  56, 145, 115, 110
+    MOVE G6A,108,  76, 147,  90,  96
+    WAIT
+
+    SPEED 좌우속도
+    MOVE G6D,108,  76, 147, 90,  98
+    MOVE G6A,90, 100, 142,  69, 108
+    WAIT
+
+    SPEED 보행속도
+
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+        GOTO MAIN
+    ENDIF
+
+
+    ERX 4800,A, 집고전진_4
+    IF A = 11 THEN
+        GOTO 집고전진_4
+        '    ELSE
+        '    	MOVE G6A, 90, 100, 100, 115, 110,100
+        ' 		MOVE G6D,112,  76, 146,  93,  96,100
+        ' 		MOVE G6B,90
+        ' 		MOVE G6C,110
+        ' 		WAIT
+        ' 		HIGHSPEED SETOFF
+        ' 		SPEED 8
+
+        ' 		MOVE G6D, 106,  76, 146,  93,  96,100		
+        ' 		MOVE G6A,  88,  71, 152,  91, 106,100
+        ' 		MOVE G6C, 100
+        ' 		MOVE G6B, 100
+        ' 		WAIT	
+        ' 		SPEED 8
+        ' 		GOSUB 기본자세2
+
+        ' 		GOTO RX_EXIT
+    ENDIF
+집고전진_4:
+    SPEED 9
+    MOVE G6A,95, 90, 120, 102, 111,100
+    MOVE G6D,108,  76, 146,  93,  96,100
+    WAIT
+
+    SPEED 7
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 145,  93, 100, 100
+    WAIT
+
+    RETURN
     '******************************************
 
 
@@ -3485,7 +3606,7 @@ MAIN_2:
 
     '**** 입력된 A값이 0 이면 MAIN 라벨로 가고
     '**** 1이면 KEY1 라벨, 2이면 key2로... 가는문
-    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65
+    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65,KEY66,KEY67,KEY68
 
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
@@ -3543,29 +3664,22 @@ KEY4:
     '***************
 KEY5:
     ETX  4800,5
-
-    J = AD(적외선AD포트)	'적외선거리값 읽기
-    ETX 4800, J
-    BUTTON_NO = J
-    GOSUB Number_Play
-    'GOSUB SOUND_PLAY_CHK
-    GOSUB GOSUB_RX_EXIT
+    GOSUB 양팔앞으로
 
     GOTO RX_EXIT
     '***************
 KEY6:
-    ETX 4800, 5
-    GOSUB 왼쪽턴20
+    ETX 4800, 6
+    GOSUB 안전구역
     GOTO RX_EXIT
 KEY7:
-    ETX 4800, 6
-    GOSUB 오른쪽턴20
+    ETX 4800, 7
+    GOSUB 확진구역
     GOTO RX_EXIT
     '***************
 KEY8:
     ETX  4800,8
     GOTO 전진종종걸음
-
     GOTO RX_EXIT
     '***************
 KEY9:
@@ -3898,6 +4012,20 @@ KEY63:
 KEY64:
     ETX 4800,  64
     GOSUB 물건집기
+    GOTO RX_EXIT
 KEY65:
     ETX 4800, 65
     GOSUB 물건놓기
+    GOTO RX_EXIT
+KEY66:
+    ETX 4800, 66
+    GOSUB 집고전진
+    GOTO RX_EXIT
+KEY67:
+    ETX 4800, 67
+    GOSUB 안전구역
+    GOTO RX_EXIT
+KEY68:
+    ETX 4800, 68
+    GOSUB 확진구역
+    GOTO RX_EXIT
