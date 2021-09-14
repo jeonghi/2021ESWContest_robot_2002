@@ -2,7 +2,7 @@ from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
 from Sensor.EdgeDetector import EdgeDetector
 from Actuator.Motion import Motion
-from Sensor.ColorChecker import get_pixel_rate4green
+#from Sensor.ColorChecker import get_pixel_rate4green
 import numpy as np
 import cv2
 import time
@@ -15,7 +15,7 @@ class Robot:
         self._image_processor = ImageProcessor(video_path=video_path)
         self._line_detector = LineDetector()
         self._edge_detector = EdgeDetector()
-        self.direction = None
+        self.direction = 'LEFT'
         self.mode = None # motion Mode
 
     def detect_alphabet(self):
@@ -38,7 +38,7 @@ class Robot:
 
     def set_mode(self, src):
         line_info = self._image_processor.get_lines()
-        if line_info["DEGREE"] == 0 # line 하나도 없을 때.
+        if line_info["DEGREE"] == 0 : # line 하나도 없을 때.
             self.mode = "find_line"
 
         elif self.mode == "find_line" and ine_info["DEGREE"] != 0:
@@ -55,7 +55,7 @@ class Robot:
 
         elif not line_info["V"] and not line_info["H"]:
             if line_info["DEGREE"] < 85:
-self.mode = "modify_angle_left"
+                self.mode = "modify_angle_left"
             elif line_info["DEGREE"] > 95:
                 print('MODIFY angle --RIGHT', line_info)
                 self._motion.turn(dir='RIGHT', loop=1)
@@ -183,43 +183,81 @@ self.mode = "modify_angle_left"
                     print(ans[4], 'try ┃ until upper then 150')
 
 
-    def return_line(self, direction):
+    def return_line__(self):
+        flag = False
         # + 고개를 든다 (고개 각도도 보면서 정해야할 듯)
-        self._motion.set_head('UP')
+        self._motion.set_head(dir='DOWN', angle=45)
+        
         # edge를 찾는다 ans:: ans[0] edge를 찾았으면 not None 없으면 None,ans[1] edge_line 갯수,ans[2] edge_line의 y좌표,ans[3] 수직선 찾으면 not None 못찾으면 None
         while True:
             src = self._image_processor.get_image(visualization=False)
-            src = cv2.resize(src, dsize=(640,480))
+            #src = cv2.resize(src, dsize=(640,480))
             ans, result_img = self._edge_detector.find_edge(src)
             cv2.imshow('result_img', result_img)
             cv2.waitKey(1)
+            print(ans)
 
-            if ans[1]<6:
+            
+
+    def return_line(self):
+        flag = False
+        # + 고개를 든다 (고개 각도도 보면서 정해야할 듯)
+        self._motion.set_head(dir='DOWN', angle=45)
+        
+        # edge를 찾는다 ans:: ans[0] edge를 찾았으면 not None 없으면 None,ans[1] edge_line 갯수,ans[2] edge_line의 y좌표,ans[3] 수직선 찾으면 not None 못찾으면 None
+        while True:
+            src = self._image_processor.get_image(visualization=False)
+            #src = cv2.resize(src, dsize=(640,480))
+            ans, result_img = self._edge_detector.find_edge(src)
+            cv2.imshow('result_img', result_img)
+            cv2.waitKey(1)
+            print(ans)
+
+            if ans[1]<9:
                 self.mode = 'find_edge'
             else:
-                if ans[2] < 150:
+                if ans[2] < 250:
                     self.mode = 'find_edge_closer'
+        
 
-
-            if self.mode == 'find_edge_closer' and ans[2] < 150:
+            if self.mode == 'find_edge_closer' and ans[2] < 250:
                     self.mode = 'find_edge_closer'
-            elif self.mode == 'find_edge_closer' and ans[2] > 150:
+            elif self.mode == 'find_edge_closer' and ans[2] >= 250:
                 if self.mode == 'find_edge_closer' and ans[3] is None:
                     self.mode = 'find_vertical'
 
-            if self.mode = 'find_vertical' and ans[3] is not None:
+            if self.mode == 'find_vertical' and ans[3] is not None:
                 self.line_tracing()
 
 
             print(self.mode)
             
             # edge_line이 5개 이상 검출될 때까지 몸을 회전시킨다
-            if self.mode='find_edge':
-                self._motion.turn(dir='LEFT')          
-            elif self.mode = 'find_edge_closer':
+            if self.mode=='find_edge':
+                if flag :
+                    self._motion.set_head('DOWN', 45)
+                    flag = not flag
+                    self._motion.turn(dir='RIGHT')
+                else:
+                    self._motion.set_head('DOWN', 60)
+                    flag = not flag
+                    continue
+                    
+
+                
+                print('turn right')
+                
+                time.sleep(0.2)
+            
+            elif self.mode == 'find_edge_closer':
+                print('forward')
                 self._motion.walk(dir='FORWARD')
-            elif self.mode = 'find_vertical':
-                self._motion.turn(dir=direction)
+                time.sleep(0.2)
+            elif self.mode == 'find_vertical':
+                print('turn')
+                self._motion.turn(dir=self.direction)
+                time.sleep(0.2)
+            
 
 
         # 검출되면? 검출된 edge line이 로봇 발 앞에 올때까지 걷는다. (판단은 edge line의 y좌표가 일정 범위 안에 들어올 때까지) --> 많이 멀면 넓게 걷고, 가까우면 보통으로 걷는다.

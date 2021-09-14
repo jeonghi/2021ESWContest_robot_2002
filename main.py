@@ -1,13 +1,13 @@
 from Actuator.Motion import Motion
 from imutils import video
 from Sensor.LineDetector import LineDetector
-from Brain.Controller import Robot
+from Brain.Controller_new import Robot
 from Sensor.ImageProcessor import ImageProcessor
 import cv2
 
 def main():
     robot = Robot()
-    robot.recognize_area_color()
+    robot.return_line()
 
 if __name__ == "__main__":
     main()

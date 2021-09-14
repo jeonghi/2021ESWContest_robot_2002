@@ -2,7 +2,7 @@ import cv2
 import numpy as np
 import math
 
-class LineDetector:
+class EdgeDetector:
     def __init__(self):
         pass
 
@@ -36,13 +36,13 @@ class LineDetector:
         lines = np.squeeze(lines)
 
         if len(lines.shape) == 0:
-            print("None")
-            return [], [], []
+            #print("None")
+            return [], []
         elif len(lines.shape) == 1 :
-            print("shape 1")
-            return [], [], []
+            #print("shape 1")
+            return [], []
         else:
-            print("shape more than 1")
+            #print("shape more than 1")
 
             edge_lines = lines[:,None]
     
@@ -91,7 +91,7 @@ class LineDetector:
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
     
         if len(vertical_lines)!=0:
-            print('vertical_lines', len(vertical_lines.shape)) 
+            #print('vertical_lines', len(vertical_lines.shape)) 
             size = int(vertical_lines.shape[0]*vertical_lines.shape[2]/2)
             vertical_fit_line = self.get_fitline(src, vertical_lines, size)
             answer[3] = 'vertical'
