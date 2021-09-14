@@ -7,10 +7,18 @@ from imutils.video import WebcamVideoStream
 from imutils.video import FileVideoStream
 from imutils.video import FPS
 from imutils import auto_canny
-from Sensor.HashDetector import HashDetector
-from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
-from Sensor.LineDetector import LineDetector
-from Sensor.ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
+if __name__ == "__main__":
+    from HashDetector import HashDetector
+    from Target import Target, setLabel, non_maximum_suppression4targets
+    from LineDetector import LineDetector
+    from ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
+    
+    
+else:
+    from Sensor.HashDetector import HashDetector
+    from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
+    from Sensor.LineDetector import LineDetector
+    from Sensor.ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
 
 class ImageProcessor:
 
@@ -220,14 +228,14 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
+    imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
         imageProcessor.get_image(visualization=True)
         #imageProcessor.ostu_thresholding(visualization=True)
         #imageProcessor.get_room_alphabet(visualization=True)
-        print(imageProcessor.get_area_color())
+        #print(imageProcessor.get_area_color())
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
