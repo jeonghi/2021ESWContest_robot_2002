@@ -73,10 +73,15 @@ class Motion:
                      self.distance = RX
     
     def notice_direction(self, dir):
+        """dir={'E', 'W', 'S', 'N'}
+        """
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
         self.TX_data_py2(dir_list[dir])
+
     def notice_area(self,area):
-        area_list = {'GREEN':67,'BLACK':68}
+        """area='GREEN' or area='BLACK'
+        """
+        area_list = {'GREEN':66,'BLACK':67}
         self.TX_data_py2(area_list[area])
 
     def set_head(self, dir, angle=0):
@@ -113,17 +118,24 @@ class Motion:
         else:
             self.TX_data_py2(dir_list[dir][angle])
 
-    def walk(self, dir, loop=1):
+
+    def walk(self, dir, loop=1, grab=False):
         dir_list = {'FORWARD':55, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
+        if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             
-    def turn(self, dir, loop=1):
+
+    def turn(self, dir, loop=1, grab=False):
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
+        if grab: dir_list[dir] += 11  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
 
+
     def get_IR(self) -> int:
+        """get IR value and return self.distance
+        """
         self.TX_data_py2(5)
         self.TX_data_py2(5)
         return self.distance
@@ -138,18 +150,17 @@ class Motion:
             self.TX_data_py2(66)
 
     def grab(self, switch=True):
+        """if switch=True then grab ON, else then grab OFF
+        """
         if switch:
             self.TX_data_py2(64)
         else:
             self.TX_data_py2(65)
 
     def get_head(self):
-        '''
-        Return vertical, horizontal head angle
-        '''
+        """Return vertical, horizontal head angle
+        """
         return (self.head_angle1, self.head_angle2)
-
-
 
 
 
