@@ -4,7 +4,7 @@ import numpy as np
 
 class Target:
 
-    def __init__(self, color=None, stats=None, centroid=None, contour=None):
+    def __init__(self, name=None, color=None, stats=None, centroid=None, contour=None):
 
         if centroid is not None and stats is not None:
             (self.x, self.y, self.width, self.height, self._area) = stats
@@ -16,6 +16,7 @@ class Target:
             self.x + (self.width // 2), self.y + (self.height // 2))
         self._color = color
         self._pts = (self.x, self.y, self.width, self.height)
+        self._name = name
 
 
     def get_target_roi(self, src, pad:int=0, visualization:bool=False, label:str=None, color=(255,255,255)) -> np.ndarray:
@@ -59,6 +60,18 @@ class Target:
 
     def get_pts(self):
         return self._pts
+
+    def set_color(self, color:str):
+        self._color = color
+        return
+
+    def set_name(self, name:str):
+        self._name = name
+        return
+
+    def get_name(self):
+        return self._name
+
 
 def compute_iou4target(box1:Target, box2:Target) -> float:
         # box = (x1, y1, x2, y2)

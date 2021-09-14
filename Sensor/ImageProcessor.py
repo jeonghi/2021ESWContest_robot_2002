@@ -6,19 +6,33 @@ import os
 from imutils.video import WebcamVideoStream
 from imutils.video import FileVideoStream
 from imutils.video import FPS
-from imutils import auto_canny
+from imutils import auto_canny, grab_contours
 if __name__ == "__main__":
     from HashDetector import HashDetector
     from Target import Target, setLabel, non_maximum_suppression4targets
     from LineDetector import LineDetector
     from ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
-    
-    
+    from LaneLines import intersect, median, left_right_lines
 else:
     from Sensor.HashDetector import HashDetector
     from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
     from Sensor.LineDetector import LineDetector
     from Sensor.ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
+    from Sensor.LaneLines import intersect, median, left_right_lines
+
+
+
+COLORS = {
+    "YELLOW": {
+        "HOME":
+            {
+                "color": "YELLOW",
+                "lower": [[0, 79, 117], [0, 79, 117], [0, 79, 117]],
+                "upper": [[32, 252, 255], [32, 252, 255], [32, 252, 255]]
+            }
+    },
+}
+
 
 class ImageProcessor:
 
@@ -55,6 +69,25 @@ class ImageProcessor:
             cv2.imshow("Src", src)
             cv2.waitKey(10)
         return src
+
+    def get_color_binary_image(self, color, img=None):  # 인자로 넘겨 받은 색상만 남기도록 이진화한뒤 원본 이미지와 이진 이미지 반
+        if img is None:
+            img = self.get_image()
+        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        lower1, lower2, lower3 = color["lower"]
+        upper1, upper2, upper3 = color["upper"]
+        img_mask1 = cv2.inRange(img_hsv, np.array(lower1), np.array(upper1))
+        img_mask2 = cv2.inRange(img_hsv, np.array(lower2), np.array(upper2))
+        img_mask3 = cv2.inRange(img_hsv, np.array(lower3), np.array(upper3))
+        temp = cv2.bitwise_or(img_mask1, img_mask2)
+        img_mask = cv2.bitwise_or(img_mask3, temp)
+
+        k = (11, 11)
+        kernel = np.ones(k, np.uint8)
+        img_mask = cv2.morphologyEx(img_mask, cv2.MORPH_OPEN, kernel)
+        img_mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
+        # img_result = cv2.bitwise_and(img, img, mask=img_mask)  # 해당 색상값만 남기기
+        return img, img_mask
 
     def get_door_alphabet(self, visualization: bool = False) -> str:
         src = self.get_image()
@@ -110,7 +143,8 @@ class ImageProcessor:
             cv2.imshow("src", cv2.hconcat(
                 [canvas, roi_canvas]))
             cv2.waitKey(1)
-        return self.hash_detector4door.detect_alphabet_hash(roi_mask)
+        answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask)
+        return answer
 
     def get_slope_degree(self, visualization: bool = False):
         src = self.get_image()
@@ -123,54 +157,54 @@ class ImageProcessor:
             canvas = src.copy()
         _, roi_mask = cv2.threshold(cv2.cvtColor(src, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         canny = auto_canny(roi_mask)
-        canny_targets = []
+        candidates = []
+
+
         cnts, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in cnts:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if vertice == 4 and 2000 <= cv2.contourArea(cnt):
+            if vertice <= 8 and 2000 <= cv2.contourArea(cnt):
                 target = Target(contour=cnt)
-                canny_targets.append(target)
+                candidates.append(target)
 
-        for candidate in canny_targets:
+        curr_candidate = None
+        curr_hamming_distance = 1
+
+        for candidate in candidates:
             roi = candidate.get_target_roi(src)
             roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
             _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             roi_thresholded = cv2.bitwise_and(roi,roi,mask=roi_mask)
-            h_value = check_color4roi(roi_thresholded)
-            result = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
-            # if result is None:
-            #     continue
-            if visualization:
-                color: str = None
-                if 95 <= h_value <= 135:
-                    color = "BLUE"
-                elif h_value <= 20 or h_value >= 150 :
-                    color = "RED"
-                setLabel(canvas, candidate.get_pts(), f"{result}-hue:{color}", color=(0, 0, 255))
-                cv2.imshow("mask", roi_thresholded)
 
+            alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.35)
+            if alphabet is None:
+                continue
+            if hamming_distance < curr_hamming_distance:
+                curr_candidate = candidate
+                curr_hamming_distance = hamming_distance
+                h_value = get_mean_value_for_non_zero(roi_thresholded)
+                if 95 <= h_value <= 135:
+                    candidate.set_color("BLUE")
+                elif h_value <= 20 or h_value >= 140 :
+                    candidate.set_color("RED")
+                candidate.set_name(alphabet)
 
         if visualization:
+            if curr_candidate:
+                setLabel(canvas, candidate.get_pts(), f"{candidate.get_name()}-:{candidate.get_color()}", color=(0, 0, 255))
             cv2.imshow("src", cv2.hconcat([canvas, cv2.cvtColor(canny,cv2.COLOR_GRAY2BGR)]))
             cv2.waitKey(1)
 
+        if curr_candidate:
+            return curr_candidate.get_name(), curr_candidate.get_color()
+
+        return None
+
     def get_arrow_direction(self):
         src = self.get_image()
-        return self.hash_detector4arrow.detect_arrow(src)
-
-    def ostu_thresholding(self, visualization: bool = False):
-        src = self.get_image()
-        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-        _, roi_mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-        roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_OPEN, kernel)
-        roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_CLOSE, kernel)
-        #roi_mask = cv2.bitwise_not(roi_mask)
-        roi_masked = cv2.bitwise_and(src, src, mask=roi_mask)
-        if visualization:
-            cv2.imshow("src", cv2.hconcat([src, cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)]))
-            cv2.waitKey(1)
+        direction, _ = self.hash_detector4arrow.detect_arrow(src)
+        return direction
 
     def get_area_color(self, threshold: float = 0.5, visualization: bool = False):
         src = self.get_image()
@@ -192,7 +226,7 @@ class ImageProcessor:
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
         mask = cv2.bitwise_not(mask)
 
-        # background : white, target : green, red, blue, black
+        # background : white, target: green, red, blue, black
         # ostu thresholding inverse : background -> black, target -> white
         _, roi_mask = cv2.threshold(v, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_OPEN, kernel)
@@ -224,18 +258,101 @@ class ImageProcessor:
         else:
             return "BLACK"
 
-        
+    def get_yellow_line_corner_pos(self, visualization=False):
+        pos = None
+        src, yellow_img_mask = self.get_color_binary_image(color=COLORS["YELLOW"]["HOME"])
+        yellow_img = cv2.bitwise_and(src,src,mask=yellow_img_mask)
+        canny_img = auto_canny(yellow_img_mask)
+        lines = cv2.HoughLinesP(canny_img, 2, np.pi / 180, threshold=50, minLineLength=50, maxLineGap=60)
+        if lines is not None:
+            if visualization:
+                for line in lines:
+                    x1, y1, x2, y2 = line[0]
+                    slope = (y2 - y1) / (x2 - x1)
+
+                    if 0 <= slope < 1: # 노란색선
+                        cv2.line(src, (x1, y1), (x2, y2), (0, 255, 255), 2)
+                    elif slope >= 1: # 하늘색선
+                        cv2.line(src, (x1, y1), (x2, y2), (255, 255, 0), 2)
+                    elif slope <= -1 : # 초록색선
+                        cv2.line(src, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                    elif -1 < slope < 0: # 빨간색선
+                        cv2.line(src, (x1, y1), (x2, y2), (255, 0, 255), 2)
+                    else:
+                        cv2.line(src, (x1, y1), (x2, y2), (255, 255, 255), 2)
+
+            filtered_left_lns, filtered_right_lns = left_right_lines(lines)
+            median_left_f = median(filtered_left_lns, [], [])
+            median_right_f = median(filtered_right_lns, [], [])
+            if median_left_f is not None and median_right_f is not None:
+                intersect_pt = intersect(median_left_f, median_right_f)
+                if intersect_pt is not None:
+                    pos = tuple(intersect_pt)
+                    print(pos)
+                    if visualization :
+                        center = (cx, cy) = (self.width // 2, self.height // 2)
+                        x_range = 10
+                        y_range = 20
+                        if cx-x_range*10 <= pos[0] <= cx+x_range*10 :
+                            cv2.circle(src, pos, 10, (255, 0, 0), -1)
+                            cv2.putText(src, "IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 0, 0), thickness=2)
+                        else:
+                            cv2.circle(src, pos, 10, (0, 0, 255), -1)
+                            cv2.putText(src, "NOT IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), thickness=2)
+
+                        cv2.line(src, (cx - x_range * 10, cy), (cx + x_range * 10, cy), (255, 0, 0), 2)
+                        cv2.circle(src, center, 10, (255, 0, 0), 2)
+                        for x_r in range(x_range + 1):
+                            if x_r == 0 or x_r == x_range:
+                                x_r *= 10
+                                if x_r != 0:
+                                    cv2.putText(src, "-%d" % x_r, (cx - x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                                (255, 0, 0), thickness=2)
+                                    cv2.putText(src, "-%d" % x_r, (cx + x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                                (255, 0, 0), thickness=2)
+                                else:
+                                    cv2.putText(src, "0", (cx, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                                (255, 0, 0), thickness=2)
+
+                                cv2.line(src, (cx - x_r, cy - y_range), (cx - x_r, cy + y_range), (255, 0, 0), 2)
+                                cv2.line(src, (cx + x_r, cy - y_range), (cx + x_r, cy + y_range), (255, 0, 0), 2)
+                            else:
+                                y_r = y_range // 2
+                                x_r *= 10
+                                cv2.line(src, (cx - x_r, cy - y_r), (cx - x_r, cy + y_r), (255, 0, 0), 1)
+                                cv2.line(src, (cx + x_r, cy - y_r), (cx + x_r, cy + y_r), (255, 0, 0), 1)
+        else:
+            if visualization:
+                cv2.imshow("yellow_mask", yellow_img)
+                cv2.imshow("canny", canny_img)
+                cv2.imshow("line", src)
+                cv2.waitKey(1)
+            return None
+
+        if visualization:
+            cv2.imshow("yellow_mask", yellow_img)
+            cv2.imshow("canny", canny_img)
+            cv2.imshow("line", src)
+            cv2.waitKey(1)
+        return pos
+
+
+
+
+
+
+
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
-        imageProcessor.get_image(visualization=True)
-        #imageProcessor.ostu_thresholding(visualization=True)
-        #imageProcessor.get_room_alphabet(visualization=True)
-        #print(imageProcessor.get_area_color())
+        # imageProcessor.get_image(visualization=True)
+        print(imageProcessor.get_room_alphabet(visualization=True))
+        # print(imageProcessor.get_area_color())
+        #imageProcessor.get_contour()
         imageProcessor.fps.update()
     imageProcessor.fps.stop()
     print("[INFO] time : " + str(imageProcessor.fps.elapsed()))

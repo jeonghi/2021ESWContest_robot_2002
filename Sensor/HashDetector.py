@@ -60,11 +60,11 @@ class HashDetector:
             hdist_dict[direction] = self.hamming_distance(img_hash, hash)
         
         result = min(hdist_dict.keys(), key=(lambda k:hdist_dict[k]))
-        
+
         if hdist_dict[result] > threshold:
-            return None
+            return None, None
         
-        return result
+        return result, hdist_dict[result]
 
     def detect_arrow(self, img : np.ndarray):
         img_hash = self.image_to_hash(img)
