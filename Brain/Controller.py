@@ -14,6 +14,7 @@ class Robot:
         self._image_processor = ImageProcessor(video_path=video_path)
         self._line_detector = LineDetector()
         self.direction = None
+        self.curr_room_color = "GREEN"
 
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
@@ -35,6 +36,7 @@ class Robot:
 
     def line_tracing(self):
         self._motion.set_head('DOWN', 30)
+        self._motion.set_head('DOWN', 45)
         while True:
             src = self._image_processor.get_image(visualization=False)
             src = cv2.resize(src, dsize=(640,480))
@@ -61,6 +63,7 @@ class Robot:
                 elif line_info["DEGREE"] > 95:
                     print('MODIFY angle --RIGHT', line_info)
                     self._motion.turn(dir='RIGHT', loop=1)
+
 
             else:
                 if line_info["HPOS"] > 200: 
@@ -114,4 +117,37 @@ class Robot:
         self._motion.set_head("UPDOWN_CENTER")
         self._motion.set_head("LEFTRIGHT_CENTER")
         return
+
+    def turn_to_yellow_line_corner(self, turn):
+        baseline = (bx, by) = (320, 420)
+        r = self._motion.set_head("DOWN", 60)
+        if self.curr_room_color is "GREEN" : # 안전 지역에서 빠져 나간다면 물건을 집지 않고 그냥 회전
+            self._motion.turn(dir=turn, loop=3)
+            flag = True
+            while True:
+                corner_pos = self._image_processor.get_yellow_line_corner_pos()
+                if corner_pos:
+                    (cx, cy) = corner_pos
+                    if bx - 50 <= cx <= bx + 50: # 적정범위 이내이면 물건 들고 전진, 리턴
+                        print("코너가 적정 범위에 들어왔습니다. 코너로 전진합니다")
+                        self._motion.walk(dir="FORWARD")
+                        cv2.destroyAllWindows()
+                        return
+                    elif bx-80 <= cx < bx-50: # 적정범위밖 왼쪽으로 치우쳐있다면요
+                        print("코너가 범위에서 왼쪽으로 벗어났습니다. 오른쪽으로 ")
+                        self._motion.turn(dir="RIGHT")
+                    elif bx+50 < cx <= bx+80: # 적정범위밖 오른쪽으로 치우쳐있다면
+                        print("코너가 범위에서 오쪽으로 벗어났습니다. 왼쪽으로 턴")
+                        self._motion.turn(dir="LEFT")
+                    else:
+                        print("걍 범위에 들지도 않아 지정 방향으로 턴")
+                        self._motion.turn(dir=turn)
+                else:
+                    if flag:
+                        self._motion.set_head("DOWN", 30)
+                    else:
+                        self._motion.set_head("DOWN", 60)
+                    flag = not flag
+                    print("코너가 검출되지 않았습니다 지정 방향으로 턴")
+                    self._motion.turn(dir=turn)
         
