@@ -216,10 +216,10 @@ self.mode = "modify_angle_left"
             # edge_line이 5개 이상 검출될 때까지 몸을 회전시킨다
             if self.mode='find_edge':
                 self._motion.turn(dir='LEFT')          
-            if self.mode = 'find_edge_closer'
+            elif self.mode = 'find_edge_closer':
                 self._motion.walk(dir='FORWARD')
-            if self.mode = 'find_vertical'
-                        self._motion.turn(dir=direction)
+            elif self.mode = 'find_vertical':
+                self._motion.turn(dir=direction)
 
 
         # 검출되면? 검출된 edge line이 로봇 발 앞에 올때까지 걷는다. (판단은 edge line의 y좌표가 일정 범위 안에 들어올 때까지) --> 많이 멀면 넓게 걷고, 가까우면 보통으로 걷는다.
