@@ -14,6 +14,7 @@ class Robot:
         self._image_processor = ImageProcessor(video_path=video_path)
         self._line_detector = LineDetector()
         self.direction = None
+        self.curr_room_color = "GREEN"
 
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
@@ -35,6 +36,7 @@ class Robot:
 
     def line_tracing(self):
         self._motion.set_head('DOWN', 30)
+        self._motion.set_head('DOWN', 45)
         while True:
             src = self._image_processor.get_image(visualization=False)
             src = cv2.resize(src, dsize=(640,480))
@@ -61,6 +63,7 @@ class Robot:
                 elif line_info["DEGREE"] > 95:
                     print('MODIFY angle --RIGHT', line_info)
                     self._motion.turn(dir='RIGHT', loop=1)
+
 
             else:
                 if line_info["HPOS"] > 200: 

@@ -394,12 +394,14 @@ class ImageProcessor:
     
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="src/old/out_room.mp4")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
-        # imageProcessor.get_image(visualization=True)
-        print(imageProcessor.get_room_alphabet(visualization=True))
+        imageProcessor.get_image(visualization=True)
+        #print(imageProcessor.get_room_alphabet(visualization=True))
+        pos = imageProcessor.get_yellow_line_corner_pos(visualization=True)
+        print(pos)
         # print(imageProcessor.get_area_color())
         #imageProcessor.get_contour()
         imageProcessor.fps.update()
