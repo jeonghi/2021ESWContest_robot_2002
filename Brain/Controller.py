@@ -155,7 +155,7 @@ class Robot:
         if not is_saferoom_found:
             self._motion.turn('LEFT', grab=True)
         else:
-            if abs(frame_center_x - saferoom_pos_x) < 20 and saferoom_pos_y < 440:
+            if abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) > 20:
                 self._motion.walk('FORWARD', grab=True)
             elif abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) < 20:
                 self._motion.grab(switch=False)
