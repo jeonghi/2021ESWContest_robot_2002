@@ -1,7 +1,7 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
 from Actuator.Motion import Motion
-from Sensor.ColorChecker import get_pixel_rate4green
+from Sensor.ColorChecker import get_mean_value_for_non_zero
 import numpy as np
 import cv2
 import time
@@ -119,6 +119,7 @@ class Robot:
         return
     
     def tracking_cube(self):
+        self._motion.set_head(dir='DOWN', angle=60)
         src = self._image_processor.get_image(visualization=False)
         h, w = src.shape[:2]
         frame_center_x = w / 2
@@ -139,14 +140,14 @@ class Robot:
         if is_cube_found and not is_cube_grabbed:
             if abs(frame_center_x - cube_center_x) < 20:
                 self._motion.walk('FORWARD')
-            elif cube_center_x < 300:
+            elif cube_center_x > 300:
                 self._motion.walk('RIGHT')
-            elif cube_center_x > 340:
+            elif cube_center_x < 340:
                 self._motion.walk('LEFT')
             
             cv2.circle(src, (cube_center_x, cube_center_y), 30, (0, 255, 255))
         
-        if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 400:
+        if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 440:
             self._motion.grab()
             is_cube_grabbed = True
             
