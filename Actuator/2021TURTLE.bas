@@ -3906,8 +3906,14 @@ KEY4:
     GOTO RX_EXIT
     '***************
 KEY5:
-    ETX  4800,5
-    GOSUB 집고전진
+	ETX  4800,5
+
+    J = AD(적외선AD포트)	'적외선거리값 읽기
+    ETX 4800, J
+    BUTTON_NO = J
+    GOSUB Number_Play
+    'GOSUB SOUND_PLAY_CHK
+    GOSUB GOSUB_RX_EXIT
 
     GOTO RX_EXIT
     '***************
