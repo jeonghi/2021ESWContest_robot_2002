@@ -335,14 +335,63 @@ class ImageProcessor:
             cv2.imshow("line", src)
             cv2.waitKey(1)
         return pos
+    
+    def get_cube_saferoom(self):
+        img = self.get_image()
+        
+        red_lower = np.array([160, 100, 20])
+        red_upper = np.array([179, 255, 255])
 
-
-
-
-
-
-
-
+        blue_lower = np.array([100, 60, 60])
+        blue_upper = np.array([140, 255, 255])
+        
+        kernel = np.ones((5, 5), np.uint8)
+        
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        
+        red_mask = cv2.inRange(hsv, red_lower, red_upper)
+        red_mask = cv2.erode(red_mask, kernel, iterations=2)
+        red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+        red_mask = cv2.dilate(red_mask, kernel, iterations=1)
+        
+        (cnts, _) = cv2.findContours(red_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        center = None
+        if len(cnts) > 0:
+            cnt = sorted(cnts, key = cv2.contourArea, reverse = True)[0]
+            ((x, y), radius) = cv2.minEnclosingCircle(cnt)
+            M = cv2.moments(cnt)
+            center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
+            
+            return center
+        return None, None
+    
+    def get_saferoom_position(self):
+        img = self.get_image()
+        
+        green_lower = np.array([40, 40, 40])
+        green_upper = np.array([70, 255, 255])
+        
+        kernel = np.ones((5, 5), np.uint8)
+        
+        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        
+        red_mask = cv2.inRange(hsv, green_lower, green_upper)
+        red_mask = cv2.erode(red_mask, kernel, iterations=2)
+        red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
+        red_mask = cv2.dilate(red_mask, kernel, iterations=1)
+        
+        (cnts, _) = cv2.findContours(red_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        center = None
+        if len(cnts) > 0:
+            cnt = sorted(cnts, key = cv2.contourArea, reverse = True)[0]
+            ((x, y), radius) = cv2.minEnclosingCircle(cnt)
+            M = cv2.moments(cnt)
+            center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
+            
+            return center
+        
+        return None, None
+    
 if __name__ == "__main__":
 
     imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
