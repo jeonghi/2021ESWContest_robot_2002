@@ -123,6 +123,7 @@ class Robot:
         src = self._image_processor.get_image(visualization=False)
         h, w = src.shape[:2]
         frame_center_x = w / 2
+        frame_center_y = h / 2
         
         cube_center_x, cube_center_y = self._image_processor.get_cube_saferoom()
         saferoom_pos_x, saferoom_pos_y = self._image_processor.get_saferoom_position()
@@ -135,7 +136,7 @@ class Robot:
         if saferoom_pos_x is None:
             is_saferoom_found = False
         
-        is_cube_grabbed = False
+        is_cube_grabbed = False if self._motion.get_IR() < 100 else True
         
         if is_cube_found and not is_cube_grabbed:
             if abs(frame_center_x - cube_center_x) < 20:
@@ -144,18 +145,21 @@ class Robot:
                 self._motion.walk('RIGHT')
             elif cube_center_x < 340:
                 self._motion.walk('LEFT')
-            
-            cv2.circle(src, (cube_center_x, cube_center_y), 30, (0, 255, 255))
         
         if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 440:
             self._motion.grab()
-            is_cube_grabbed = True
-            
-        if is_saferoom_found and is_cube_grabbed:
-            if abs(frame_center_x - is_saferoom_found) < 20:
-                self._motion.walk('FORWARD')
-            elif cube_center_x < 300:
-                self._motion.walk('RIGHT')
-            elif cube_center_x > 340:
-                self._motion.walk('LEFT')
-            cv2.circle(src, (saferoom_pos_x, saferoom_pos_y), 30, (255, 0, 255))
+        
+        if not is_cube_grabbed:
+            return
+        
+        if not is_saferoom_found:
+            self._motion.turn('LEFT', grab=True)
+        else:
+            if abs(frame_center_x - saferoom_pos_x) < 20 and saferoom_pos_y < 440:
+                self._motion.walk('FORWARD', grab=True)
+            elif abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) < 20:
+                self._motion.grab(switch=False)
+            elif saferoom_pos_x > 300:
+                self._motion.turn('RIGHT', grab=True)
+            elif saferoom_pos_x < 340: 
+                self._motion.turn('LEFT', grab=True)
