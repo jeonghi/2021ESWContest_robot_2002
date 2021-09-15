@@ -14,6 +14,7 @@ class Robot:
         self._image_processor = ImageProcessor(video_path=video_path)
         self._line_detector = LineDetector()
         self.direction = None
+        self.cube_grabbed = False
         self.curr_room_color = "GREEN"
 
     def detect_alphabet(self):
@@ -22,7 +23,7 @@ class Robot:
         alphabet = None
         while alphabet is None:
             alphabet = self._image_processor.get_door_alphabet()
-            
+
             if alphabet is not None:
                 break
 
@@ -30,7 +31,7 @@ class Robot:
                 self._motion.walk("RIGHT")
             else:
                 self._motion.walk("LEFT")
-        
+
             flag = not flag
         self._motion.notice_direction(dir=alphabet)
 
@@ -43,7 +44,7 @@ class Robot:
             line_info, result_img = self._line_detector.get_all_lines(src)
             cv2.imshow('src', result_img)
             cv2.waitKey(1)
-            
+
             if line_info["V"] and not line_info["H"]:
                 if 300 < line_info["VPOS"] <340:
                     print('FORWARD', line_info)
@@ -66,7 +67,7 @@ class Robot:
 
 
             else:
-                if line_info["HPOS"] > 200: 
+                if line_info["HPOS"] > 200:
                     if line_info["H_MIN_X"] < 50 and line_info["H_MAX_X"] < 340:
                         print('┒', line_info)
                         if self.direction == 'LEFT':
@@ -88,7 +89,7 @@ class Robot:
                             #self.count += 1
                         else:
                             print("화살표 인식 전입니다.")
-                        
+
                     else:
                         print('T', line_info)
                         self._motion.set_head("DOWN", 100)
@@ -117,49 +118,52 @@ class Robot:
         self._motion.set_head("UPDOWN_CENTER")
         self._motion.set_head("LEFTRIGHT_CENTER")
         return
-    
+
     def tracking_cube(self):
         self._motion.set_head(dir='DOWN', angle=60)
         src = self._image_processor.get_image(visualization=False)
         h, w = src.shape[:2]
         frame_center_x = w / 2
         frame_center_y = h / 2
-        
+
         cube_center_x, cube_center_y = self._image_processor.get_cube_saferoom()
         saferoom_pos_x, saferoom_pos_y = self._image_processor.get_saferoom_position()
-        
+
         is_cube_found = True
         if cube_center_x is None:
             is_cube_found = False
-        
+
         is_saferoom_found = True
         if saferoom_pos_x is None:
             is_saferoom_found = False
-        
-        is_cube_grabbed = False if self._motion.get_IR() < 100 else True
-        
-        if is_cube_found and not is_cube_grabbed:
+
+        cur_ir = self._motion.get_IR()
+        print('NOW IR:: ', cur_ir)
+
+        #cube_grabbed = False if cur_ir < 100 else True
+
+        if self.cube_grabbed:
+            if not is_saferoom_found:
+                self._motion.turn('LEFT', grab=True)
+                print("saferoom not found")
+            else:
+                if abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) > 20:
+                    self._motion.walk('FORWARD', grab=True)
+                elif abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) < 20:
+                    self._motion.grab(switch=False)
+                elif saferoom_pos_x < 300:
+                    self._motion.turn('LEFT', grab=True)
+                    print("saferoom found left")
+                elif saferoom_pos_x > 340:
+                    self._motion.turn('LEFT', grab=True)
+                    print("saferoom found right")
+        else:
             if abs(frame_center_x - cube_center_x) < 20:
                 self._motion.walk('FORWARD')
             elif cube_center_x > 300:
                 self._motion.walk('RIGHT')
             elif cube_center_x < 340:
                 self._motion.walk('LEFT')
-        
-        if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 440:
-            self._motion.grab()
-        
-        if not is_cube_grabbed:
-            return
-        
-        if not is_saferoom_found:
-            self._motion.turn('LEFT', grab=True)
-        else:
-            if abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) > 20:
-                self._motion.walk('FORWARD', grab=True)
-            elif abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) < 20:
-                self._motion.grab(switch=False)
-            elif saferoom_pos_x > 300:
-                self._motion.turn('RIGHT', grab=True)
-            elif saferoom_pos_x < 340: 
-                self._motion.turn('LEFT', grab=True)
+            if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 440:
+                self._motion.grab()
+                self.cube_grabbed = True
