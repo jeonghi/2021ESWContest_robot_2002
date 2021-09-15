@@ -10,8 +10,9 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        #self._motion = Motion()
-        self._image_processor = ImageProcessor(video_path=video_path)
+        #self._motion = Motion()"Sensor/src/old/out_room.mp4"
+        #self._image_processor = ImageProcessor(video_path=video_path)
+        self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/return_line.h264")
         self._line_detector = LineDetector()
         self.direction = None
         self.cube_grabbed = False
@@ -169,14 +170,9 @@ class Robot:
                 self.cube_grabbed = True
 
     def return_line__(self):
-        flag = False
-        # + 고개를 든다 (고개 각도도 보면서 정해야할 듯)
-        #self._motion.set_head(dir='DOWN', angle=60)
-        
-        while True:
-            line_info,edge_info, result =  self._image_processor.line_tracing()
-            cv2.imshow('result', result)
-            cv2.waitKey(1)
-            print(line_info)
-            print(edge_info)
+        line_info,edge_info, result =  self._image_processor.line_tracing()
+        cv2.imshow('result', result)
+        cv2.waitKey(1)
+        print(line_info)
+        print(edge_info)
 
