@@ -104,29 +104,34 @@ class LineDetector:
             x1, y1 = int(((src.shape[0]-1)-y)/vy*vx + x) , src.shape[0]-1
             x2, y2 = int(((src.shape[0]/2+200)-y)/vy*vx + x) , int(src.shape[0]/2)
             result = [x1,y1,x2,y2]
+            return result
         elif what_line == 'horizontal':
             middle=int(lines.mean(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
             result = [max_x, middle, min_x, middle]
+            return result
         elif what_line == 'edge':
             max_y=int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0]) 
             max_x = int(lines.max(axis=0)[0]) 
-            result = [max_x, max_y, min_x, max_y] 
+            result = [max_x, max_y, min_x, max_y]
+            return result
         elif what_line == 'edge_R':
             min_y=int(lines.min(axis=0)[1])
             max_y=int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0]) 
             max_x = int(lines.max(axis=0)[0]) 
             result = [max_x, min_y, min_x, max_y] 
+            return result
         elif what_line == 'edge_L':
             min_y=int(lines.min(axis=0)[1])
             max_y=int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0]) 
             max_x = int(lines.max(axis=0)[0]) 
             result = [min_x, min_y, max_x, max_y] 
-        return result
+            return result
+        
 
     def get_fitline__(self, img, f_lines): 
         lines = np.squeeze(f_lines)
@@ -145,7 +150,7 @@ class LineDetector:
     def get_all_lines(self, src, line_visualization = False, edge_visualization = False):
 
         line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
-        edge_info = {"EDGE_LINE": 0,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
+        edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
 
         lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L,edge_lines_R = self.get_lines(src)
 
@@ -183,7 +188,6 @@ class LineDetector:
         if len(edge_lines) != 0:
             size = int(edge_lines.shape[0]*edge_lines.shape[2]/2)
             edge_fit_line = self.get_fitline(src, edge_lines, size, 'edge')
-            edge_info["EDGE_LINE"] = edge_fit_line[1] # [max_x, max_y, min_x, max_y] 
             if edge_visualization is True:
                 self.draw_lines(temp, edge_fit_line, 'edge', 'fit')
                 src = cv2.addWeighted(src, 1, temp, 1., 0.)
@@ -208,20 +212,27 @@ class LineDetector:
                 self.draw_lines(temp, edge_line_R, 'edge_R', 'fit')
                 src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
+        if len(edge_lines) != 0 and len(edge_lines_L)!=0 and len(edge_lines_R)!=0:
+            x_center = int((edge_line_L[2]+edge_line_R[2])/2)
+            y_center = edge_fit_line[1] # [max_x, max_y, min_x, max_y] 
+            edge_info["EDGE_POS"] = [x_center, y_center]
+        else:
+            edge_info["EDGE_POS"] = None
+
         return line_info,edge_info, src
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture(".\src\old\out_room.mp4")
+    video = cv2.VideoCapture("/home/sol/Desktop/2021ESWContest (copy)/Sensor/src/old/out_room.mp4")
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
         if not ret:
-            video = cv2.VideoCapture(".\src\old\out_room.mp4")
-            print("No video")
+            video = cv2.VideoCapture("/home/sol/Desktop/2021ESWContest (copy)/Sensor/src/old/out_room.mp4")
             continue
         src = cv2.resize(src, dsize=(640,480))
         line_info,edge_info, result = line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
+        print(line_info)
         print(edge_info)
         cv2.imshow('result',result)
         key = cv2.waitKey(1)
@@ -229,4 +240,3 @@ if __name__ == "__main__":
             break
     video.release()
     cv2.destroyAllWindows()
-
