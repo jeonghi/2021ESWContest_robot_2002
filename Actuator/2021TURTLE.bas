@@ -3518,12 +3518,20 @@ Number_Play: '  BUTTON_NO = 숫자대입
 양팔벌리기:
     'MOVE G6A, 101,  83, 128,  96,  99, 100
     'MOVE G6D, 100,  79, 128, 100,  99, 100
-    MOVE G6B, 101,  91,  99, 100, 100, 101
-    MOVE G6C, 107, 101, 100, 100,  99, 100
+    MOVE G6B, 107, 101, 100, 100, 100, 101
+    MOVE G6C, 107, 101, 100, 100, 100, 100
     WAIT
 
 
     RETURN
+
+잡기기본자세:
+    MOVE G6B, 90, 80, 80, 90, 100, 101
+    MOVE G6C, 90, 80, 80, 90, 100, 100
+    WAIT
+
+    RETURN
+
 
 양팔앞으로:
     SPEED 4
@@ -3779,6 +3787,120 @@ Number_Play: '  BUTTON_NO = 숫자대입
     WAIT
 
     RETURN
+횟수_집고후진:
+    GOSUB All_motor_mode3
+    넘어진확인 = 0
+    보행COUNT = 0
+    SPEED 7
+    HIGHSPEED SETON
+
+
+    IF 보행순서 = 0 THEN
+        보행순서 = 1
+        MOVE G6A,95,  76, 145,  93, 101
+        MOVE G6D,101,  76, 145,  93, 98
+        MOVE G6B, 190, 10, 50
+        MOVE G6C, 190, 10, 50
+        WAIT
+
+        GOTO 횟수_집고후진_1
+    ELSE
+        보행순서 = 0
+        MOVE G6D,95,  76, 145,  93, 101
+        MOVE G6A,101,  76, 145,  93, 98
+        MOVE G6B, 190, 10, 50
+        MOVE G6C, 190, 10, 50
+        WAIT
+
+        GOTO 횟수_집고후진_4
+    ENDIF
+
+
+    '**********************
+
+횟수_집고후진_1:
+    MOVE G6D,104,  76, 147,  93,  102
+    MOVE G6A,95,  95, 120, 95, 104
+    MOVE G6B, 190, 10, 50
+    MOVE G6C, 190, 10, 50
+    WAIT
+
+
+
+횟수_집고후진_3:
+    MOVE G6A, 103,  79, 147,  89, 100
+    MOVE G6D,95,   65, 147, 103,  102
+    WAIT
+
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+        GOTO RX_EXIT
+    ENDIF
+    보행COUNT = 보행COUNT + 1
+    IF 보행COUNT > 보행횟수 THEN  GOTO 횟수_집고후진_3_stop
+    ERX 4800,A, 횟수_집고후진_4
+    IF A <> A_old THEN
+횟수_집고후진_3_stop:
+        MOVE G6D,95,  85, 130, 100, 104
+        MOVE G6A,104,  77, 146,  93,  102
+        MOVE G6B, 190, 10, 50
+        MOVE G6C, 190, 10, 50
+        WAIT
+
+        'SPEED 15
+        '        GOSUB 안정화자세
+        '       HIGHSPEED SETOFF
+        '      SPEED 5
+        '     GOSUB 기본자세2
+
+        '   DELAY 400
+        GOTO RX_EXIT
+    ENDIF
+    '*********************************
+
+횟수_집고후진_4:
+    MOVE G6A,104,  76, 147,  93,  102
+    MOVE G6D,95,  95, 120, 95, 104
+    MOVE G6B, 190, 10, 50
+    MOVE G6C, 190, 10, 50
+    WAIT
+
+
+횟수_집고후진_6:
+    MOVE G6D, 103,  79, 147,  89, 100
+    MOVE G6A,95,   65, 147, 103,  102
+    WAIT
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+        GOTO RX_EXIT
+    ENDIF
+
+    보행COUNT = 보행COUNT + 1
+    IF 보행COUNT > 보행횟수 THEN  GOTO 횟수_집고후진_6_stop
+
+    ERX 4800,A, 횟수_집고후진_1
+    IF A <> A_old THEN  'GOTO 횟수_집고후진_멈춤
+횟수_집고후진_6_stop:
+        MOVE G6A,95,  85, 130, 100, 104
+        MOVE G6D,104,  77, 146,  93,  102
+        MOVE G6B, 190, 10, 50
+        MOVE G6C, 190, 10, 50
+        WAIT
+
+        'SPEED 15
+        '        GOSUB 안정화자세
+        '       HIGHSPEED SETOFF
+        '      SPEED 5
+        '     GOSUB 기본자세2
+
+        '  DELAY 400
+        GOTO RX_EXIT
+    ENDIF
+
+    GOTO 횟수_집고후진_1
+
 
 우유깍놓기_1:
     SPEED 4
@@ -3849,7 +3971,7 @@ MAIN_2:
 
     '**** 입력된 A값이 0 이면 MAIN 라벨로 가고
     '**** 1이면 KEY1 라벨, 2이면 key2로... 가는문
-    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65,KEY66,KEY67,KEY68,KEY70,KEY71,KEY72,KEY73,KEY74,KEY75,KEY76,KEY77,KEY78
+    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65,KEY66,KEY67,KEY68,KEY69,KEY70,KEY71,KEY72,KEY73,KEY74,KEY75,KEY76,KEY77,KEY78
 
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
@@ -3928,12 +4050,16 @@ KEY7:
     '***************
 KEY8:
     ETX  4800,8
-    GOSUB 집고왼쪽턴3_LOOP
+
+    보행횟수 = 1
+    GOTO 횟수_집고후진
+
+
     GOTO RX_EXIT
     '***************
 KEY9:
     ETX  4800,9
-    GOSUB 집고오른쪽턴3_LOOP
+    GOSUB 잡기기본자세
     GOTO RX_EXIT
     '***************
 KEY10: '0
@@ -4276,9 +4402,9 @@ KEY68:
     ETX 4800, 68
     GOSUB 집고전진
     GOTO RX_EXIT
-KEY69: 
+KEY69:
     ETX 4800, 69
-    GOSUB 연속후진   
+    GOTO 연속후진
     GOTO RX_EXIT
 KEY70:
     ETX 4800, 70
