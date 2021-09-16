@@ -12,13 +12,13 @@ if __name__ == "__main__":
     from HashDetector import HashDetector
     from Target import Target, setLabel
     from LineDetector import LineDetector
-    from ColorChecker import ColorPreProcessor, ColorAreaChecker
+    from ColorChecker import ColorPreProcessor
     from LaneLines import intersect, median, left_right_lines
 else:
     from Sensor.HashDetector import HashDetector
     from Sensor.Target import Target, setLabel
     from Sensor.LineDetector import LineDetector
-    from Sensor.ColorChecker import ColorPreProcessor, ColorAreaChecker
+    from Sensor.ColorChecker import ColorPreProcessor
     from Sensor.LaneLines import intersect, median, left_right_lines
 
 
@@ -96,7 +96,7 @@ class ImageProcessor:
                 if visualization:
                     setLabel(canvas, cnt, "canny", color=(0,0,255))
 
-        target = non_maximum_suppression4targets(canny_targets, no_canny_targets, threshold=0.7)
+        target = Target.non_maximum_suppression4targets(canny_targets, no_canny_targets, threshold=0.7)
 
         if visualization:
             cv2.imshow("src", cv2.hconcat([canvas, roi_canvas]))
