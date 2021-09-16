@@ -3799,7 +3799,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     'DELAY 10
     'GOSUB 기본자세2
     RETURN
-    
+
 우유깍잡기_1:
     SPEED 4
     MOVE G6B, 190, 10, 50
@@ -3906,7 +3906,7 @@ KEY4:
     GOTO RX_EXIT
     '***************
 KEY5:
-	ETX  4800,5
+    ETX  4800,5
 
     J = AD(적외선AD포트)	'적외선거리값 읽기
     ETX 4800, J
@@ -3928,12 +3928,12 @@ KEY7:
     '***************
 KEY8:
     ETX  4800,8
-    GOSUB 우유깍놓기_1
+    GOSUB 집고왼쪽턴3_LOOP
     GOTO RX_EXIT
     '***************
 KEY9:
     ETX  4800,9
-    GOSUB 우유깍놓기_2
+    GOSUB 집고오른쪽턴3_LOOP
     GOTO RX_EXIT
     '***************
 KEY10: '0
@@ -4276,8 +4276,10 @@ KEY68:
     ETX 4800, 68
     GOSUB 집고전진
     GOTO RX_EXIT
-    'KEY69: 집고후진
-
+KEY69: 
+    ETX 4800, 68
+    GOSUB 집고전진
+    GOTO RX_EXIT'집고후진 아직 안만들어서 집고전진으로 임시저장
 KEY70:
     ETX 4800, 70
     GOSUB 집고왼쪽옆으로
@@ -4302,17 +4304,17 @@ KEY75:
     ETX  4800,75
     GOSUB 우유깍놓기_2
     GOTO RX_EXIT
-KEY76: 
+KEY76:
     ETX  4800,76
     GOSUB 우유깍잡기_1
     GOTO RX_EXIT
     '***************
-KEY77: 
+KEY77:
     ETX  4800,77
     GOSUB 우유깍잡기_2
     GOTO RX_EXIT
     '***************
-KEY78: 
+KEY78:
     ETX 4800, 78
     GOSUB 우유깍잡기_3
     GOTO RX_EXIT
