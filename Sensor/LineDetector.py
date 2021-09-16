@@ -47,8 +47,8 @@ class LineDetector:
                 cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
     def mask_color(self, src):
-        yellow_lower = np.array([18, 94, 140])
-        yellow_upper = np.array([48, 255, 255])
+        yellow_lower = np.array([0, 140, 95])
+        yellow_upper = np.array([58, 200, 151])
         src = cv2.GaussianBlur(src, (5, 5), 0)
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
