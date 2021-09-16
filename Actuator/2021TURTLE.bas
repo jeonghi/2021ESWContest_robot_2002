@@ -4277,9 +4277,9 @@ KEY68:
     GOSUB 집고전진
     GOTO RX_EXIT
 KEY69: 
-    ETX 4800, 68
-    GOSUB 집고전진
-    GOTO RX_EXIT'집고후진 아직 안만들어서 집고전진으로 임시저장
+    ETX 4800, 69
+    GOSUB 연속후진   
+    GOTO RX_EXIT
 KEY70:
     ETX 4800, 70
     GOSUB 집고왼쪽옆으로
