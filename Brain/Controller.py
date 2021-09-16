@@ -1,6 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
-from Actuator.Motion import Motion
+# from Actuator.Motion import Motion
 from Sensor.ColorChecker import get_mean_value_for_non_zero
 import numpy as np
 import cv2
@@ -10,16 +10,18 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        self._motion = Motion()
+        #self._motion = Motion()
         #self._image_processor = ImageProcessor(video_path=video_path)
         self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/return_line.h264")
         self._line_detector = LineDetector()
         self.direction = None
-        self.mode = 'start'
+        # self.mode = 'start'
+        self.mode = 'end_mission'
         self.cube_grabbed = False
         self.curr_room_color = "GREEN"
         self.count = 0
         self.progress_of_roobot= [None, ]
+        self.walk_info = None
 
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
@@ -177,7 +179,7 @@ class Robot:
         cv2.imshow('result', result)
         cv2.waitKey(1)
         #print(line_info)
-        #print(edge_info)
+        print(edge_info)
         return line_info, edge_info
         
 

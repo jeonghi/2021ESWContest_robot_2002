@@ -406,14 +406,14 @@ class ImageProcessor:
         cv2.waitKey(1)
 
 if __name__ == "__main__":
-    imageProcessor = ImageProcessor()
+    imageProcessor = ImageProcessor("Sensor/src/line_test/return_line.h264")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
-        #line_info,edge_info, result = imageProcessor.line_tracing()
-        imageProcessor.test()
-        #print(edge_info)
-        #cv2.imshow('result',result)
-        #key = cv2.waitKey(1)
-        #if key == 27:
-        #    break
+        line_info,edge_info, result = imageProcessor.line_tracing()
+        #imageProcessor.test()
+        print(edge_info)
+        cv2.imshow('result',result)
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
