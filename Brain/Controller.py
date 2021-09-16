@@ -1,6 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
-#from Actuator.Motion import Motion
+from Actuator.Motion import Motion
 from Sensor.ColorChecker import get_mean_value_for_non_zero
 import numpy as np
 import cv2
@@ -10,13 +10,16 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        #self._motion = Motion()"Sensor/src/old/out_room.mp4"
+        self._motion = Motion()
         #self._image_processor = ImageProcessor(video_path=video_path)
         self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/return_line.h264")
         self._line_detector = LineDetector()
         self.direction = None
+        self.mode = 'start'
         self.cube_grabbed = False
         self.curr_room_color = "GREEN"
+        self.count = 0
+        self.progress_of_roobot= [None, ]
 
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
@@ -169,10 +172,320 @@ class Robot:
                 self._motion.grab()
                 self.cube_grabbed = True
 
-    def return_line__(self):
+    def line_tracing(self):
         line_info,edge_info, result =  self._image_processor.line_tracing()
         cv2.imshow('result', result)
         cv2.waitKey(1)
-        print(line_info)
-        print(edge_info)
+        #print(line_info)
+        #print(edge_info)
+        return line_info, edge_info
+        
 
+    def detect_direction(self):
+        self.detect_alphabet()
+        self.mode = 'walk'
+
+    def walk(self, line_info):
+        # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
+        if self.walk_info == '│':
+            if 300 < line_info["V_X"][0] <340:
+                print('│', line_info)
+                self._motion.walk(dir='FORWARD', loop=1)
+            else:
+                if line_info["V_X"][0] < 300:
+                    print('← ←', line_info)
+                    self._motion.walk(dir='LEFT', loop=1)
+                elif line_info["V_X"][0] > 340:
+                    print('→ →', line_info)
+                    self._motion.walk(dir='RIGHT', loop=1)
+
+        elif self.walk_info == '─':
+            self._motion.walk(dir='BACK', loop=2)
+            if self.progress_of_roobot[2] == 'detect_direction':
+                self.mode = 'detect_direction: fail'
+            else:
+                self.mode = 'walk'
+
+        elif self.walk_info == None: # 'modify_angle'
+            if line_info["DEGREE"] < 85:
+                print('MODIFY angle --LEFT', line_info)
+                self._motion.turn(dir='LEFT', loop=1)
+            elif line_info["DEGREE"] > 95:
+                print('MODIFY angle --RIGHT', line_info)
+                self._motion.turn(dir='RIGHT', loop=1)            
+
+        else:
+            print("self.walk_info is blank, Please check line_info")
+
+    def find_edge(self):
+        self._motion.set_head('DOWN', 60)
+        self._motion.turn(dir='LEFT', loop=2)
+
+    def return_line(self):
+        self._motion.walk(dir='FOWARD', loop=2)
+
+    def find_V(self):
+        self._motion.turn(self.direction, 1)
+
+    def setting_mode(self):
+        line_info, edge_info = self.line_tracing()
+        # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
+        # edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
+
+        # 방위 인식
+        if self.mode == 'start' :
+            self.mode = 'detect_direction' # --> walk
+            if self.progress_of_roobot[0] != self.mode:
+                self.progress_of_roobot.insert(0, self.mode)
+
+        if self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
+            if self.direction != None:
+                self.detect_direction()
+                self.mode = 'detect_direction'
+            else:
+                self.mode = 'walk'
+
+        # 걷기 # 보정 추가로 넣기
+        elif self.mode == 'walk' and self.walk_info != '┐' and self.walk_info != '┌' :
+            if line_info["V"]==True and line_info["H"]==False:
+                self.walk_info = '│'
+                self.walk(line_info, self.walk_info)
+                if self.progress_of_roobot[0] != self.walk_info:
+                    self.progress_of_roobot.insert(0, self.walk_info)
+            elif line_info["V"]==True and line_info["H"]==True:
+                if line_info["V_X"][0] < 20 and line_info["V_X"][1] < 360 :
+                    self.walk_info = '┐'
+                    if self.progress_of_roobot[0] != self.walk_info:
+                        self.progress_of_roobot.insert(0, self.walk_info)
+                elif line_info["V_X"][0] > 280 and line_info["V_X"][1] > 600 :
+                    self.walk_info = '┌'
+                    if self.progress_of_roobot[0] != self.walk_info:
+                        self.progress_of_roobot.insert(0, self.walk_info)
+                else :
+                    self.walk_info = 'T'
+                    if self.progress_of_roobot[0] != self.walk_info:
+                        self.progress_of_roobot.insert(0, self.walk_info)
+            elif line_info["V"]==False and line_info["H"]==True: 
+                self.walk_info = '─'
+                self.walk(line_info, self.walk_info)
+                if self.progress_of_roobot[0] != self.walk_info:
+                    self.progress_of_roobot.insert(0, self.walk_info)
+            else:
+                self.walk_info = None # 'modify_angle'
+                self.walk(line_info, self.walk_info)           
+
+        # 미션 진입 판별
+        elif self.mode == 'walk' and self.walk_info == '┐':
+            if self.direction == 'RIGHT':
+                self.mode = 'start_mission' # --> end_mission --> return_line
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+
+            elif self.direction == 'LEFT':
+                self.mode = 'is_finish_line' # --> walk / finish
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                print('The Robot has not direction, Please Set **self.direction**')
+
+        elif self.mode == 'walk' and self.walk_info =='┌':
+            if self.direction == 'LEFT':
+                self.mode = 'start_mission' # --> end_mission
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+            elif self.direction == 'RIGHT':
+                self.mode = 'is_finish_line' # --> finish 
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                print('The Robot has not direction, Please Set **self.direction**')
+
+        # elif self.mode == 'start_mission':
+
+        # 미션 끝나면? - self.mode == 'end_mission'
+
+        # 방탈출
+        elif self.mode == 'end_mission' or self.mode == 'find_edge':
+            if edge_info["EDGE_POS"] != None :
+                if 320 < edge_info["EDGE_POS"][0] < 360 :
+                    self.mode == 'return_line' # --> find_V
+                    if self.progress_of_roobot[0] != self.mode:
+                        self.progress_of_roobot.insert(0, self.mode)
+            else:
+                self.mode = 'find_edge' # --> return_line
+                self.find_edge()
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)        
+
+        elif self.mode == 'return_line':
+            if edge_info["EDGE_POS"][1] > 380:
+                self.mode = 'find_V' # --> walk
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                self.mode = 'return_line' # --> find_V
+                self.return_line()
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+                    
+        elif self.mode == 'find_V':
+            self._motion.turn(self.direction, 1)
+            if line_info["V"] == True :
+                self.mode = 'walk'
+            else:
+                self.mode = 'find_V'
+                self.find_V()
+
+        # 나가기
+        elif self.mode == 'is_finish_line':
+            if self.count < 3:
+                self._motion.walk(dir='FORWARD', loop=8)
+                self.mode = 'walk'
+            else:
+                self.mode = 'finish' # --> stop!
+                if self.progress_of_roobot[0] != self.mode:
+                        self.progress_of_roobot.insert(0, self.mode)
+            self.count += 1
+
+
+
+    def setting_mode_test(self):
+        line_info, edge_info = self.line_tracing()
+        # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
+        # edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
+
+        # 방위 인식
+        if self.mode == 'start' :
+            self.mode = 'detect_direction' # --> walk
+            if self.progress_of_roobot[0] != self.mode:
+                print(self.mode)
+                self.progress_of_roobot.insert(0, self.mode)
+
+        if self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
+            if self.direction != None:
+                #self.detect_direction()
+                self.mode = 'detect_direction'
+            else:
+                self.mode = 'walk'
+
+        # 걷기 # 보정 추가로 넣기
+        elif self.mode == 'walk' and self.walk_info != '┐' and self.walk_info != '┌' :
+            if line_info["V"]==True and line_info["H"]==False:
+                self.walk_info = '│'
+                # self.walk(line_info, self.walk_info)
+                if self.progress_of_roobot[0] != self.walk_info:
+                    print(self.walk_info)
+                    self.progress_of_roobot.insert(0, self.walk_info)
+            elif line_info["V"]==True and line_info["H"]==True:
+                if line_info["V_X"][0] < 20 and line_info["V_X"][1] < 360 :
+                    self.walk_info = '┐'
+                    if self.progress_of_roobot[0] != self.walk_info:
+                        print(self.walk_info)
+                        self.progress_of_roobot.insert(0, self.walk_info)
+                elif line_info["V_X"][0] > 280 and line_info["V_X"][1] > 600 :
+                    self.walk_info = '┌'
+                    if self.progress_of_roobot[0] != self.walk_info:
+                        self.progress_of_roobot.insert(0, self.walk_info)
+                else :
+                    self.walk_info = 'T'
+                    if self.progress_of_roobot[0] != self.walk_info:
+                        print(self.walk_info)
+                        self.progress_of_roobot.insert(0, self.walk_info)
+            elif line_info["V"]==False and line_info["H"]==True: 
+                self.walk_info = '─'
+                # self.walk(line_info, self.walk_info)
+                if self.progress_of_roobot[0] != self.walk_info:
+                    print(self.walk_info)
+                    self.progress_of_roobot.insert(0, self.walk_info)
+            else:
+                print(self.walk_info)
+                self.walk_info = None # 'modify_angle'
+                # self.walk(line_info, self.walk_info)           
+
+        # 미션 진입 판별
+        elif self.mode == 'walk' and self.walk_info == '┐':
+            if self.direction == 'RIGHT':
+                self.mode = 'start_mission' # --> end_mission --> return_line
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+
+            elif self.direction == 'LEFT':
+                self.mode = 'is_finish_line' # --> walk / finish
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                print('The Robot has not direction, Please Set **self.direction**')
+
+        elif self.mode == 'walk' and self.walk_info =='┌':
+            if self.direction == 'LEFT':
+                self.mode = 'start_mission' # --> end_mission
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+            elif self.direction == 'RIGHT':
+                self.mode = 'is_finish_line' # --> finish 
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                print('The Robot has not direction, Please Set **self.direction**')
+
+        # elif self.mode == 'start_mission':
+
+        # 미션 끝나면? - self.mode == 'end_mission'
+
+        # 방탈출
+        elif self.mode == 'end_mission' or self.mode == 'find_edge':
+            if edge_info["EDGE_POS"] != None :
+                if 320 < edge_info["EDGE_POS"][0] < 360 :
+                    self.mode == 'return_line' # --> find_V
+                    if self.progress_of_roobot[0] != self.mode:
+                        print(self.mode)
+                        self.progress_of_roobot.insert(0, self.mode)
+            else:
+                self.mode = 'find_edge' # --> return_line
+                #self.find_edge()
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)        
+
+        elif self.mode == 'return_line':
+            if edge_info["EDGE_POS"][1] > 380:
+                self.mode = 'find_V' # --> walk
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                self.mode = 'return_line' # --> find_V
+                #self.return_line()
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+                    
+        elif self.mode == 'find_V':
+            #self._motion.turn(self.direction, 1)
+            if line_info["V"] == True :
+                self.mode = 'walk'
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                self.mode = 'find_V'
+                #self.find_V()
+
+        # 나가기
+        elif self.mode == 'is_finish_line':
+            if self.count < 3:
+                #self._motion.walk(dir='FORWARD', loop=8)
+                self.mode = 'walk'
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                self.mode = 'finish' # --> stop!
+                if self.progress_of_roobot[0] != self.mode:
+                    print(self.mode)
+                    self.progress_of_roobot.insert(0, self.mode)
+            self.count += 1

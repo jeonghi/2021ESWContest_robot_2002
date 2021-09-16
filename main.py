@@ -8,7 +8,7 @@ import cv2
 def main():
     robot = Robot()
     while True:
-        robot.return_line__()
+        robot.setting_mode_test()
 
 if __name__ == "__main__":
     main()

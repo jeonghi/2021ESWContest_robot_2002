@@ -398,14 +398,22 @@ class ImageProcessor:
         src = self.get_image()
         return self.line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
 
+    def test(self):
+        src = self.get_image()
+        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
+        y, cb, cr = cv2.split(ycrcb)
+        cv2.imshow("yellow space", y)
+        cv2.waitKey(1)
+
 if __name__ == "__main__":
-    imageProcessor = ImageProcessor(video_path="Sensor/src/old/out_room.mp4")
+    imageProcessor = ImageProcessor()
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
-        line_info,edge_info, result = imageProcessor.line_tracing()
-        print(edge_info)
-        cv2.imshow('result',result)
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
+        #line_info,edge_info, result = imageProcessor.line_tracing()
+        imageProcessor.test()
+        #print(edge_info)
+        #cv2.imshow('result',result)
+        #key = cv2.waitKey(1)
+        #if key == 27:
+        #    break
