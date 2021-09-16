@@ -72,56 +72,56 @@ class Target:
     def get_name(self):
         return self._name
 
+    @staticmethod
+    def compute_iou4target(box1, box2) -> float: # (box1 : Target, box2 : Target) -> return Target Object
+            # box = (x1, y1, x2, y2)
+            box1_area = (box1.width + 1) * (box1.height + 1)
+            box2_area = (box2.width + 1) * (box2.height + 1)
 
-def compute_iou4target(box1:Target, box2:Target) -> float:
-        # box = (x1, y1, x2, y2)
-        box1_area = (box1.width + 1) * (box1.height + 1)
-        box2_area = (box2.width + 1) * (box2.height + 1)
+            # obtain x1, y1, x2, y2 of the intersection
+            x1 = max(box1.x, box2.x)
+            y1 = max(box1.y, box2.y)
+            x2 = min(box1.x+box1.width, box2.x+box2.width)
+            y2 = min(box1.y+box1.height, box2.y+box2.height)
 
-        # obtain x1, y1, x2, y2 of the intersection
-        x1 = max(box1.x, box2.x)
-        y1 = max(box1.y, box2.y)
-        x2 = min(box1.x+box1.width, box2.x+box2.width)
-        y2 = min(box1.y+box1.height, box2.y+box2.height)
+            # compute the width and height of the intersection
+            w = max(0, x2 - x1 + 1)
+            h = max(0, y2 - y1 + 1)
 
-        # compute the width and height of the intersection
-        w = max(0, x2 - x1 + 1)
-        h = max(0, y2 - y1 + 1)
+            inter = w * h
+            iou = inter / (box1_area + box2_area - inter)
+            return iou
 
-        inter = w * h
-        iou = inter / (box1_area + box2_area - inter)
-        return iou
+    @staticmethod
+    def non_maximum_suppression4targets(targets1:list, targets2:list, threshold:float): # -> return Target Object
+        maximum_set = None
+        if targets1 and targets2:
+            for target1 in targets1:
+                for target2 in targets2:
+                    iou = Target.compute_iou4target(target1, target2)
+                    if iou > threshold:
+                        threshold = iou
+                        maximum_set = (target1, target2)
 
-def non_maximum_suppression4targets(targets1:list, targets2:list, threshold:float) -> Target:
+        if maximum_set :
+            t1: Target = maximum_set[0]
+            t2: Target = maximum_set[1]
+            # obtain x1, y1, x2, y2 of the intersection
+            x1 = max(t1.x, t2.x)
+            y1 = max(t1.y, t2.y)
+            x2 = min(t1.x + t1.width, t2.x + t2.width)
+            y2 = min(t1.y + t1.height, t2.y + t2.height)
 
-    maximum_set = None
-    if targets1 and targets2:
-        for target1 in targets1:
-            for target2 in targets2:
-                iou = compute_iou4target(target1, target2)
-                if iou > threshold:
-                    threshold = iou
-                    maximum_set = (target1, target2)
+            # compute the width and height of the intersection
+            width = max(0, x2 - x1 + 1)
+            height = max(0, y2 - y1 + 1)
+            area = width * height
+            centroid = (center_x, center_y) = (x1 + (width//2), y1 + (height//2))
+            stats = (x1, y1, width, height, area)
 
-    if maximum_set :
-        t1: Target = maximum_set[0]
-        t2: Target = maximum_set[1]
-        # obtain x1, y1, x2, y2 of the intersection
-        x1 = max(t1.x, t2.x)
-        y1 = max(t1.y, t2.y)
-        x2 = min(t1.x + t1.width, t2.x + t2.width)
-        y2 = min(t1.y + t1.height, t2.y + t2.height)
-
-        # compute the width and height of the intersection
-        width = max(0, x2 - x1 + 1)
-        height = max(0, y2 - y1 + 1)
-        area = width * height
-        centroid = (center_x, center_y) = (x1 + (width//2), y1 + (height//2))
-        stats = (x1, y1, width, height, area)
-
-        return Target(color=t1.get_color(), stats=stats, centroid=centroid)
-    else:
-        return None
+            return Target(color=t1.get_color(), stats=stats, centroid=centroid)
+        else:
+            return None
 
 
 def setLabel(src, pts, label, color=(0,255,0)):
