@@ -10,13 +10,13 @@ from imutils import auto_canny, grab_contours
 
 if __name__ == "__main__":
     from HashDetector import HashDetector
-    from Target import Target, setLabel, non_maximum_suppression4targets
+    from Target import Target, setLabel
     from LineDetector import LineDetector
     from ColorChecker import ColorPreProcessor, ColorAreaChecker
     from LaneLines import intersect, median, left_right_lines
 else:
     from Sensor.HashDetector import HashDetector
-    from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
+    from Sensor.Target import Target, setLabel
     from Sensor.LineDetector import LineDetector
     from Sensor.ColorChecker import ColorPreProcessor, ColorAreaChecker
     from Sensor.LaneLines import intersect, median, left_right_lines
