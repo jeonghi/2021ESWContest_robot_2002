@@ -174,8 +174,6 @@ class Robot:
         #self._motion.set_head(dir='DOWN', angle=60)
         
         while True:
-            src = self._image_processor.get_image(visualization=False)
-            src = cv2.resize(src, dsize=(640,480))
             line_info,edge_info, result =  self._image_processor.line_tracing()
             cv2.imshow('result', result)
             cv2.waitKey(1)

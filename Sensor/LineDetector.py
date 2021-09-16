@@ -47,7 +47,7 @@ class LineDetector:
                 cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
     def mask_color(self, src):
-        yellow_lower = np.array([0, 140, 95])
+        yellow_lower = np.array([0, 20, 95])
         yellow_upper = np.array([58, 200, 151])
         src = cv2.GaussianBlur(src, (5, 5), 0)
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
@@ -223,12 +223,12 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture("/home/sol/Desktop/2021ESWContest (copy)/Sensor/src/old/out_room.mp4")
+    video = cv2.VideoCapture("./Sensor/src/line_test/return_line.h264")
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
         if not ret:
-            video = cv2.VideoCapture("/home/sol/Desktop/2021ESWContest (copy)/Sensor/src/old/out_room.mp4")
+            video = cv2.VideoCapture("./Sensor/src/line_test/return_line.h264")
             continue
         src = cv2.resize(src, dsize=(640,480))
         line_info,edge_info, result = line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
