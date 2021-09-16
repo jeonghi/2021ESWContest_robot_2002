@@ -212,12 +212,13 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture("./out_room.mp4")
+    video = cv2.VideoCapture(".\src\old\out_room.mp4")
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
         if not ret:
-            video = cv2.VideoCapture("./out_room.mp4")
+            video = cv2.VideoCapture(".\src\old\out_room.mp4")
+            print("No video")
             continue
         src = cv2.resize(src, dsize=(640,480))
         line_info,edge_info, result = line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)

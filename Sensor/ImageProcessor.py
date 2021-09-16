@@ -47,14 +47,16 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
-            self.hash_detector4door = HashDetector(file_path='EWSN/')
-            self.hash_detector4room = HashDetector(file_path='ABCD/')
-            self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
+            self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
+            self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
+            self.line_detector = LineDetector()
         else:
 
             self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
             self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
             self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
+            self.line_detector = LineDetector()
         #self.line_detector = LineDetector()
 
         shape = (self.height, self.width, _) = self.get_image().shape
@@ -391,23 +393,19 @@ class ImageProcessor:
             return center
         
         return None, None
-    
-if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/old/out_room.mp4")
+    def line_tracing(self):
+        src = self.get_image()
+        return self.line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
+
+if __name__ == "__main__":
+    imageProcessor = ImageProcessor(video_path="Sensor/src/old/out_room.mp4")
     imageProcessor.fps.start()
     #while imageProcessor.fps._numFrames < 200:
     while True:
-        imageProcessor.get_image(visualization=True)
-        #print(imageProcessor.get_room_alphabet(visualization=True))
-        pos = imageProcessor.get_yellow_line_corner_pos(visualization=True)
-        print(pos)
-        # print(imageProcessor.get_area_color())
-        #imageProcessor.get_contour()
-        imageProcessor.fps.update()
-    imageProcessor.fps.stop()
-    print("[INFO] time : " + str(imageProcessor.fps.elapsed()))
-    print("[INFO] FPS : " + str(imageProcessor.fps.fps()))
-
-
-
+        line_info,edge_info, result = imageProcessor.line_tracing()
+        print(edge_info)
+        cv2.imshow('result',result)
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
