@@ -7,31 +7,19 @@ from imutils.video import WebcamVideoStream
 from imutils.video import FileVideoStream
 from imutils.video import FPS
 from imutils import auto_canny, grab_contours
+
 if __name__ == "__main__":
     from HashDetector import HashDetector
     from Target import Target, setLabel, non_maximum_suppression4targets
     from LineDetector import LineDetector
-    from ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
+    from ColorChecker import ColorPreProcessor, ColorAreaChecker
     from LaneLines import intersect, median, left_right_lines
 else:
     from Sensor.HashDetector import HashDetector
     from Sensor.Target import Target, setLabel, non_maximum_suppression4targets
     from Sensor.LineDetector import LineDetector
-    from Sensor.ColorChecker import get_red_mask, get_blue_mask, get_green_mask, get_mean_value_for_non_zero
+    from Sensor.ColorChecker import ColorPreProcessor, ColorAreaChecker
     from Sensor.LaneLines import intersect, median, left_right_lines
-
-
-
-COLORS = {
-    "YELLOW": {
-        "HOME":
-            {
-                "color": "YELLOW",
-                "lower": [[0, 79, 117], [0, 79, 117], [0, 79, 117]],
-                "upper": [[32, 252, 255], [32, 252, 255], [32, 252, 255]]
-            }
-    },
-}
 
 
 class ImageProcessor:
@@ -47,17 +35,19 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
-            self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
-            self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
-            self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
-            self.line_detector = LineDetector()
+            self.hash_detector4door = HashDetector(file_path='EWSN/')
+            self.hash_detector4room = HashDetector(file_path='ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
+
         else:
 
             self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
             self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
             self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
-            self.line_detector = LineDetector()
-        #self.line_detector = LineDetector()
+
+        self.line_detector = LineDetector()
+        self.color_preprocessor = ColorPreProcessor
+        self.COLORS = self.color_preprocessor.COLORS
 
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
@@ -69,27 +59,9 @@ class ImageProcessor:
             exit()
         if visualization:
             cv2.imshow("Src", src)
-            cv2.waitKey(10)
+            cv2.waitKey(1)
         return src
 
-    def get_color_binary_image(self, color, img=None):  # 인자로 넘겨 받은 색상만 남기도록 이진화한뒤 원본 이미지와 이진 이미지 반
-        if img is None:
-            img = self.get_image()
-        img_hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        lower1, lower2, lower3 = color["lower"]
-        upper1, upper2, upper3 = color["upper"]
-        img_mask1 = cv2.inRange(img_hsv, np.array(lower1), np.array(upper1))
-        img_mask2 = cv2.inRange(img_hsv, np.array(lower2), np.array(upper2))
-        img_mask3 = cv2.inRange(img_hsv, np.array(lower3), np.array(upper3))
-        temp = cv2.bitwise_or(img_mask1, img_mask2)
-        img_mask = cv2.bitwise_or(img_mask3, temp)
-
-        k = (11, 11)
-        kernel = np.ones(k, np.uint8)
-        img_mask = cv2.morphologyEx(img_mask, cv2.MORPH_OPEN, kernel)
-        img_mask = cv2.morphologyEx(img_mask, cv2.MORPH_CLOSE, kernel)
-        # img_result = cv2.bitwise_and(img, img, mask=img_mask)  # 해당 색상값만 남기기
-        return img, img_mask
 
     def get_door_alphabet(self, visualization: bool = False) -> str:
         src = self.get_image()
@@ -185,7 +157,7 @@ class ImageProcessor:
             if hamming_distance < curr_hamming_distance:
                 curr_candidate = candidate
                 curr_hamming_distance = hamming_distance
-                h_value = get_mean_value_for_non_zero(roi_thresholded)
+                h_value = self.color_preprocessor.get_mean_value_for_non_zero(roi_thresholded)
                 if 95 <= h_value <= 135:
                     candidate.set_color("BLUE")
                 elif h_value <= 20 or h_value >= 140 :
@@ -215,10 +187,10 @@ class ImageProcessor:
         h = h.astype(v.dtype)
 
         # red mask
-        red_mask = get_red_mask(h)
+        red_mask = self.color_preprocessor.get_red_mask(h)
 
         # blue mask
-        blue_mask = get_blue_mask(h)
+        blue_mask = self.color_preprocessor.get_blue_mask(h)
 
         # mask denoise
         mask = cv2.bitwise_or(red_mask, blue_mask)
@@ -240,7 +212,7 @@ class ImageProcessor:
         h = cv2.bitwise_and(h, h, mask=roi_mask)
 
         # get mean value about non_zero value
-        h_mean = get_mean_value_for_non_zero(h)
+        h_mean = self.color_preprocessor(h)
 
         # green
         green_upper = 85
@@ -262,7 +234,8 @@ class ImageProcessor:
 
     def get_yellow_line_corner_pos(self, visualization=False):
         pos = None
-        src, yellow_img_mask = self.get_color_binary_image(color=COLORS["YELLOW"]["HOME"])
+        src = self.get_image()
+        src, yellow_img_mask = self.get_color_binary_image(src=src, color=self.COLORS["YELLOW"]["HOME"])
         yellow_img = cv2.bitwise_and(src,src,mask=yellow_img_mask)
         canny_img = auto_canny(yellow_img_mask)
         lines = cv2.HoughLinesP(canny_img, 2, np.pi / 180, threshold=50, minLineLength=50, maxLineGap=60)
@@ -399,13 +372,7 @@ class ImageProcessor:
         return self.line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
 
 if __name__ == "__main__":
-    imageProcessor = ImageProcessor(video_path="Sensor/src/old/out_room.mp4")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
-    #while imageProcessor.fps._numFrames < 200:
     while True:
-        line_info,edge_info, result = imageProcessor.line_tracing()
-        print(edge_info)
-        cv2.imshow('result',result)
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
+        imageProcessor.get_door_alphabet(visualization=True)
