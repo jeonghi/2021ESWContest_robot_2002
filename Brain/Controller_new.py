@@ -41,7 +41,7 @@ class Robot:
         if line_info["DEGREE"] == 0 : # line 하나도 없을 때.
             self.mode = "find_line"
 
-        elif self.mode == "find_line" and ine_info["DEGREE"] != 0:
+        elif self.mode == "find_line" and line_info["DEGREE"] != 0:
             self.mode = "find_edge"
 
         elif line_info["V"] == True and line_info["H"] == False:
@@ -180,18 +180,16 @@ class Robot:
                         self._motion.turn(self.direction, 8)
                 else:
                     self._motion.walk('FORWARD')
-                    print(ans[4], 'try ┃ until upper then 150')
 
 
     def return_line__(self):
         flag = False
         # + 고개를 든다 (고개 각도도 보면서 정해야할 듯)
-        self._motion.set_head(dir='DOWN', angle=45)
+        self._motion.set_head(dir='DOWN', angle=60)
         
-        # edge를 찾는다 ans:: ans[0] edge를 찾았으면 not None 없으면 None,ans[1] edge_line 갯수,ans[2] edge_line의 y좌표,ans[3] 수직선 찾으면 not None 못찾으면 None
         while True:
             src = self._image_processor.get_image(visualization=False)
-            #src = cv2.resize(src, dsize=(640,480))
+            src = cv2.resize(src, dsize=(640,480))
             ans, result_img = self._edge_detector.find_edge(src)
             cv2.imshow('result_img', result_img)
             cv2.waitKey(1)

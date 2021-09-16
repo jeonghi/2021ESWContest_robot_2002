@@ -8,7 +8,7 @@ import cv2
 def main():
     robot = Robot()
     while True:
-        robot.tracking_cube()
+        robot.return_line__()
 
 if __name__ == "__main__":
     main()

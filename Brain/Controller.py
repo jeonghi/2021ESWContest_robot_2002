@@ -1,6 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
-from Actuator.Motion import Motion
+#from Actuator.Motion import Motion
 from Sensor.ColorChecker import get_mean_value_for_non_zero
 import numpy as np
 import cv2
@@ -10,7 +10,7 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        self._motion = Motion()
+        #self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
         self._line_detector = LineDetector()
         self.direction = None
@@ -167,3 +167,18 @@ class Robot:
             if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 440:
                 self._motion.grab()
                 self.cube_grabbed = True
+
+    def return_line__(self):
+        flag = False
+        # + 고개를 든다 (고개 각도도 보면서 정해야할 듯)
+        #self._motion.set_head(dir='DOWN', angle=60)
+        
+        while True:
+            src = self._image_processor.get_image(visualization=False)
+            src = cv2.resize(src, dsize=(640,480))
+            line_info,edge_info, result =  self._image_processor.line_tracing()
+            cv2.imshow('result', result)
+            cv2.waitKey(1)
+            print(line_info)
+            print(edge_info)
+
