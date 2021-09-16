@@ -379,21 +379,10 @@ class ImageProcessor:
         cv2.waitKey(1)
 
 if __name__ == "__main__":
-<<<<<<< HEAD
-    imageProcessor = ImageProcessor("Sensor/src/line_test/return_line.h264")
-=======
+
     imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
->>>>>>> 36293455cccec46b616df45044a68ea41dbbe806
     imageProcessor.fps.start()
     while True:
-<<<<<<< HEAD
+
         line_info,edge_info, result = imageProcessor.line_tracing()
-        #imageProcessor.test()
-        print(edge_info)
-        cv2.imshow('result',result)
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
-=======
-        imageProcessor.get_door_alphabet(visualization=True)
->>>>>>> 36293455cccec46b616df45044a68ea41dbbe806
+
