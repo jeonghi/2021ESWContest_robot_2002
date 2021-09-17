@@ -163,11 +163,8 @@ class Motion:
         return (self.head_angle1, self.head_angle2)
 
     def basic_form(self):
-        time.sleep(0.3)
         self.TX_data_py2(45)
-        time.sleep(0.3)
         self.TX_data_py2(54)
-        time.sleep(0.3)
         self.TX_data_py2(10)
 
 
