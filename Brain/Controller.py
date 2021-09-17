@@ -22,6 +22,9 @@ class Robot:
         self.progress_of_roobot= [None, ]
         self.walk_info = None
 
+    def set_basic_form(self):
+        self._motion.basic_form()
+
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
         flag = True
