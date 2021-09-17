@@ -1,7 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
-# from Actuator.Motion import Motion
-from Sensor.ColorChecker import get_mean_value_for_non_zero
+from Actuator.Motion import Motion
 import numpy as np
 import cv2
 import time
@@ -10,9 +9,9 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        #self._motion = Motion()
-        #self._image_processor = ImageProcessor(video_path=video_path)
-        self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/return_line.h264")
+        self._motion = Motion()
+        self._image_processor = ImageProcessor(video_path=video_path)
+        #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/return_line.h264")
         self._line_detector = LineDetector()
         self.direction = None
         # self.mode = 'start'
@@ -144,7 +143,7 @@ class Robot:
             is_saferoom_found = False
 
         cur_ir = self._motion.get_IR()
-        print('NOW IR:: ', cur_ir)
+        print('cur IR:: ', cur_ir)
 
         #cube_grabbed = False if cur_ir < 100 else True
 
@@ -161,7 +160,7 @@ class Robot:
                     self._motion.turn('LEFT', grab=True)
                     print("saferoom found left")
                 elif saferoom_pos_x > 340:
-                    self._motion.turn('LEFT', grab=True)
+                    self._motion.turn('RIGHT', grab=True)
                     print("saferoom found right")
         else:
             if abs(frame_center_x - cube_center_x) < 20:
@@ -179,7 +178,7 @@ class Robot:
         cv2.imshow('result', result)
         cv2.waitKey(1)
         #print(line_info)
-        print(edge_info)
+        #print(edge_info)
         return line_info, edge_info
         
 
@@ -446,6 +445,10 @@ class Robot:
                     if self.progress_of_roobot[0] != self.mode:
                         print(self.mode)
                         self.progress_of_roobot.insert(0, self.mode)
+                else:
+                    print(edge_info["EDGE_POS"])
+                    self.mode='find_edge'
+                    print(self.mode)
             else:
                 self.mode = 'find_edge' # --> return_line
                 #self.find_edge()
