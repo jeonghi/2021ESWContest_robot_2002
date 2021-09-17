@@ -20,6 +20,8 @@ if __name__ == "__main__":
             command_key = 65
         elif command == "exit":
             break
+        else:
+            continue
         
         print("Launch " + command)
         motion.TX_data_py2(command_key)
