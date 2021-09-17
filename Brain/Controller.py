@@ -128,7 +128,11 @@ class Robot:
         return
 
     def tracking_cube(self):
-        self._motion.set_head(dir='DOWN', angle=60)
+        if not self.cube_grabbed:
+            self._motion.set_head(dir='DOWN', angle=60)
+        else:
+            self._motion.set_head("UPDOWN_CENTER")
+
         src = self._image_processor.get_image(visualization=False)
         h, w = src.shape[:2]
         frame_center_x = w / 2
@@ -145,8 +149,8 @@ class Robot:
         if saferoom_pos_x is None:
             is_saferoom_found = False
 
-        cur_ir = self._motion.get_IR()
-        print('cur IR:: ', cur_ir)
+        #cur_ir = self._motion.get_IR()
+        #print('cur IR:: ', cur_ir)
 
         #cube_grabbed = False if cur_ir < 100 else True
 
@@ -157,7 +161,7 @@ class Robot:
             else:
                 if abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) > 20:
                     self._motion.walk('FORWARD', grab=True)
-                elif abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) < 20:
+                elif abs(frame_center_x - saferoom_pos_x) < 20 and saferoom_pos_y > 440:
                     self._motion.grab(switch=False)
                 elif saferoom_pos_x < 300:
                     self._motion.turn('LEFT', grab=True)
