@@ -48,31 +48,30 @@ class ImageProcessor:
         self.line_detector = LineDetector()
         self.color_preprocessor = ColorPreProcessor
         self.COLORS = self.color_preprocessor.COLORS
-        self.src = None
 
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
         time.sleep(2)
 
     def get_image(self, visualization=False):
-        self.src = self._cam.read()
-        if self.src is None:
+        src = self._cam.read()
+        if src is None:
             exit()
         if visualization:
-            cv2.imshow("src", self.src)
+            cv2.imshow("src", src)
             cv2.waitKey(1)
-        return self.src
+        return src
 
 
     def get_door_alphabet(self, visualization: bool = False) -> str:
-        self.src = self.get_image()
+        src = self.get_image()
         if visualization:
-            canvas = self.src.copy()
+            canvas = src.copy()
             roi_canvas = canvas.copy()
         no_canny_targets = []
         canny_targets = []
         # 그레이스케일화
-        gray = cv2.cvtColor(self.src, cv2.COLOR_BGR2GRAY)
+        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
         _, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         canny = auto_canny(mask)
@@ -108,7 +107,7 @@ class ImageProcessor:
 
         if target is None:
             return None
-        roi = target.get_target_roi(src=self.src)
+        roi = target.get_target_roi(src=src)
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         if visualization:
@@ -122,15 +121,15 @@ class ImageProcessor:
         return answer
 
     def get_slope_degree(self, visualization: bool = False):
-        self.src = self.get_image()
-        return self.line_detector.get_slope_degree(self.src)
+        src = self.get_image()
+        return self.line_detector.get_slope_degree(src)
 
     def get_room_alphabet(self, visualization: bool = False):
 
-        self.src = self.get_image()
+        src = self.get_image()
         if visualization:
-            canvas = self.src.copy()
-        _, roi_mask = cv2.threshold(cv2.cvtColor(self.src, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+            canvas = src.copy()
+        _, roi_mask = cv2.threshold(cv2.cvtColor(src, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         canny = auto_canny(roi_mask)
         candidates = []
 
@@ -147,7 +146,7 @@ class ImageProcessor:
         curr_hamming_distance = 1
 
         for candidate in candidates:
-            roi = candidate.get_target_roi(self.src)
+            roi = candidate.get_target_roi(src)
             roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
             _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             roi_thresholded = cv2.bitwise_and(roi,roi,mask=roi_mask)
@@ -177,13 +176,13 @@ class ImageProcessor:
         return None
 
     def get_arrow_direction(self):
-        self.src = self.get_image()
-        direction, _ = self.hash_detector4arrow.detect_arrow(self.src)
+        src = self.get_image()
+        direction, _ = self.hash_detector4arrow.detect_arrow(src)
         return direction
 
     def get_area_color(self, threshold: float = 0.5, visualization: bool = False):
-        self.src = self.get_image()
-        hsv = cv2.cvtColor(self.src, cv2.COLOR_BGR2HSV)
+        src = self.get_image()
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(hsv)
         h = h.astype(v.dtype)
 
@@ -224,7 +223,7 @@ class ImageProcessor:
         pixel_rate = np.count_nonzero(green) / np.count_nonzero(h)
 
         if visualization:
-            dst = cv2.bitwise_and(self.src, self.src, mask=roi_mask)
+            dst = cv2.bitwise_and(src, src, mask=roi_mask)
             cv2.imshow("dst", dst)
             cv2.waitKey(1)
 
@@ -235,9 +234,9 @@ class ImageProcessor:
 
     def get_yellow_line_corner_pos(self, visualization=False):
         pos = None
-        self.src = self.get_image()
-        self.src, yellow_img_mask = self.get_color_binary_image(src=self.src, color=self.COLORS["YELLOW"]["HOME"])
-        yellow_img = cv2.bitwise_and(self.src,self.src,mask=yellow_img_mask)
+        src = self.get_image()
+        src, yellow_img_mask = self.get_color_binary_image(src=src, color=self.COLORS["YELLOW"]["HOME"])
+        yellow_img = cv2.bitwise_and(src,src,mask=yellow_img_mask)
         canny_img = auto_canny(yellow_img_mask)
         lines = cv2.HoughLinesP(canny_img, 2, np.pi / 180, threshold=50, minLineLength=50, maxLineGap=60)
         if lines is not None:
@@ -247,15 +246,15 @@ class ImageProcessor:
                     slope = (y2 - y1) / (x2 - x1)
 
                     if 0 <= slope < 1: # 노란색선
-                        cv2.line(self.src, (x1, y1), (x2, y2), (0, 255, 255), 2)
+                        cv2.line(src, (x1, y1), (x2, y2), (0, 255, 255), 2)
                     elif slope >= 1: # 하늘색선
-                        cv2.line(self.src, (x1, y1), (x2, y2), (255, 255, 0), 2)
+                        cv2.line(src, (x1, y1), (x2, y2), (255, 255, 0), 2)
                     elif slope <= -1 : # 초록색선
-                        cv2.line(self.src, (x1, y1), (x2, y2), (0, 255, 0), 2)
+                        cv2.line(src, (x1, y1), (x2, y2), (0, 255, 0), 2)
                     elif -1 < slope < 0: # 빨간색선
-                        cv2.line(self.src, (x1, y1), (x2, y2), (255, 0, 255), 2)
+                        cv2.line(src, (x1, y1), (x2, y2), (255, 0, 255), 2)
                     else:
-                        cv2.line(self.src, (x1, y1), (x2, y2), (255, 255, 255), 2)
+                        cv2.line(src, (x1, y1), (x2, y2), (255, 255, 255), 2)
 
             filtered_left_lns, filtered_right_lns = left_right_lines(lines)
             median_left_f = median(filtered_left_lns, [], [])
@@ -270,45 +269,45 @@ class ImageProcessor:
                         x_range = 10
                         y_range = 20
                         if cx-x_range*10 <= pos[0] <= cx+x_range*10 :
-                            cv2.circle(self.src, pos, 10, (255, 0, 0), -1)
-                            cv2.putText(self.src, "IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 0, 0), thickness=2)
+                            cv2.circle(src, pos, 10, (255, 0, 0), -1)
+                            cv2.putText(src, "IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 0, 0), thickness=2)
                         else:
-                            cv2.circle(self.src, pos, 10, (0, 0, 255), -1)
-                            cv2.putText(self.src, "NOT IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), thickness=2)
+                            cv2.circle(src, pos, 10, (0, 0, 255), -1)
+                            cv2.putText(src, "NOT IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), thickness=2)
 
-                        cv2.line(self.src, (cx - x_range * 10, cy), (cx + x_range * 10, cy), (255, 0, 0), 2)
-                        cv2.circle(self.src, center, 10, (255, 0, 0), 2)
+                        cv2.line(src, (cx - x_range * 10, cy), (cx + x_range * 10, cy), (255, 0, 0), 2)
+                        cv2.circle(src, center, 10, (255, 0, 0), 2)
                         for x_r in range(x_range + 1):
                             if x_r == 0 or x_r == x_range:
                                 x_r *= 10
                                 if x_r != 0:
-                                    cv2.putText(self.src, "-%d" % x_r, (cx - x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                    cv2.putText(src, "-%d" % x_r, (cx - x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
                                                 (255, 0, 0), thickness=2)
-                                    cv2.putText(self.src, "-%d" % x_r, (cx + x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                    cv2.putText(src, "-%d" % x_r, (cx + x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
                                                 (255, 0, 0), thickness=2)
                                 else:
-                                    cv2.putText(self.src, "0", (cx, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
+                                    cv2.putText(src, "0", (cx, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
                                                 (255, 0, 0), thickness=2)
 
-                                cv2.line(self.src, (cx - x_r, cy - y_range), (cx - x_r, cy + y_range), (255, 0, 0), 2)
-                                cv2.line(self.src, (cx + x_r, cy - y_range), (cx + x_r, cy + y_range), (255, 0, 0), 2)
+                                cv2.line(src, (cx - x_r, cy - y_range), (cx - x_r, cy + y_range), (255, 0, 0), 2)
+                                cv2.line(src, (cx + x_r, cy - y_range), (cx + x_r, cy + y_range), (255, 0, 0), 2)
                             else:
                                 y_r = y_range // 2
                                 x_r *= 10
-                                cv2.line(self.src, (cx - x_r, cy - y_r), (cx - x_r, cy + y_r), (255, 0, 0), 1)
-                                cv2.line(self.src, (cx + x_r, cy - y_r), (cx + x_r, cy + y_r), (255, 0, 0), 1)
+                                cv2.line(src, (cx - x_r, cy - y_r), (cx - x_r, cy + y_r), (255, 0, 0), 1)
+                                cv2.line(src, (cx + x_r, cy - y_r), (cx + x_r, cy + y_r), (255, 0, 0), 1)
         else:
             if visualization:
                 cv2.imshow("yellow_mask", yellow_img)
                 cv2.imshow("canny", canny_img)
-                cv2.imshow("line", self.src)
+                cv2.imshow("line", src)
                 cv2.waitKey(1)
             return None
 
         if visualization:
             cv2.imshow("yellow_mask", yellow_img)
             cv2.imshow("canny", canny_img)
-            cv2.imshow("line", self.src)
+            cv2.imshow("line", src)
             cv2.waitKey(1)
         return pos
     
@@ -369,12 +368,12 @@ class ImageProcessor:
         return None, None
 
     def line_tracing(self):
-        self.src = self.get_image()
-        return self.line_detector.get_all_lines(self.src, line_visualization = False, edge_visualization = True)
+        src = self.get_image()
+        return self.line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
 
     def test(self):
-        self.src = self.get_image()
-        ycrcb = cv2.cvtColor(self.src, cv2.COLOR_BGR2YCrCb)
+        src = self.get_image()
+        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
         y, cb, cr = cv2.split(ycrcb)
         cv2.imshow("yellow space", y)
         cv2.waitKey(1)
