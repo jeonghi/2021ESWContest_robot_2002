@@ -13,7 +13,7 @@ from threading import Thread, Lock
 class Motion:
     head_angle1 = 'UPDOWN_CENTER'
     head_angle2 = 'LEFTRIGHT_CENTER'
-    
+
     def __init__(self):
         self.serial_use = 1
         self.serial_port = None
@@ -35,10 +35,10 @@ class Motion:
 
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
         self.lock.acquire()
-        
+
         self.serial_port.write(serial.to_bytes([one_byte]))  # python3
         time.sleep(0.02)
-        
+
     def RX_data(self):
         if self.serial_port.inWaiting() > 0:
             result = self.serial_port.read(1)
@@ -62,7 +62,7 @@ class Motion:
                 result = ser.read(1)
                 RX = ord(result)
                 print ("RX=" + str(RX))
-                
+
                 # -----  remocon 16 Code  Exit ------
                 if RX == 16:
                     self.receiving_exit = 0
@@ -71,7 +71,7 @@ class Motion:
                     self.lock.release()
                 elif RX != 200:
                      self.distance = RX
-    
+
     def notice_direction(self, dir):
         """dir={'E', 'W', 'S', 'N'}
         """
@@ -124,7 +124,7 @@ class Motion:
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
-            
+
 
     def turn(self, dir, loop=1, grab=False):
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
@@ -162,6 +162,14 @@ class Motion:
         """
         return (self.head_angle1, self.head_angle2)
 
+    def basic_form(self):
+        time.sleep(0.3)
+        self.TX_data_py2(45)
+        time.sleep(0.3)
+        self.TX_data_py2(54)
+        time.sleep(0.3)
+        self.TX_data_py2(10)
+
 
 
 
@@ -170,9 +178,8 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.set_head('UPDOWN_CENTER')
-    pass
-
+    motion.TX_data_py2(16) # power on/off
+#    motion.TX_data_py2(65)
 
 
 
