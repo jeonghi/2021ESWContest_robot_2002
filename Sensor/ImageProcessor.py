@@ -46,7 +46,7 @@ class ImageProcessor:
             self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
 
         self.line_detector = LineDetector()
-        self.color_preprocessor = ColorPreProcessor
+        self.color_preprocessor = ColorPreProcessor()
         self.COLORS = self.color_preprocessor.COLORS
 
         shape = (self.height, self.width, _) = self.get_image().shape
@@ -138,7 +138,7 @@ class ImageProcessor:
         for cnt in cnts:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if vertice <= 8 and 2000 <= cv2.contourArea(cnt):
+            if vertice <= 8 and 1500 <= cv2.contourArea(cnt):
                 target = Target(contour=cnt)
                 candidates.append(target)
 
@@ -151,17 +151,19 @@ class ImageProcessor:
             _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             roi_thresholded = cv2.bitwise_and(roi,roi,mask=roi_mask)
 
-            alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.35)
+            alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.55)
             if alphabet is None:
                 continue
             if hamming_distance < curr_hamming_distance:
                 curr_candidate = candidate
                 curr_hamming_distance = hamming_distance
-                h_value = self.color_preprocessor.get_mean_value_for_non_zero(roi_thresholded)
-                if 95 <= h_value <= 135:
-                    candidate.set_color("BLUE")
-                elif h_value <= 20 or h_value >= 140 :
-                    candidate.set_color("RED")
+                # h_value = self.color_preprocessor.get_mean_value_for_non_zero(roi_thresholded)
+                color = self.color_preprocessor.check_red_or_blue(roi)
+                # if 95 <= h_value <= 135:
+                #     candidate.set_color("BLUE")
+                # elif h_value <= 20 or h_value >= 140 :
+                #     candidate.set_color("RED")
+                candidate.set_color(color)
                 candidate.set_name(alphabet)
 
         if visualization:
@@ -212,7 +214,7 @@ class ImageProcessor:
         h = cv2.bitwise_and(h, h, mask=roi_mask)
 
         # get mean value about non_zero value
-        h_mean = self.color_preprocessor(h)
+        h_mean = self.color_preprocessor.get_mean_value_for_non_zero(h)
 
         # green
         green_upper = 85
@@ -372,17 +374,27 @@ class ImageProcessor:
         return self.line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
 
     def test(self):
-        src = self.get_image()
+        src = self.get_image(visualization=True)
         ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
-        y, cb, cr = cv2.split(ycrcb)
-        cv2.imshow("yellow space", y)
+        y, cr, cb = cv2.split(ycrcb)
+        # cb = cv2.equalizeHist(cb)
+        # cr = cv2.equalizeHist(cr)
+        #_, b_mask = cv2.threshold(cb, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
+        #_, r_mask = cv2.threshold(cr, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
+        _, b_mask = cv2.threshold(cb, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
+        _, r_mask = cv2.threshold(cr, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
+
+
+        v1 = cv2.hconcat([cb, cr])
+        v2 = cv2.hconcat([b_mask,r_mask])
+        cv2.imshow("result", cv2.vconcat([v1, v2]))
         cv2.waitKey(1)
+
 
 if __name__ == "__main__":
 
     imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
     while True:
-
-        line_info,edge_info, result = imageProcessor.line_tracing()
+        imageProcessor.get_room_alphabet(visualization=True)
 
