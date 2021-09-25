@@ -343,29 +343,37 @@ class ImageProcessor:
     def get_saferoom_position(self):
         img = self.get_image()
         
+        h, w = img.shape[:2]
+
+        frame_center_x = w / 2
+        frame_center_y = h / 2
+
         green_lower = np.array([40, 40, 40])
         green_upper = np.array([70, 255, 255])
         
         kernel = np.ones((5, 5), np.uint8)
         
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
+        _, saturation, _ = cv2.split(hsv)
         
-        red_mask = cv2.inRange(hsv, green_lower, green_upper)
-        red_mask = cv2.erode(red_mask, kernel, iterations=2)
-        red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
-        red_mask = cv2.dilate(red_mask, kernel, iterations=1)
+        green_mask = cv2.inRange(hsv, green_lower, green_upper)
+        green_mask = cv2.erode(green_mask, kernel, iterations=2)
+        green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
+        green_mask = cv2.dilate(green_mask, kernel, iterations=1)
         
-        (cnts, _) = cv2.findContours(red_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        center = None
+        _, binary = cv2.threshold(saturation, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        green_area_mask = cv2.bitwise_and(green_mask, binary)
+
+        cnts, _ = cv2.findContours(green_area_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        center = None, None
+
         if len(cnts) > 0:
             cnt = sorted(cnts, key = cv2.contourArea, reverse = True)[0]
             ((x, y), radius) = cv2.minEnclosingCircle(cnt)
             M = cv2.moments(cnt)
             center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
-            
-            return center
-        
-        return None, None
+
+        return center
 
     def line_tracing(self):
         src = self.get_image()
