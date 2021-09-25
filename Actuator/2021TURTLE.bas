@@ -3705,8 +3705,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
     'DELAY 20
     SPEED 6
     GOSUB All_motor_mode3
-    MOVE G6B, 190, 10, 50
-    MOVE G6C, 190, 10, 50
+    'MOVE G6B, 190, 10, 50
+    'MOVE G6C, 190, 10, 50
     WAIT
 
     DELAY 20
