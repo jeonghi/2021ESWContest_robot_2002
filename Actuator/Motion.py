@@ -172,11 +172,15 @@ class Motion:
         """
         angle_list = [30, 90, 60]
         if grab:
-            self.set_head(dir='DOWN', angle=angle_list[level-1])
             self.TX_data_py2(75+level)
+            time.sleep(0.5)
+            self.set_head(dir='DOWN', angle=angle_list[level-1])
         else:
-            self.set_head(dir='DOWN', angle=100)
             self.TX_data_py2(73+level)
+            time.sleep(0.5)
+            self.set_head(dir='DOWN', angle=100)
+            
+            
 
 
 
@@ -186,7 +190,10 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.TX_data_py2(16) # power on/off
+    #motion.TX_data_py2(16) # power on/off
+    motion.move_arm(grab=True, level=1)
+    time.sleep(2)
+    motion.move_arm(grab=True, level=3)
 #    motion.TX_data_py2(65)
 
 

@@ -48,11 +48,8 @@ class Robot:
         dq = deque(grabbed_head_moving)
         while (True):
             if dq[0] == None :
-                dq.rotate(n=1)
-                self._motion.turn(dir="LEFT", loop=2, grab=True)
-                time.sleep(2)
-            dq[0]
-            dq.rotate(n=1)
+                pass
+                
 
 
 
