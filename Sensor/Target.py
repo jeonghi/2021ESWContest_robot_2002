@@ -124,7 +124,7 @@ class Target:
             return None
 
 
-def setLabel(src, pts, label, color=(0,255,0)):
+def setLabel(src, pts, label=None, color=(0,255,0)):
     if type(pts) == type(np.array([])) :
         (x, y, w, h) = cv2.boundingRect(pts)
     else:
@@ -132,7 +132,8 @@ def setLabel(src, pts, label, color=(0,255,0)):
     pt1 = (x, y)
     pt2 = (x+w, y+h)
     cv2.rectangle(src, pt1, pt2, color, 2)
-    cv2.putText(src, label, (pt1[0], pt1[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color)
+    if label is not None:
+        cv2.putText(src, label, (pt1[0], pt1[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color)
 
 if __name__ == "__main__":
     from Sensor.ImageProcessor import ImageProcessor

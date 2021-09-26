@@ -127,18 +127,22 @@ class ImageProcessor:
     def get_room_alphabet(self, visualization: bool = False):
 
         src = self.get_image()
+
         if visualization:
             canvas = src.copy()
-        _, roi_mask = cv2.threshold(cv2.cvtColor(src, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        canny = auto_canny(roi_mask)
+
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        canny = auto_canny(mask)
         candidates = []
 
 
-        cnts, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         for cnt in cnts:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if vertice <= 8 and 1500 <= cv2.contourArea(cnt):
+            if vertice <= 8 and 1000 <= cv2.contourArea(cnt):
                 target = Target(contour=cnt)
                 candidates.append(target)
 
@@ -150,8 +154,8 @@ class ImageProcessor:
             roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
             _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
             roi_thresholded = cv2.bitwise_and(roi,roi,mask=roi_mask)
-
-            alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.55)
+            setLabel(canvas, candidate.get_pts(), color=(255, 255, 255))
+            alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
             if alphabet is None:
                 continue
             if hamming_distance < curr_hamming_distance:
@@ -165,6 +169,7 @@ class ImageProcessor:
                 #     candidate.set_color("RED")
                 candidate.set_color(color)
                 candidate.set_name(alphabet)
+
 
         if visualization:
             if curr_candidate:
@@ -376,19 +381,85 @@ class ImageProcessor:
     def test(self):
         src = self.get_image(visualization=True)
         ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         y, cr, cb = cv2.split(ycrcb)
-        # cb = cv2.equalizeHist(cb)
-        # cr = cv2.equalizeHist(cr)
-        #_, b_mask = cv2.threshold(cb, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
-        #_, r_mask = cv2.threshold(cr, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
-        _, b_mask = cv2.threshold(cb, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
-        _, r_mask = cv2.threshold(cr, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
+        h, s, v = cv2.split(hsv)
 
+        n_cr = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
+        n_cb = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
+        #y = cv2.normalize(y, None, 0, 255, cv2.NORM_MINMAX)
+        v = cv2.normalize(v, None, 0, 255, cv2.NORM_MINMAX)
 
-        v1 = cv2.hconcat([cb, cr])
-        v2 = cv2.hconcat([b_mask,r_mask])
-        cv2.imshow("result", cv2.vconcat([v1, v2]))
+        _, y_mask = cv2.threshold(y, thresh=0, maxval=255, type=cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        ycrcb = cv2.merge([y, cr, cb])
+        dst = cv2.cvtColor(ycrcb, cv2.COLOR_YCrCb2BGR)
+        dst = cv2.bitwise_and(dst, dst, mask=y_mask)
+        v1 = cv2.hconcat([n_cr, n_cb])
+        v2 = cv2.hconcat([src, dst])
+        v3 = cv2.hconcat([y, v])
+        cv2.imshow("result", cv2.vconcat([v1, v3]))
+
+        #cv2.imshow("crcb", v1)
+        cv2.imshow('dst', v2)
         cv2.waitKey(1)
+
+    def test1(self):
+        src = self.get_image()
+        # b, g, r = cv2.split(src)
+        # hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        # h, l, s = cv2.split(hls)
+        # hls = cv2.hconcat([h, l, s])
+        # cv2.putText(hls, "HLS", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255,255,255),5)
+        # hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        # h, s, v = cv2.split(hsv)
+        # hsv = cv2.hconcat([h,s,v])
+        # cv2.putText(hsv, "HSV", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 5)
+        # lab = cv2.cvtColor(src, cv2.COLOR_BGR2LAB)
+        # l, a, b = cv2.split(lab)
+        # lab = cv2.hconcat([l, a, b])
+        # cv2.putText(lab, "LAB", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 5)
+        # xyz = cv2.cvtColor(src, cv2.COLOR_BGR2XYZ)
+        # x, y, z = cv2.split(xyz)
+        # xyz = cv2.hconcat([x, y, z])
+        # cv2.putText(xyz, "XYZ", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 5)
+        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
+        y, cr, cb = cv2.split(ycrcb)
+        ycrcb = cv2.hconcat([y, cr, cb])
+        cv2.putText(ycrcb, "YCrCb", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 5)
+        cr = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
+        cb = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
+        y = cv2.normalize(y, None, 0, 255, cv2.NORM_MINMAX)
+        normalized_ycrcb = cv2.hconcat([y, cr, cb])
+        cv2.putText(normalized_ycrcb, "normalized_YCrCb", (70, 70), cv2.FONT_HERSHEY_SIMPLEX, 3, (255, 255, 255), 5)
+        #result = cv2.vconcat([hls, hsv, lab, xyz, ycrcb])
+        result = cv2.vconcat([ycrcb, normalized_ycrcb])
+
+        cv2.imshow("result", result)
+
+        cv2.waitKey(1)
+
+    def test2(self):
+        src = self.get_image()
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        #g = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
+        y, cr, cb = cv2.split(ycrcb)
+        cr = cv2.bitwise_and(cr, cr, mask=mask)
+        cb = cv2.bitwise_and(cb, cb, mask=mask)
+        cr = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
+        cb = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
+        _, cr = cv2.threshold(cr, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, cb = cv2.threshold(cb, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+
+        ycrcb = cv2.hconcat([y, cr, cb])
+        cv2.imshow("mask", ycrcb)
+        cv2.waitKey(1)
+
+
+
+
 
 
 if __name__ == "__main__":
@@ -396,5 +467,6 @@ if __name__ == "__main__":
     imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.get_room_alphabet(visualization=True)
+        #imageProcessor.get_room_alphabet(visualization=True)
+        imageProcessor.test2()
 

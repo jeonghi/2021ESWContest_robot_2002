@@ -93,9 +93,9 @@ class Motion:
         }
         """
         if dir == 'DOWN':
-            self.head_angle1 = angle
-        elif dir == 'LEFT' and dir == 'RIGHT':
-            self.head_angle2 = angle
+            self.head_angle1 = (dir, angle)
+        elif dir == 'LEFT' or dir == 'RIGHT':
+            self.head_angle2 = (dir, angle)
         elif dir == 'UPDOWN_CENTER':
             self.head_angle1 = dir
         elif dir == 'LEFTRIGHT_CENTER':
@@ -166,6 +166,17 @@ class Motion:
         self.TX_data_py2(45)
         self.TX_data_py2(54)
         self.TX_data_py2(10)
+
+    def move_arm(self, grab=True, level=2):
+        """level: if grab is True, {1,2,3} else grab is False, {1,2}
+        """
+        angle_list = [30, 90, 60]
+        if grab:
+            self.set_head(dir='DOWN', angle=angle_list[level-1])
+            self.TX_data_py2(75+level)
+        else:
+            self.set_head(dir='DOWN', angle=100)
+            self.TX_data_py2(73+level)
 
 
 
