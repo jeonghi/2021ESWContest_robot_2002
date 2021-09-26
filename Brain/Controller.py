@@ -16,47 +16,59 @@ class Robot:
         self._line_detector = LineDetector()
         self.direction = "LEFT"
         # self.mode = 'start'
-        self.mode = 'end_mission'
+        # self.mode = 'end_mission'
         self.cube_grabbed = False
         self.curr_room_color = "GREEN"
         self.count = 0
         self.progress_of_roobot= [None, ]
         self.walk_info = None
 
+
     def set_basic_form(self):
         self._motion.basic_form()
 
+
     def trace_milk(self, area:str) -> None :
-        HEAD = []
-        dq = deque(HEAD)
+        grabbed_head_moving = [None]
+        grabbed_head_moving.append(self._motion.move_arm(grab=True, level=1))
+        grabbed_head_moving.append(self._motion.move_arm(grab=True, level=2))
+        grabbed_head_moving.append(self._motion.move_arm(grab=True, level=3))
+        dq = deque(grabbed_head_moving)
         while(dq[0]):
+
             pass
-    def find_milk(self):
-        pass
 
-    def check_green_area(self) -> bool :
-        for curr_level in [3,2,1]:
-            self._motion.move_arm(grab=True, level=curr_level)
-            if self._image_processor.check_green_area(): # 초록색 영역이 감지되면
-                return True
-        return False
 
-    def transport_milk_to_green_area(self) -> bool: # if return false, retry trace milk
-        doing_mission_flag = True
-        while doing_mission_flag :
-            self.cube_grabbed = True if self._motion.get_IR() < 100 else False
-            if self.cube_grabbed :
-                return False
-            while self.check_green_area() is False: # 찾았다.
-                self._motion.turn(dir=self.direction, loop=2, grab=True)
-            self._motion.move_arm(grab=True, level=3) # 손 위로 번쩍 고개 완전 아래로 들고 전진
-            while self._image_processor.check_green_area() is False:
-                self._motion.walk(dir="FORWARD", loop=2, grab=True)
-            # 내려 놓기
+    def check_green_area(self) -> None :
+        grabbed_head_moving = []
+        grabbed_head_moving.append(self._motion.move_arm(grab=True, level=1))
+        grabbed_head_moving.append(self._motion.move_arm(grab=True, level=2))
+        grabbed_head_moving.append(self._motion.move_arm(grab=True, level=3))
+        grabbed_head_moving.append(None)
+        dq = deque(grabbed_head_moving)
+        while (True):
+            if dq[0] == None :
+                dq.rotate(n=1)
+                self._motion.turn(dir="LEFT", loop=2, grab=True)
+            dq[0]
+            dq.rotate(n=1)
 
-    def green_room_mission(self):
 
-        self.trace_milk()
+
+    # def transport_milk_to_green_area(self) -> bool: # if return false, retry trace milk
+    #     doing_mission_flag = True
+    #     while doing_mission_flag :
+    #         self.cube_grabbed = True if self._motion.get_IR() < 100 else False
+    #         if self.cube_grabbed :
+    #             return False
+    #         while self.check_green_area() is False: # 찾았다.
+    #             self._motion.turn(dir=self.direction, loop=2, grab=True)
+    #         self._motion.move_arm(grab=True, level=3) # 손 위로 번쩍 고개 완전 아래로 들고 전진
+    #         while self._image_processor.check_green_area() is False:
+    #             self._motion.walk(dir="FORWARD", loop=2, grab=True)
+    #         # 내려 놓기
+
+
 
 
 

@@ -457,6 +457,9 @@ class ImageProcessor:
         cv2.imshow("mask", ycrcb)
         cv2.waitKey(1)
 
+    def check_green(self):
+        pass
+
 
 
 
