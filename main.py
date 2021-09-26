@@ -12,7 +12,7 @@ def main():
     robot = Robot()
     #====================== debug ======================
 
-    video_recorder = VideoRecorder()
+    #video_recorder = VideoRecorder()
     kb = kbhit.KBHit()
 
     print("Press ESC key to exit")
@@ -24,16 +24,17 @@ def main():
                 break
 
         frame = robot._image_processor.get_image()
-        video_recorder.record_frame(frame)
+        #video_recorder.record_frame(frame)
 
     #===================== function ======================
 
-        robot.tracking_cube()
+        #robot.tracking_cube()
+        robot.check_green_area()
 
 
     #=====================================================
     
-    video_recorder.stop()
+    #video_recorder.stop()
     robot.set_basic_form()
 
 if __name__ == "__main__":

@@ -50,6 +50,7 @@ class Robot:
             if dq[0] == None :
                 dq.rotate(n=1)
                 self._motion.turn(dir="LEFT", loop=2, grab=True)
+                time.sleep(2)
             dq[0]
             dq.rotate(n=1)
 
