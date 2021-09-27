@@ -100,6 +100,12 @@ class ColorPreProcessor():
         src_mean = np.true_divide(src.sum(), (src != 0).sum())
         return int(np.mean(src_mean))
 
+    @staticmethod
+    def check_red_or_blue(src: np.array) -> str:
+        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
+        y, cr, cb = cv2.split(ycrcb)
+        answer = "RED" if np.mean(cr) > np.mean(cb) else "BLUE"
+        return answer
 
 
 
