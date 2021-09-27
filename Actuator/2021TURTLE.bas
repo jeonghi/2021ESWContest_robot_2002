@@ -4079,17 +4079,13 @@ KEY12: ' ▼
     GOTO RX_EXIT
     '***************
 KEY13: '▶
-    ETX  4800,13
-    GOSUB 우유깍잡기_2
-
-
+    ETX 4800, 13
+    GOSUB 집고왼쪽턴3_LOOP
     GOTO RX_EXIT
     '***************
 KEY14: ' ◀
-    ETX  4800,14
-    GOSUB 우유깍잡기_1
-
-
+    ETX 4800, 14
+    GOSUB 집고오른쪽턴3_LOOP
     GOTO RX_EXIT
     '***************
 KEY15: 'A
@@ -4403,8 +4399,12 @@ KEY68:
     GOSUB 집고전진
     GOTO RX_EXIT
 KEY69:
-    ETX 4800, 69
-    GOTO 연속후진
+    ETX  4800,69
+
+    보행횟수 = 1
+    GOTO 횟수_집고후진
+
+
     GOTO RX_EXIT
 KEY70:
     ETX 4800, 70
