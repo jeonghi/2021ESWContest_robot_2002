@@ -17,7 +17,8 @@ class Robot:
         # self.mode = 'start'
         self.mode = 'end_mission'
         self.cube_grabbed = False
-        self.curr_room_color = "GREEN"
+        self.cur_room_color = "GREEN"
+        self.saferoom_pos = "LEFT"
         self.count = 0
         self.progress_of_roobot= [None, ]
         self.walk_info = None
@@ -128,57 +129,83 @@ class Robot:
         return
 
     def tracking_cube(self):
-        if not self.cube_grabbed:
-            self._motion.set_head(dir='DOWN', angle=60)
-        else:
-            self._motion.set_head("UPDOWN_CENTER")
+        def head_down(state):
+            if state == "UPDOWN_CENTER":
+                return 60
+            elif state == 60:
+                return 45
+            elif state == 45:
+                return 30
+            elif state == 30:
+                return 20
+            else:
+                return state
+
+        def head_up(state):
+            if state == 20:
+                return 30
+            elif state == 30:
+                return 45
+            elif state == 45:
+                return 60
+            elif state == 60:
+                return "UPDOWN_CENTER"
+            else:
+                return state
+
+        v_angle, _ = self._motion.get_head()
+        cube_center_x, cube_center_y = self._image_processor.get_cube_saferoom()
+        saferoom_x, saferoom_y = self._image_processor.get_saferoom_position()
 
         src = self._image_processor.get_image(visualization=False)
         h, w = src.shape[:2]
+        
         frame_center_x = w / 2
         frame_center_y = h / 2
-
-        cube_center_x, cube_center_y = self._image_processor.get_cube_saferoom()
-        saferoom_pos_x, saferoom_pos_y = self._image_processor.get_saferoom_position()
-
-        is_cube_found = True
-        if cube_center_x is None:
-            is_cube_found = False
-
-        is_saferoom_found = True
-        if saferoom_pos_x is None:
-            is_saferoom_found = False
-
-        #cur_ir = self._motion.get_IR()
-        #print('cur IR:: ', cur_ir)
-
-        #cube_grabbed = False if cur_ir < 100 else True
-
-        if self.cube_grabbed:
-            if not is_saferoom_found:
-                self._motion.turn('LEFT', grab=True)
-                print("saferoom not found")
-            else:
-                if abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) > 20:
-                    self._motion.walk('FORWARD', grab=True)
-                elif abs(frame_center_x - saferoom_pos_x) < 20 and saferoom_pos_y > 440:
-                    self._motion.grab(switch=False)
-                elif saferoom_pos_x < 300:
-                    self._motion.turn('LEFT', grab=True)
-                    print("saferoom found left")
-                elif saferoom_pos_x > 340:
-                    self._motion.turn('RIGHT', grab=True)
-                    print("saferoom found right")
-        else:
-            if abs(frame_center_x - cube_center_x) < 20:
-                self._motion.walk('FORWARD')
-            elif cube_center_x > 300:
-                self._motion.walk('RIGHT')
-            elif cube_center_x < 340:
-                self._motion.walk('LEFT')
-            if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 440:
+        
+        if not self.cube_grabbed:
+            if v_angle == 20:
+                #v_angle = 60
                 self._motion.grab()
                 self.cube_grabbed = True
+
+            if abs(frame_center_x - cube_center_x) < 20:
+                self._motion.walk('FORWARD')
+
+                if cube_center_y > (frame_center_y + 20):
+                    print("cube below center!")
+                    print("v_angle: ", v_angle)
+
+                    v_angle = head_down(v_angle)
+                    self._motion.set_head("DOWN", v_angle)
+
+            elif cube_center_x < 300:
+                self._motion.walk('LEFT')
+            elif cube_center_x > 340:
+                self._motion.walk('RIGHT')
+        else:
+            print("GRABED!!!")
+            if self.saferoom_pos == "LEFT":
+                v_angle = 60
+                self._motion.set_head("DOWN", v_angle)
+                #self._motion.walk('BACKWARD', loop=2, grab=True)
+                self._motion.turn('LEFT', loop=2, grab=True)
+                self.saferoom_pos = ""
+
+            if saferoom_x is None:
+                return
+
+            if abs(frame_center_x - saferoom_x) < 50:
+                self._motion.walk('FORWARD', grab=True)
+
+                if saferoom_y > (frame_center_y + 50):
+                    self._motion.grab(switch=False)
+                    return
+
+            elif saferoom_x < 300:
+                self._motion.turn('LEFT', grab=True)
+            elif saferoom_x > 340:
+                self._motion.turn('RIGHT', grab=True)
 
     def line_tracing(self):
         line_info,edge_info, result =  self._image_processor.line_tracing()
