@@ -4171,14 +4171,14 @@ KEY12: ' ▼
     '***************
 KEY13: '▶
     ETX  4800,13
-    GOSUB 우유깍잡기_2
+    GOSUB 집고오른쪽턴3_LOOP
 
 
     GOTO RX_EXIT
     '***************
 KEY14: ' ◀
     ETX  4800,14
-    GOSUB 우유깍잡기_1
+    GOSUB 집고오른쪽턴20
 
 
     GOTO RX_EXIT
