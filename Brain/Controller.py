@@ -534,7 +534,7 @@ class Robot:
         grabbed_head_moving = ["begin", "HIGH", "LOW", "MIDDLE", "end"]
         flag = -1
         dq = deque(grabbed_head_moving)
-        dq.rotate(n=flag)
+        dq.rotate(flag)
         while True:
             result = (line_info, edge_info, src) = self._image_processor.line_tracing(edge_visualization=True)
             print(result)

@@ -29,7 +29,7 @@ def main():
     #===================== function ======================
 
         #robot.tracking_cube()
-    robot.find_yellow_corner_for_out_room()
+        robot.find_yellow_corner_for_out_room()
 
 
 

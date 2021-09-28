@@ -170,7 +170,7 @@ class Motion:
         level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
         self.TX_data_py2(75+level[dir])
         time.sleep(0.1)
-        self.set_head(dir='DOWN', angle=angle_list[level[dir-1]])
+        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
 
 
 # **************************************************
