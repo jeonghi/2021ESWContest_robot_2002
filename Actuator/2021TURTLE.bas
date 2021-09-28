@@ -3695,6 +3695,97 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     GOSUB 기본자세
     RETURN
+물건집고전진:
+    보행속도 = 8
+    좌우속도 = 4
+    넘어진확인 = 0
+
+    'GOSUB 전방하향18도
+    'DELAY 20
+    SPEED 6
+    GOSUB All_motor_mode3
+    MOVE G6B, 160, 10, 50
+    MOVE G6C, 160, 10, 50
+    WAIT
+
+    DELAY 20
+    'HIGHSPEED SETON
+
+    SPEED 6
+    MOVE G6D,  90,  74, 144,  95, 110
+    MOVE G6A, 108,  76, 146,  93, 96
+    WAIT
+
+    SPEED 8
+    MOVE G6D,90, 90, 120, 102, 110,100
+    MOVE G6A,108,  76, 147,  93,  96,100
+    WAIT
+
+    'HIGHSPEED SETOFF
+    GOTO 물건집고전진_2	
+
+물건집고전진_2:
+    MOVE G6A,110,  76, 147,  93, 100,100
+    MOVE G6D,96, 90, 120, 102, 107,100
+    WAIT
+
+물건집고전진_3:
+    'ETX 4800,13 '진행코드를 보냄
+
+    SPEED 보행속도
+
+    MOVE G6D, 90,  56, 145, 115, 110
+    MOVE G6A,108,  76, 147,  90,  96
+    WAIT
+
+    SPEED 좌우속도
+    MOVE G6D,108,  76, 147, 90,  98
+    MOVE G6A,90, 100, 142,  69, 108
+    WAIT
+
+    SPEED 보행속도
+
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+        GOTO MAIN
+    ENDIF
+
+
+    ERX 4800,A, 물건집고전진_4
+    IF A = 11 THEN
+        GOTO 물건집고전진_4
+        '    ELSE
+        '    	MOVE G6A, 90, 100, 100, 115, 110,100
+        ' 		MOVE G6D,112,  76, 146,  93,  96,100
+        ' 		MOVE G6B,90
+        ' 		MOVE G6C,110
+        ' 		WAIT
+        ' 		HIGHSPEED SETOFF
+        ' 		SPEED 8
+
+        ' 		MOVE G6D, 106,  76, 146,  93,  96,100		
+        ' 		MOVE G6A,  88,  71, 152,  91, 106,100
+        ' 		MOVE G6C, 100
+        ' 		MOVE G6B, 100
+        ' 		WAIT	
+        ' 		SPEED 8
+        ' 		GOSUB 기본자세2
+
+        ' 		GOTO RX_EXIT
+    ENDIF
+물건집고전진_4:
+    SPEED 9
+    MOVE G6A,95, 90, 120, 102, 111,100
+    MOVE G6D,108,  76, 146,  93,  96,100
+    WAIT
+
+    SPEED 7
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 145,  93, 100, 100
+    WAIT
+
+    RETURN
 
 집고전진:
     보행속도 = 8
@@ -4058,8 +4149,8 @@ KEY8:
     GOTO RX_EXIT
     '***************
 KEY9:
-    ETX  4800,9
-    GOSUB 잡기기본자세
+    ETX 4800, 9
+    GOSUB 물건집고전진
     GOTO RX_EXIT
     '***************
 KEY10: '0

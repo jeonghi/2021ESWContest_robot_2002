@@ -38,6 +38,12 @@ if __name__ == "__main__":
         elif command == "grab off":
             command_key = 65
             is_grabbed = False
+        elif command == "movearm 1":
+            command_key = 76
+        elif command == "movearm 2":
+            command_key = 77
+        elif command == "movearm 3":
+            command_key = 78
 
         elif command.split()[0] == "head": # usage head [direction] [angle] ex) head down 60
             cmd, opt, angle = command.split()

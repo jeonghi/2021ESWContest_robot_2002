@@ -367,6 +367,7 @@ class ImageProcessor:
         green_area_mask = cv2.bitwise_and(green_mask, binary)
 
         cnts, _ = cv2.findContours(green_area_mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        cnt = None
         center = None, None
 
         if len(cnts) > 0:
@@ -374,8 +375,18 @@ class ImageProcessor:
             ((x, y), radius) = cv2.minEnclosingCircle(cnt)
             M = cv2.moments(cnt)
             center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
+        
+        def distance(pt1, pt2):
+            from math import sqrt
+            return sqrt((pt1[0] - pt2[0]) ** 2 + (pt1[1] - pt2[1]) ** 2)
+        
+        max_dist = 0
+        max_pos = 0, 0
+        for pos in cnt:
+            if max_dist < distance((frame_center_x, 0), pos[0]):
+                max_pos = pos[0]
 
-        return center
+        return max_pos
 
     def line_tracing(self):
         src = self.get_image()
