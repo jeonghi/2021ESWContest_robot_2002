@@ -140,22 +140,15 @@ class Motion:
         self.TX_data_py2(5)
         return self.distance
 
-    def open_door_1(self):
-        self.turn('LEFT', loop=7)
-        self.TX_data_py2(63)
-        self.walk('RIGHT', loop=20)
-
-    def open_door_2(self, loop=1):
+    def open_door(self, loop=1):
         for _ in range(loop):
             self.TX_data_py2(66)
 
     def grab(self, switch=True):
         """if switch=True then grab ON, else then grab OFF
         """
-        if switch:
-            self.TX_data_py2(64)
-        else:
-            self.TX_data_py2(65)
+        tx = 64 if switch else 65
+        self.TX_data_py2(tx)
 
     def get_head(self):
         """Return vertical, horizontal head angle
@@ -167,20 +160,15 @@ class Motion:
         self.TX_data_py2(54)
         self.TX_data_py2(10)
 
-    def move_arm(self, grab=True, level=2):
-        """level: if grab is True, {1,2,3} else grab is False, {1,2}
+    def move_arm(self, dir='HIGH'):
+        """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
+        팔을 위로 하면 머리는 아래로 숙임.
         """
         angle_list = [30, 90, 60]
-        if grab:
-            self.set_head(dir='DOWN', angle=angle_list[level-1])
-            time.sleep(0.1)
-            self.TX_data_py2(75+level)
-        else:
-            self.set_head(dir='DOWN', angle=100)
-            time.sleep(0.1)
-            self.TX_data_py2(73+level)
-
-
+        level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
+        self.TX_data_py2(75+level[dir])
+        time.sleep(0.1)
+        self.set_head(dir='DOWN', angle=angle_list[level[dir-1]])
 
 
 # **************************************************
