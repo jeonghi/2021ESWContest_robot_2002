@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 import time
 import sys
+from collections import deque
 
 class Robot:
 
@@ -528,3 +529,24 @@ class Robot:
                     print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)
             self.count += 1
+
+    def find_yellow_corner_for_out_room(self) -> None:
+        grabbed_head_moving = ["begin", "HIGH", "LOW", "MIDDLE", "end"]
+        flag = -1
+        dq = deque(grabbed_head_moving)
+        dq.rotate(n=flag)
+        while True:
+            result = (line_info, edge_info, src) = self._image_processor.line_tracing(edge_visualization=True)
+            print(result)
+            if dq[0] == "begin":
+                flag = -1
+                self._motion.turn(dir="LEFT", grab=True, loop=2)
+                time.sleep(1)
+            elif dq[0] == "end":
+                flag = 1
+                self._motion.turn(dir="LEFT", grab=True, loop=2)
+                time.sleep(1)
+            else:
+                self._motion.move_arm(dir=dq[0])
+                time.sleep(1)
+            dq.rotate(flag)

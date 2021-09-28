@@ -388,9 +388,13 @@ class ImageProcessor:
 
         return max_pos
 
-    def line_tracing(self):
+    def line_tracing(self, line_visualization=False, edge_visualization=False):
         src = self.get_image()
-        return self.line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
+        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src, line_visualization = line_visualization, edge_visualization = edge_visualization)
+        if line_visualization or edge_visualization :
+            cv2.imshow("line", src)
+            cv2.waitKey(1)
+        return result
 
     def test(self):
         src = self.get_image(visualization=True)
