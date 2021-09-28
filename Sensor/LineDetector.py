@@ -47,8 +47,8 @@ class LineDetector:
                 cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
     def mask_color(self, src):
-        yellow_lower = np.array([0, 20, 95])
-        yellow_upper = np.array([58, 200, 151])
+        yellow_lower = np.array([20,20,100])
+        yellow_upper = np.array([32, 255, 255])
         src = cv2.GaussianBlur(src, (5, 5), 0)
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
@@ -56,6 +56,12 @@ class LineDetector:
 
     def get_lines(self, src):
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+        ret, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        src = cv2.bitwise_and(src, src, mask = mask)
+        #cv2.imshow('mask', mask)
+        #cv2.imshow('src', src)
+
         yellow_mask = self.mask_color(src)
         yellow_edges = cv2.Canny(yellow_mask, 75, 150)
         lines = cv2.HoughLinesP(yellow_edges, 1, 1 * np.pi/180, 30, np.array([]), minLineLength=100, maxLineGap=150)
@@ -231,6 +237,14 @@ if __name__ == "__main__":
             video = cv2.VideoCapture("./Sensor/src/line_test/return_line.h264")
             continue
         src = cv2.resize(src, dsize=(640,480))
+
+        hsv_image = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        val_S = 0
+        val_V = 70
+        array = np.full(hsv_image.shape, (0,val_S,val_V), dtype=np.uint8)
+        val_add_image = cv2.add(hsv_image, array)
+        src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
+
         line_info,edge_info, result = line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
         print(line_info)
         print(edge_info)
