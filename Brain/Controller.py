@@ -168,6 +168,102 @@ class Robot:
     def find_V(self): # 안씀
         self._motion.turn(self.direction, 1)
 
+    def check_area(self, line_info, edge_info):
+        
+        #line_info = {'ALL_X': [0,0] , 'ALL_Y': [0,0], 'H' : False, 'H_DEGREE': 0,'H_X':[0,0], 'H_Y':[0,0]}
+        #edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X':0,'EDGE_DOWN_Y':0, 'EDGE_UP_Y': 0}
+        
+        if self.box_pos == 'RIGHT':
+            if line_info["ALL_X"][1] > 600 and line_info["H"] == True:
+                if line_info["ALL_X"][0] < 200:
+                    # ++ 모션 잡은 상태로 팔 앞으로 뻗고 고개 내림
+                    self.mode = 'box_into_area'
+                else:
+                    self._motion.walk(dir='RIGHT', loop=1)
+            else:
+                self._motion.turn(dir='LEFT', loop=1)
+        elif self.box_pos == 'LEFT':
+            if line_info["ALL_X"][0] < 50 :
+                if line_info["ALL_X"][1] < 400:
+                    # ++ 모션 잡은 상태로 팔 앞으로 뻗고 고개 내림
+                    self.mode = 'box_into_area'
+                else:
+                    self._motion.walk(dir='LEFT', loop=1)
+            else:
+                self._motion.turn(dir='RIGHT', loop=1)
+        elif self.box_pos == 'MIDDLE':
+            if edge_info["EDGE_DOWN_X"] < 300:
+                self._motion.walk(dir='RIGHT', loop=1)
+            elif edge_info["EDGE_DOWN_X"] > 360 :
+                self._motion.walk(dir='LEFT', loop=1)
+            #elif 300 < edge_info["EDGE_DOWN_X"] < 360 :
+            else:
+                # ++ 모션 잡은 상태로 팔 앞으로 뻗고 고개 내림
+                self.mode = 'box_into_area'
+        else:
+            print("self.box_pos is None, Please check it")
+
+            # 2) 초록 구역이 적합하게 보일 때까지 돈다
+                # self.box_pos == 'RIGHT' -> turn LEFT
+                # self.box_pos == 'LEFT' -> turn RIGHT
+            # 3) 모든 선분의 가장 끝 x값이 화면 끝라인에 근접하면? 돌기 멈춤     ### lines의 minx, maxx
+                # self.box_pos == 'RIGHT' -> ' max x > 600 ' -> 멈춤
+                # self.box_pos == 'LEFT'  -> ' min_x < 50 '  -> 멈춤
+            # 4) 초록 구역이 크게 보이지 않아 걸음으로 보정한다
+                # self.box_pos == 'RIGHT' -> ' min x < 200 ' -> 오른쪽 이동 -> 멈춤
+                # self.box_pos == 'LEFT'  -> ' max_x > 400 '  -> 왼쪽 이동 -> 멈춤
+
+            # self.box_pos == 'MIDDLE' 이면 EDGE_DOWN_X가 중앙에 오도록 걸음으로 보정한다. -> 중앙에 오면 멈춤
+
+
+            
+    def box_into_area(self, line_info, edge_info):
+        # 5) self.mode = box_into_area 
+        # LEFT, RIGHT -> H에 가까워지게 가서 그냥 넣으면 됨     ### H : True/False, H의 mean y
+        # MIDDLE -> edge_down_y좌표가 가까워지게 가서 넣으면 됨
+        # 6) 팔 앞으로 뻗고 고개 내리고 H/edge_DOWN에 가까워질 때까지 걷는다
+
+        
+        #line_info = {'ALL_X': [0,0] , 'ALL_Y': [0,0], 'H' : False, 'H_DEGREE': 0,'H_X':[0,0], 'H_Y':[0,0]}
+        #edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X':0,'EDGE_DOWN_Y':0, 'EDGE_UP_Y': 0}
+
+        if self.box_pos == 'LEFT' or 'RIGHT':
+            if line_info['ALL_Y'][0] > 240: # 발 나온다는 생각으로 절반 아래에 오면 발 앞이라고 생각할 것임 -- 수정 예정
+                if line_info["H"] == True and line_info['H_DEGREE'] < 2 :
+                    self._motion.walk(dir='FORWARD', loop=1)
+                    # ++ 모션 앉고 잡은 박스 놓는 모션 넣기
+                    self.mode = 'end_mission'
+                    self.color = 'YELLOW'
+                else:
+                    #line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
+                    self._motion.walk(dir='FORWARD', loop=4)
+                    # ++ 모션 앉고 잡은 박스 놓는 모션 넣기
+                    self.mode = 'end_mission'
+                    self.color = 'YELLOW'
+            else:
+                self._motion.walk(dir='FORWARD', loop=1)
+
+
+        elif self.box_pos == 'MIDDLE':
+            if line_info['ALL_Y'][0] > 240:
+                #line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
+                self._motion.walk(dir='FORWARD', loop=4)
+                # ++ 모션 앉고 잡은 박스 놓는 모션 넣기
+                self.mode = 'end_mission'
+                self.color = 'YELLOW'
+            else:
+                self._motion.walk(dir='FORWARD', loop=1)
+
+        else:
+            print("self.box_pos is None, Please check it")
+
+        # 7) 화면에 그냥 lines 감지되면 min y값이 일정범위 이상이 되면 멈춘다 ### lines의 miny
+        # 8) edge_DOWN이면 한두걸음 가서 그냥 넣고 H이면 fit_H 감지될 때까지 보정한다    ### H의 degree 또는 fit_H: True/False
+            # H_degree가 몇이냐에 따라 turn LEFT, RIGHT 보정들어감
+        # 9) 한두걸음 가서 놓는다.
+    # 4. grap off 동작하면서 self.mode = 'end_mission', self.color = 'YELLOW'로 바꿔주세요
+        
+
 
     # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
     def setting_mode(self):
@@ -259,37 +355,41 @@ class Robot:
             else:
                 print('The Robot has not direction, Please Set **self.direction**')
 
+
+
+
+
+
         # elif self.mode == 'start_mission':
-        # 0. 확진 / 안전 구역 확인 : self.color 바꿔주세요
+        # 0. 확진 / 안전 구역 확인 : self.color 바꿔주세요, self.mode = 'box_tracking'로 바꿔주세요.
 
 
-
+        # elif self.mode == 'box_tracking':
         # 1. red, blue 알파벳 구별: edge_info["EDGE_UP_Y"] 기준으로 윗 공간, self.alphabet_color 알파벳 색깔 넣어주세요
-        # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, RIGHT)
+        # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, MIDDLE, RIGHT)
+        ## grap on 과 동시에 self.mode = 'box_into_area'로 바꾸기
+        ## # 1) 박스 grap on 하면 손 내리고 고개든다 (MIDDLE이면 고개 좀 많이 내려주기, LEFT RIGHT는 30 정도면 될 듯?아마??)
+
+            # ++ 집은 채로 손내리는 모션
+            # ++ 고개 드는 모션
+
+
+
+
 
 
 
         # 3. 박스 구역의 평행선 H 기준으로 안으로 또는 밖으로 옮기기
-            # 1) 박스 grap on 하면 손 내리고 고개든다
-            # 2) 초록 구역이 적합하게 보일 때까지 돈다
-                # self.box_pos == 'RIGHT' -> turn LEFT
-                # self.box_pos == 'LEFT' -> turn RIGHT
-            # 3) 모든 선분의 가장 끝 x값이 화면 끝라인에 근접하면? 돌기 멈춤     ### lines의 minx, maxx
-                # self.box_pos == 'RIGHT' -> ' max x > 600 ' -> 멈춤
-                # self.box_pos == 'LEFT'  -> ' min_x < 50 '  -> 멈춤
-            # 4) 초록 구역이 크게 보이지 않아 걸음으로 보정한다
-                # self.box_pos == 'RIGHT' -> ' min x < 200 ' -> 오른쪽 이동 -> 멈춤
-                # self.box_pos == 'LEFT'  -> ' max_x > 400 '  -> 왼쪽 이동 -> 멈춤
-            # 5) 공간 위치 인지 
-                # H 감지되면 측면 구간 -> H에 가까워지게 가서 그냥 넣으면 됨     ### H : True/False, H의 mean y
-                # H 감지안되면 정중앙 구간 -> edge_DOWN 선에서 조금 더 가서 넣으면 됨 -> 7번으로 감안될듯 ### edge_DOWN : True/False, edge_DOWN의 mean y
-            # 6) 팔 앞으로 뻗고 고개 내리고 H/edge_DOWN에 가까워질 때까지 걷는다
-            # 7) 화면에 그냥 lines 감지되면 min y값이 일정범위 이상이 되면 멈춘다 ### lines의 miny
-            # 8) edge_DOWN이면 한두걸음 가서 그냥 넣고 H이면 fit_H 감지될 때까지 보정한다    ### H의 degree 또는 fit_H: True/False
-                # H_degree가 몇이냐에 따라 turn LEFT, RIGHT 보정들어감
-            # 9) 한두걸음 가서 놓는다.
-        # 4. grap off 동작하면서 self.mode = 'end_mission', self.color = 'YELLOW'로 바꿔주세요
+        elif self.mode == 'check_area':
+            self.box_into_area(line_info, edge_info)
 
+        elif self.mode == 'box_into_area':
+            self.box_into_area(line_info, edge_info)
+        
+        
+
+
+            
 
 
 

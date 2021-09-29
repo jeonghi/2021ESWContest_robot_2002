@@ -417,12 +417,12 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="Sensor/src/green_room_test/green_area1.h264")
+    imageProcessor = ImageProcessor(video_path="Sensor/src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
     while True:
         
         line_info,edge_info, src = imageProcessor.line_tracing(color='GREEN')
-        print(edge_info["EDGE_UP_Y"])
+        print(line_info["H_DEGREE"])
         cv2.imshow('src',src)
         key = cv2.waitKey(1)
         if key == 27:

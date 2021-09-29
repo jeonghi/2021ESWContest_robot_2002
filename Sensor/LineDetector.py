@@ -262,7 +262,7 @@ class LineDetector:
 
         if color == 'GREEN':
             line_info = {'ALL_X': [0,0] , 'ALL_Y': [0,0], 'H' : False, 'H_DEGREE': 0,'H_X':[0,0], 'H_Y':[0,0]}
-            edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_Y':0, 'EDGE_UP_Y': 0}
+            edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X':0,'EDGE_DOWN_Y':0, 'EDGE_UP_Y': 0}
 
             if len(lines)!=0:
                 size = int(lines.shape[0]*lines.shape[2]/2)
@@ -284,7 +284,7 @@ class LineDetector:
                 # [max_x, max_y, min_x, min_y]
                 H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                 line_info["H"] = True
-                line_info["H_degree"] = H_degree
+                line_info["H_DEGREE"] = H_degree
                 line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]] #[min_x, middle, max_x, middle]
                 line_info["H_Y"] =  [horizontal_fit_line[1], horizontal_fit_line[2]]
                 if edge_visualization is True:
@@ -298,6 +298,7 @@ class LineDetector:
                 edge_fit_line_DOWN = self.get_fitline(src, edge_lines, size, 'edge_DOWN')
                 edge_info["EDGE_UP_Y"]= edge_fit_line_UP[1]
                 edge_info["EDGE_DOWN"]= True
+                edge_info["EDGE_DOWN_X"]=int((edge_fit_line_DOWN[0]+edge_fit_line_DOWN[2])/2)
                 edge_info["EDGE_DOWN_Y"]= edge_fit_line_DOWN[1]
                 if edge_visualization is True:
                     self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
