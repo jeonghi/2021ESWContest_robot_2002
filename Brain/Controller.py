@@ -1,6 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
-from Actuator.Motion import Motion
+#from Actuator.Motion import Motion
 import numpy as np
 import cv2
 import time
@@ -9,9 +9,9 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        self._motion = Motion()
-        self._image_processor = ImageProcessor(video_path=video_path)
-        #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
+        #self._motion = Motion()
+        #self._image_processor = ImageProcessor(video_path=video_path)
+        self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
         self._line_detector = LineDetector()
         self.direction = None
         # self.mode = 'start'
