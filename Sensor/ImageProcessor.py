@@ -391,9 +391,9 @@ class ImageProcessor:
 
         return max_pos
 
-    def line_tracing(self, line_visualization=False, edge_visualization=False):
+    def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
         src = self.get_image()
-        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src, line_visualization = line_visualization, edge_visualization = edge_visualization)
+        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         if line_visualization or edge_visualization :
             cv2.imshow("line", src)
             cv2.waitKey(1)
@@ -464,9 +464,12 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         #g = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+        green_upper = 80
+        green_lower = 20
         ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
         y, cr, cb = cv2.split(ycrcb)
+        self.color_preprocessor.get_green_mask(h)
         cr = cv2.bitwise_and(cr, cr, mask=mask)
         cb = cv2.bitwise_and(cb, cb, mask=mask)
         cr = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
@@ -478,8 +481,21 @@ class ImageProcessor:
         cv2.imshow("mask", ycrcb)
         cv2.waitKey(1)
 
-    def check_green(self):
-        pass
+    def test3(self):
+        src = self.get_image()
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+
+        red_mask = self.color_preprocessor.get_red_mask(h)
+        mask = cv2.bitwise_and(mask, red_mask)
+
+        green_mask = self.color_preprocessor.get_green_mask(h)
+        self.line_tracing()
+        #mask = cv2.bitwise_and(mask, green_mask)
+
+        cv2.imshow("mask", mask)
+        cv2.waitKey(1)
 
 
 
@@ -488,8 +504,10 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.get_room_alphabet(visualization=True)
+        #imageProcessor.get_room_alphabet(visualization=True)
+        #imageProcessor.test3()
+        imageProcessor.line_tracing(color="GREEN", line_visualization=True)
 

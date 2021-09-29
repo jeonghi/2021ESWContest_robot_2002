@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+from Sensor.ColorChecker import ColorPreProcessor
 
 class LineDetector:
     def __init__(self):
@@ -46,17 +47,28 @@ class LineDetector:
             for line in lines:
                 cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
-    def mask_color(self, src):
-        yellow_lower = np.array([0, 20, 95])
-        yellow_upper = np.array([58, 200, 151])
+    @staticmethod
+    def mask_color(src, color:str):
         src = cv2.GaussianBlur(src, (5, 5), 0)
-        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, thresh=70, maxval=255, type=cv2.THRESH_BINARY)
+        if color == "YELLOW":
+
+            #color_mask = ColorPreProcessor.get_yellow_mask4hue(h)
+            src = cv2.bitwise_and(src, src, mask=mask)
+            color_mask = ColorPreProcessor.get_yellow_mask4hsv(src)
+        elif color == "GREEN":
+            color_mask = ColorPreProcessor.get_green_mask(h)
+        else:
+            color_mask = ColorPreProcessor.get_green_mask(h)
+        mask = cv2.bitwise_and(mask, color_mask)
         return mask
 
-    def get_lines(self, src):
-        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        yellow_mask = self.mask_color(src)
+
+
+    def get_lines(self, src, color="YELLOW"):
+        yellow_mask = LineDetector.mask_color(src=src, color=color)
         yellow_edges = cv2.Canny(yellow_mask, 75, 150)
         lines = cv2.HoughLinesP(yellow_edges, 1, 1 * np.pi/180, 30, np.array([]), minLineLength=100, maxLineGap=150)
         lines = np.squeeze(lines)
@@ -147,12 +159,12 @@ class LineDetector:
         return result
 
 
-    def get_all_lines(self, src, line_visualization = False, edge_visualization = False):
+    def get_all_lines(self, src, color="YELLOW", line_visualization = False, edge_visualization = False):
 
         line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
         edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
 
-        lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L,edge_lines_R = self.get_lines(src)
+        lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L,edge_lines_R = self.get_lines(src=src, color=color)
 
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
 
@@ -221,22 +233,3 @@ class LineDetector:
 
         return line_info,edge_info, src
 
-
-if __name__ == "__main__":
-    video = cv2.VideoCapture("./Sensor/src/line_test/return_line.h264")
-    line_detector = LineDetector()
-    while True:
-        ret, src = video.read()
-        if not ret:
-            video = cv2.VideoCapture("./Sensor/src/line_test/return_line.h264")
-            continue
-        src = cv2.resize(src, dsize=(640,480))
-        line_info,edge_info, result = line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
-        print(line_info)
-        print(edge_info)
-        cv2.imshow('result',result)
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
-    video.release()
-    cv2.destroyAllWindows()

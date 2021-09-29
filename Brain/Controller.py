@@ -41,22 +41,22 @@ class Robot:
 
     def check_green_area(self) -> None :
         grabbed_head_moving = ["begin",1, 2, 3,"end"]
-        flag = 1
+        flag = -1
         dq = deque(grabbed_head_moving)
-        dq.rotate(n=flag)
+        dq.rotate(flag)
         while (True):
             if dq[0] == "begin":
-                flag = 1
+                flag = -1
                 self._motion.turn(dir="LEFT", grab=True, loop=2)
                 time.sleep(1)
             elif dq[0] == "end":
-                flag = -1
+                flag = 1
                 self._motion.turn(dir="LEFT", grab=True, loop=2)
                 time.sleep(1)
             else:
                 self._motion.move_arm(grab=True, level=dq[0])
                 time.sleep(1)
-            dq.rotate(n=flag)
+            dq.rotate(flag)
 
                 
 
