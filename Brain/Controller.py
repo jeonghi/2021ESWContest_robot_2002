@@ -156,7 +156,7 @@ class Robot:
 
         v_angle, _ = self._motion.get_head()
         cube_center_x, cube_center_y = self._image_processor.get_cube_saferoom()
-        saferoom_x, saferoom_y = self._image_processor.get_saferoom_position()
+        h_degree = self._image_processor.get_saferoom_position()
 
         src = self._image_processor.get_image(visualization=False)
         h, w = src.shape[:2]
@@ -193,20 +193,19 @@ class Robot:
                 self._motion.turn('LEFT', loop=2, grab=True)
                 self.saferoom_pos = ""
 
-            if saferoom_x is None:
+            if h_degree is None:
                 return
 
-            if abs(frame_center_x - saferoom_x) < 50:
-                self._motion.walk('FORWARD', grab=True)
-
-                if saferoom_y > (frame_center_y + 50):
-                    self._motion.grab(switch=False)
-                    return
-
-            elif saferoom_x < 300:
-                self._motion.turn('LEFT', grab=True)
-            elif saferoom_x > 340:
-                self._motion.turn('RIGHT', grab=True)
+            if h_degree < 0:
+                print("turn LEFT")
+                #self._motion.turn('LEFT', grab=True)
+            elif h_degree > 0:
+                print("turn RIGHT")
+                #self._motion.turn('RIGHT', grab=True)
+            
+            if np.abs(h_degree) > 175:
+                print("HEAD DOWN")
+                #self._motion.set_head("DOWN", 10)
 
     def line_tracing(self):
         line_info,edge_info, result =  self._image_processor.line_tracing()
@@ -216,7 +215,6 @@ class Robot:
         #print(edge_info)
         return line_info, edge_info
         
-
     def detect_direction(self):
         self.detect_alphabet()
         self.mode = 'walk'
