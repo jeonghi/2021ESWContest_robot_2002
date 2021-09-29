@@ -3719,7 +3719,7 @@ KEY13: '▶
     '***************
 KEY14: ' ◀
     ETX  4800,14
-    GOSUB 집고오른쪽턴20
+    GOSUB 집고왼쪽턴3_LOOP
 
 
     GOTO RX_EXIT
