@@ -21,11 +21,13 @@ class EdgeDetector:
                 cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
     def mask_color(self, src):
-        yellow_lower = np.array([18, 94, 140])
-        yellow_upper = np.array([48, 255, 255])
+        match_lower = np.array([20, 52, 72]) #green_lower
+        match_upper = np.array([80,  255, 255]) #green_upper  
+        #yellow_lower = np.array([18, 94, 140])
+        #yellow_upper = np.array([48, 255, 255])
         src = cv2.GaussianBlur(src, (5, 5), 0)
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+        mask = cv2.inRange(hsv, match_lower, match_upper)
         return mask
 
     def get_lines(self, src):
@@ -100,3 +102,22 @@ class EdgeDetector:
             src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
         return answer, src
+
+if __name__ == "__main__":
+    video = cv2.VideoCapture("./Sensor/src/green_room_test/green_area1.h264")
+    line_detector = EdgeDetector()
+    while True:
+        ret, src = video.read()
+        if not ret:
+            video = cv2.VideoCapture("./Sensor/src/green_room_test/green_area1.h264")
+            continue
+        src = cv2.resize(src, dsize=(640,480))
+
+        answer, result = line_detector.find_edge(src)
+        #print(answer)
+        cv2.imshow('result',result)
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
+    video.release()
+    cv2.destroyAllWindows()

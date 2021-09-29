@@ -369,9 +369,9 @@ class ImageProcessor:
         
         return None, None
 
-    def line_tracing(self):
+    def line_tracing(self, color='YELLOW'):
         src = self.get_image()
-        return self.line_detector.get_all_lines(src, line_visualization = False, edge_visualization = True)
+        return self.line_detector.get_all_lines(src, color, line_visualization = False, edge_visualization = True)
 
     def test(self):
         src = self.get_image(visualization=True)
@@ -418,14 +418,13 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
+    imageProcessor = ImageProcessor(video_path="Sensor/src/green_room_test/green_area1.h264")
     imageProcessor.fps.start()
     while True:
         
-        src, yellow_mask, yellow_edges = imageProcessor.get_yellow_edges()
+        line_info,edge_info, src = imageProcessor.line_tracing(color='GREEN')
+        print(edge_info["EDGE_UP_Y"])
         cv2.imshow('src',src)
-        cv2.imshow('yellow_mask',yellow_mask)
-        cv2.imshow('yellow_edges',yellow_edges)
         key = cv2.waitKey(1)
         if key == 27:
             break

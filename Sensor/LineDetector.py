@@ -46,27 +46,50 @@ class LineDetector:
             for line in lines:
                 cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
-    def mask_color(self, src):
-        yellow_lower = np.array([10,40,95])
-        yellow_upper = np.array([40, 220, 220])
+    #def mask_color(self, src):
+        #hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        #h, s, v = cv2.split(hsv)
+        #ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+        #src = cv2.bitwise_and(src, src, mask = mask)
+        #yellow_lower = np.array([10,40,95])
+        #yellow_upper = np.array([40, 220, 220])
+        #src = cv2.GaussianBlur(src, (5, 5), 0)
+        #hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        #mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+        #return mask
+
+    def mask_color(self, src, color = 'YELLOW'):
+        if color == 'YELLOW':
+            hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+            h, s, v = cv2.split(hsv)
+            ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+            src = cv2.bitwise_and(src, src, mask = mask)
+            match_lower = np.array([10,40,95]) #yellow_lower
+            match_upper = np.array([40, 220, 220]) #yellow_upper
+
+        if color == 'GREEN':
+            hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+            h, l, s = cv2.split(hls)
+            ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+            src = cv2.bitwise_and(src, src, mask = mask)
+            match_lower = np.array([20, 30, 30]) #green_lower
+            match_upper = np.array([80,  255, 255]) #green_upper  
+
+        # if color == 'BLACK':      
+
         src = cv2.GaussianBlur(src, (5, 5), 0)
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+        mask = cv2.inRange(hsv, match_lower, match_upper)
         return mask
 
-    def get_lines(self, src):
-        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(hsv)
-        ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
-        src = cv2.bitwise_and(src, src, mask = mask)
+    def get_lines(self, src, color= 'YELLOW'):
+        mask = self.mask_color(src, color)
+        edges = cv2.Canny(mask, 75, 150)
 
-        yellow_mask = self.mask_color(src)
-        yellow_edges = cv2.Canny(yellow_mask, 75, 150)
+        cv2.imshow('mask', mask)
+        cv2.imshow('yellow_edges', edges)
 
-        cv2.imshow('mask', yellow_mask)
-        cv2.imshow('yellow_edges', yellow_edges)
-
-        lines = cv2.HoughLinesP(yellow_edges, 1, 1 * np.pi/180, 30, np.array([]), minLineLength=30, maxLineGap=150)
+        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi/180, 30, np.array([]), minLineLength=30, maxLineGap=150)
         lines = np.squeeze(lines)
         
         if len(lines.shape) == 0:
@@ -120,7 +143,8 @@ class LineDetector:
             result = [max_x, middle, min_x, middle]
             return result
         elif what_line == 'edge':
-            max_y=int(lines.max(axis=0)[1])
+            #max_y=int(lines.max(axis=0)[1])
+            max_y=int(lines.min(axis=0)[1])
             min_x = int(lines.min(axis=0)[0]) 
             max_x = int(lines.max(axis=0)[0]) 
             result = [max_x, max_y, min_x, max_y]
@@ -155,12 +179,12 @@ class LineDetector:
         return result
 
 
-    def get_all_lines(self, src, line_visualization = False, edge_visualization = False):
+    def get_all_lines(self, src, color='YELLOW', line_visualization = False, edge_visualization = False):
 
         line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
-        edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
+        edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0], "EDGE_UP_Y": 0}
 
-        lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L,edge_lines_R = self.get_lines(src)
+        lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L,edge_lines_R = self.get_lines(src, color)
 
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
 
@@ -196,6 +220,7 @@ class LineDetector:
         if len(edge_lines) != 0:
             size = int(edge_lines.shape[0]*edge_lines.shape[2]/2)
             edge_fit_line = self.get_fitline(src, edge_lines, size, 'edge')
+            edge_info["EDGE_UP_Y"]= edge_fit_line[1]
             if edge_visualization is True:
                 self.draw_lines(temp, edge_fit_line, 'edge', 'fit')
                 src = cv2.addWeighted(src, 1, temp, 1., 0.)
