@@ -47,8 +47,8 @@ class LineDetector:
                 cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
 
     def mask_color(self, src):
-        yellow_lower = np.array([10,110,95])
-        yellow_upper = np.array([56, 200, 255])
+        yellow_lower = np.array([10,40,95])
+        yellow_upper = np.array([40, 220, 220])
         src = cv2.GaussianBlur(src, (5, 5), 0)
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
@@ -57,13 +57,15 @@ class LineDetector:
     def get_lines(self, src):
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         h, s, v = cv2.split(hsv)
-        ret, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY+cv2.THRESH_OTSU)
+        ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
         src = cv2.bitwise_and(src, src, mask = mask)
-        #cv2.imshow('mask', mask)
-        #cv2.imshow('src', src)
 
         yellow_mask = self.mask_color(src)
         yellow_edges = cv2.Canny(yellow_mask, 75, 150)
+
+        cv2.imshow('mask', yellow_mask)
+        cv2.imshow('yellow_edges', yellow_edges)
+
         lines = cv2.HoughLinesP(yellow_edges, 1, 1 * np.pi/180, 30, np.array([]), minLineLength=30, maxLineGap=150)
         lines = np.squeeze(lines)
         
@@ -229,18 +231,18 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture("./Sensor/src/line_test/return_line.h264")
+    video = cv2.VideoCapture("./Sensor/src/line_test/case2.h264")
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
         if not ret:
-            video = cv2.VideoCapture("./Sensor/src/line_test/return_line.h264")
+            video = cv2.VideoCapture("./Sensor/src/line_test/case2.h264")
             continue
         src = cv2.resize(src, dsize=(640,480))
 
         hsv_image = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        val_S = 0
-        val_V = 70
+        val_S = 10
+        val_V = 30
         array = np.full(hsv_image.shape, (0,val_S,val_V), dtype=np.uint8)
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)

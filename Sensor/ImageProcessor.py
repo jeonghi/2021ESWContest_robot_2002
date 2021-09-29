@@ -391,10 +391,43 @@ class ImageProcessor:
         cv2.waitKey(1)
 
 
+    def mask_color(self, src):
+#        yellow_lower = np.array([10,40,95])
+#        yellow_upper = np.array([56, 200, 255])
+#        yellow_lower = np.array([20,20,100])
+#        yellow_upper = np.array([32, 255, 255])
+        yellow_lower = np.array([10,40,95])
+        yellow_upper = np.array([40, 220, 220])
+        src = cv2.GaussianBlur(src, (5, 5), 0)
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+        return mask
+
+    def get_yellow_edges(self):
+        src = self.get_image()
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+        ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+        src = cv2.bitwise_and(src, src, mask = mask)
+
+        yellow_mask = self.mask_color(src)
+        yellow_edges = cv2.Canny(yellow_mask, 75, 150)
+
+        return src, yellow_mask, yellow_edges
+
+
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.line_tracing()
+        
+        src, yellow_mask, yellow_edges = imageProcessor.get_yellow_edges()
+        cv2.imshow('src',src)
+        cv2.imshow('yellow_mask',yellow_mask)
+        cv2.imshow('yellow_edges',yellow_edges)
+        key = cv2.waitKey(1)
+        if key == 27:
+            break
+    cv2.destroyAllWindows()
 
