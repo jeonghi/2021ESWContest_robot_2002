@@ -190,8 +190,12 @@ class Robot:
         
 
     def detect_direction(self):
-        self.detect_alphabet()
-        self.mode = 'walk'
+        self.direction = self._image_processor.get_arrow_direction()
+        if self.direction == None :
+            self.mode = 'detect_direction: fail'
+        else:
+            self.mode = 'detect_direction: success'
+            print(self.direction)
 
     def walk(self, line_info):
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
@@ -201,18 +205,11 @@ class Robot:
                 self._motion.walk(dir='FORWARD', loop=1)
             else:
                 if line_info["V_X"][0] < 300:
-                    print('← ←', line_info)
+                    print('← ←', line_info["V_X"][0])
                     self._motion.walk(dir='LEFT', loop=1)
                 elif line_info["V_X"][0] > 340:
-                    print('→ →', line_info)
+                    print('→ →', line_info["V_X"][0])
                     self._motion.walk(dir='RIGHT', loop=1)
-
-        elif self.walk_info == '─':
-            self._motion.walk(dir='BACK', loop=2)
-            if self.progress_of_roobot[2] == 'detect_direction':
-                self.mode = 'detect_direction: fail'
-            else:
-                self.mode = 'walk'
 
         elif self.walk_info == None: # 'modify_angle'
             if line_info["DEGREE"] < 85:
@@ -220,10 +217,11 @@ class Robot:
                 self._motion.turn(dir='LEFT', loop=1)
             elif line_info["DEGREE"] > 95:
                 print('MODIFY angle --RIGHT', line_info)
-                self._motion.turn(dir='RIGHT', loop=1)            
+                self._motion.turn(dir='RIGHT', loop=1)
 
         else:
-            print("self.walk_info is blank, Please check line_info")
+            print('walk_info is not │ or None ------------>', self.walk_info)    
+
 
     def find_edge(self): #find_corner_for_outroom
         self._motion.set_head('DOWN', 60)
@@ -242,29 +240,31 @@ class Robot:
         # edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
 
 
-        # start > detect_direction > walk > │ , ┐ , ┌ , ─ > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
+        # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
 
-
+        print(self.mode)
         # 방위 인식
         if self.mode == 'start' :
-            self.mode = 'detect_direction' # --> walk
+            if self.progress_of_roobot[0] != self.walk_info:
+                self.progress_of_roobot.insert(0, self.walk_info)
+
+            self.mode = 'detect_alphabet' # --> walk
+
             if self.progress_of_roobot[0] != self.mode:
                 self.progress_of_roobot.insert(0, self.mode)
 
-        if self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
-            if self.direction == None:
-                self.mode = 'detect_direction'
-                self.detect_direction()
-            else:
-                self.mode = 'walk'
+        elif self.mode == 'detect_alphabet':
+            self.detect_alphabet()
+            self.mode = 'walk'
 
         # 걷기 # 보정 추가로 넣기
         elif self.mode == 'walk' and self.walk_info != '┐' and self.walk_info != '┌' :
             if line_info["V"]==True and line_info["H"]==False:
                 self.walk_info = '│'
-                self.walk(line_info, self.walk_info)
+                self.walk(line_info)
                 if self.progress_of_roobot[0] != self.walk_info:
                     self.progress_of_roobot.insert(0, self.walk_info)
+
             elif line_info["V"]==True and line_info["H"]==True:
                 if line_info["V_X"][0] < 20 and line_info["V_X"][1] < 360 :
                     self.walk_info = '┐'
@@ -276,16 +276,31 @@ class Robot:
                         self.progress_of_roobot.insert(0, self.walk_info)
                 else :
                     self.walk_info = 'T'
+                    self.mode = 'detect_direction'
                     if self.progress_of_roobot[0] != self.walk_info:
                         self.progress_of_roobot.insert(0, self.walk_info)
+
             elif line_info["V"]==False and line_info["H"]==True: 
                 self.walk_info = '─'
-                self.walk(line_info, self.walk_info)
+                self.mode = 'detect_direction'
                 if self.progress_of_roobot[0] != self.walk_info:
                     self.progress_of_roobot.insert(0, self.walk_info)
             else:
                 self.walk_info = None # 'modify_angle'
-                self.walk(line_info, self.walk_info)           
+                self.walk(line_info)      
+
+        elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
+            if self.mode == 'detect_direction: fail':
+                self._motion.walk("BACKWARD", 1)
+            else:
+                pass
+
+            if self.direction == None:
+                self.detect_direction()
+            else:
+                self.mode = 'walk' 
+
+     
 
         # 미션 진입 판별
         elif self.mode == 'walk' and self.walk_info == '┐':
@@ -315,13 +330,22 @@ class Robot:
 
         # elif self.mode == 'start_mission':
 
-        # 미션 끝나면? - self.mode == 'end_mission'
 
-        # 방탈출
+
+
+
+
+
+
+
+
+        # 미션 끝나면? - self.mode == 'end_mission'
+        
+        # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 320 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
-                    self.mode == 'return_line' # --> find_V
+                    self.mode = 'return_line' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
                 else: # yellow edge 중앙 X
@@ -373,33 +397,35 @@ class Robot:
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
         # edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
 
+
+        # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
+
+        print(self.mode)
         # 방위 인식
         if self.mode == 'start' :
-            self.mode = 'detect_direction' # --> walk
+            if self.progress_of_roobot[0] != self.walk_info:
+                self.progress_of_roobot.insert(0, self.walk_info)
+
+            self.mode = 'detect_alphabet' # --> walk
             if self.progress_of_roobot[0] != self.mode:
-                print(self.mode)
                 self.progress_of_roobot.insert(0, self.mode)
 
-        if self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
-            if self.direction != None:
-                #self.detect_direction()
-                self.mode = 'detect_direction'
-            else:
-                self.mode = 'walk'
+        elif self.mode == 'detect_alphabet':
+            self.detect_alphabet()
+            self.mode = 'walk'
 
         # 걷기 # 보정 추가로 넣기
         elif self.mode == 'walk' and self.walk_info != '┐' and self.walk_info != '┌' :
             if line_info["V"]==True and line_info["H"]==False:
                 self.walk_info = '│'
-                # self.walk(line_info, self.walk_info)
+                #self.walk(line_info)
                 if self.progress_of_roobot[0] != self.walk_info:
-                    print(self.walk_info)
                     self.progress_of_roobot.insert(0, self.walk_info)
+
             elif line_info["V"]==True and line_info["H"]==True:
                 if line_info["V_X"][0] < 20 and line_info["V_X"][1] < 360 :
                     self.walk_info = '┐'
                     if self.progress_of_roobot[0] != self.walk_info:
-                        print(self.walk_info)
                         self.progress_of_roobot.insert(0, self.walk_info)
                 elif line_info["V_X"][0] > 280 and line_info["V_X"][1] > 600 :
                     self.walk_info = '┌'
@@ -407,32 +433,43 @@ class Robot:
                         self.progress_of_roobot.insert(0, self.walk_info)
                 else :
                     self.walk_info = 'T'
+                    self.mode = 'detect_direction'
                     if self.progress_of_roobot[0] != self.walk_info:
-                        print(self.walk_info)
                         self.progress_of_roobot.insert(0, self.walk_info)
+
             elif line_info["V"]==False and line_info["H"]==True: 
                 self.walk_info = '─'
-                # self.walk(line_info, self.walk_info)
+                self.mode = 'detect_direction'
                 if self.progress_of_roobot[0] != self.walk_info:
-                    print(self.walk_info)
                     self.progress_of_roobot.insert(0, self.walk_info)
             else:
-                print(self.walk_info)
                 self.walk_info = None # 'modify_angle'
-                # self.walk(line_info, self.walk_info)           
+                #self.walk(line_info)
+                print('modify_angle')      
+
+        #elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
+            #if self.mode == 'detect_direction: fail':
+                #self._motion.walk("BACKWARD", 1)
+            #else:
+                #pass
+
+            #if self.direction == None:
+                #self.detect_direction()
+            #else:
+                #self.mode = 'walk' 
+
+     
 
         # 미션 진입 판별
         elif self.mode == 'walk' and self.walk_info == '┐':
             if self.direction == 'RIGHT':
                 self.mode = 'start_mission' # --> end_mission --> return_line
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)
 
             elif self.direction == 'LEFT':
                 self.mode = 'is_finish_line' # --> walk / finish
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)
             else:
                 print('The Robot has not direction, Please Set **self.direction**')
@@ -441,12 +478,10 @@ class Robot:
             if self.direction == 'LEFT':
                 self.mode = 'start_mission' # --> end_mission
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)
             elif self.direction == 'RIGHT':
                 self.mode = 'is_finish_line' # --> finish 
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)
             else:
                 print('The Robot has not direction, Please Set **self.direction**')
@@ -457,51 +492,55 @@ class Robot:
 
 
 
-        # 미션 끝나면? - self.mode == 'end_mission'
 
-        # 방탈출
+
+
+
+
+        # 미션 끝나면? - self.mode == 'end_mission'
+        
+        # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
-            if edge_info["EDGE_POS"] != None :
-                if 320 < edge_info["EDGE_POS"][0] < 360 :
-                    self.mode == 'return_line' # --> find_V
+            if edge_info["EDGE_POS"] != None : # yellow edge 감지
+                if 320 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
+                    print('yellow edge 감지:: yellow edge x 좌표 중앙 O')
+                    self.mode = 'return_line' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
-                        print(self.mode)
                         self.progress_of_roobot.insert(0, self.mode)
-                else:
-                    print(edge_info["EDGE_POS"])
-                    self.mode='find_edge'
-                    print(self.mode)
-            else:
+                else: # yellow edge 중앙 X
+                     #self.find_edge()
+                     print('yellow edge 감지:: yellow edge 중앙 X')
+                     if self.progress_of_roobot[0] != self.mode:
+                        self.progress_of_roobot.insert(0, self.mode)
+            else: # yellow edge 감지 X 
                 self.mode = 'find_edge' # --> return_line
                 #self.find_edge()
+                print('yellow edge 감지 X')
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)        
 
         elif self.mode == 'return_line':
-            if edge_info["EDGE_POS"][1] > 380:
-                self.mode = 'find_V' # --> walk
+            if edge_info["EDGE_POS"][1] > 380: # yellow edge y 좌표 가까이 O
+                print('yellow edge y 좌표 가까이 O')
+                self.mode = 'find_V' # --> 걸을 직선 찾고 walk
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)
-            else:
+            else: # yellow edge y 좌표 가까이 X
                 self.mode = 'return_line' # --> find_V
+                print('yellow edge y 좌표 가까이 X')
                 # self.return_line()
-                # self._motion.walk(dir='FOWARD', loop=2)
+                self._motion.walk(dir='FOWARD', loop=2)
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
                     self.progress_of_roobot.insert(0, self.mode)
                     
         elif self.mode == 'find_V':
+            print('V 직선 찾기')
             #self._motion.turn(self.direction, 1)
             if line_info["V"] == True :
                 self.mode = 'walk'
-                if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
-                    self.progress_of_roobot.insert(0, self.mode)
             else:
                 self.mode = 'find_V'
-                #self.find_V()
+                # self.find_V()
                 #self._motion.turn(self.direction, 1)
 
         # 나가기
@@ -509,12 +548,8 @@ class Robot:
             if self.count < 3:
                 #self._motion.walk(dir='FORWARD', loop=8)
                 self.mode = 'walk'
-                if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
-                    self.progress_of_roobot.insert(0, self.mode)
             else:
                 self.mode = 'finish' # --> stop!
                 if self.progress_of_roobot[0] != self.mode:
-                    print(self.mode)
-                    self.progress_of_roobot.insert(0, self.mode)
+                        self.progress_of_roobot.insert(0, self.mode)
             self.count += 1
