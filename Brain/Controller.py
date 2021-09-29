@@ -1,6 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
-#from Actuator.Motion import Motion
+from Actuator.Motion import Motion
 import numpy as np
 import cv2
 import time
@@ -9,7 +9,7 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        #self._motion = Motion()
+        self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
         #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
         self._line_detector = LineDetector()
@@ -224,8 +224,8 @@ class Robot:
 
 
     def find_edge(self): #find_corner_for_outroom
-        self._motion.set_head('DOWN', 60)
-        self._motion.turn(dir='LEFT', loop=2) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+        self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+        time.sleep(1)
 
     def return_line(self): # 안씀
         self._motion.walk(dir='FOWARD', loop=2)
