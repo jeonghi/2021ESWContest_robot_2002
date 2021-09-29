@@ -3556,8 +3556,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
 우유깍잡기_1:
     SPEED 4
-    MOVE G6B, 190, 10, 50
-    MOVE G6C, 190, 10, 50
+    MOVE G6B, 190, 10, 60
+    MOVE G6C, 190, 10, 60
     WAIT
 
     'DELAY 10
@@ -3566,8 +3566,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
 우유깍잡기_2:
     SPEED 4
-    MOVE G6B, 150, 10, 50
-    MOVE G6C, 150, 10, 50
+    MOVE G6B, 150, 10, 60
+    MOVE G6C, 150, 10, 60
     WAIT
 
     'DELAY 10
@@ -3576,8 +3576,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
 우유깍잡기_3:
     SPEED 4
-    MOVE G6B, 130, 10, 50
-    MOVE G6C, 130, 10, 50
+    MOVE G6B, 130, 10, 60
+    MOVE G6C, 130, 10, 60
     WAIT
 
     'DELAY 10
