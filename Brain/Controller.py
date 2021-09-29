@@ -16,6 +16,9 @@ class Robot:
         self.direction = 'LEFT'
         # self.mode = 'start'
         self.mode = 'end_mission'
+        self.color = 'YELLOW'
+        self.box_pos = 'RIGHT'
+        self.alphabet_color = 'RED'
         self.cube_grabbed = False
         self.curr_room_color = "GREEN"
         self.count = 0
@@ -42,80 +45,6 @@ class Robot:
 
             flag = not flag
         self._motion.notice_direction(dir=alphabet)
-
-    def line_tracing(self):
-        self._motion.set_head('DOWN', 30)
-        self._motion.set_head('DOWN', 45)
-        while True:
-            src = self._image_processor.get_image(visualization=False)
-            src = cv2.resize(src, dsize=(640,480))
-            line_info, result_img = self._line_detector.get_all_lines(src)
-            cv2.imshow('src', result_img)
-            cv2.waitKey(1)
-
-            if line_info["V"] and not line_info["H"]:
-                if 300 < line_info["VPOS"] <340:
-                    print('FORWARD', line_info)
-                    self._motion.walk(dir='FORWARD', loop=1)
-                else:
-                    if line_info["VPOS"] < 300:
-                        print('MODIFY walk --LEFT', line_info)
-                        self._motion.walk(dir='LEFT', loop=1)
-                    elif line_info["VPOS"] > 340:
-                        print('MODIFY walk --RIGHT', line_info)
-                        self._motion.walk(dir='RIGHT', loop=1)
-
-            elif not line_info["V"] and not line_info["H"]:
-                if line_info["DEGREE"] < 85:
-                    print('MODIFY angle --LEFT', line_info)
-                    self._motion.turn(dir='LEFT', loop=1)
-                elif line_info["DEGREE"] > 95:
-                    print('MODIFY angle --RIGHT', line_info)
-                    self._motion.turn(dir='RIGHT', loop=1)
-
-
-            else:
-                if line_info["HPOS"] > 200:
-                    if line_info["H_MIN_X"] < 50 and line_info["H_MAX_X"] < 340:
-                        print('┒', line_info)
-                        if self.direction == 'LEFT':
-                            print(self.direction, "모드여서 좌회전 안하고 직진합니다.")
-                            self._motion.walk(dir='FORWARD', loop=4)
-                            #self.count += 1
-                        elif self.direction == 'RIGHT':
-                            self._motion.turn('LEFT', loop=8)
-                        else:
-                            print("화살표 인식 전입니다.")
-
-                    elif line_info["H_MIN_X"] > 300 and line_info["H_MAX_X"]>600:
-                        print('┎', line_info)
-                        if self.direction == 'LEFT':
-                            self._motion.turn('RIGHT', loop=8)
-                        elif self.direction == 'RIGHT':
-                            print(self.direction, "모드여서 우회전 안하고 직진합니다.")
-                            self._motion.walk(dir='FORWARD', loop=4)
-                            #self.count += 1
-                        else:
-                            print("화살표 인식 전입니다.")
-
-                    else:
-                        print('T', line_info)
-                        self._motion.set_head("DOWN", 100)
-                        self.direction = self._image_processor.get_arrow_direction()
-                        print('MODE::', self.direction)
-                        time.sleep(0.1)
-                        while self.direction == None:
-                            self._motion.walk("BACKWARD", 1)
-                            self.direction = self._image_processor.get_arrow_direction()
-                            print('MODE::', self.direction)
-                            time.sleep(0.1)
-                        self._motion.set_head('DOWN', 10)
-                        self._motion.walk('FORWARD', 2)
-                        self._motion.walk(self.direction, 4)
-                        self._motion.turn(self.direction, 8)
-                else:
-                    self._motion.walk('FORWARD')
-                    print('low then 150')
 
     def recognize_area_color(self):
         self._motion.set_head(self.direction, 45)
@@ -181,7 +110,7 @@ class Robot:
                 self.cube_grabbed = True
 
     def line_tracing(self):
-        line_info,edge_info, result =  self._image_processor.line_tracing()
+        line_info, edge_info, result =  self._image_processor.line_tracing(self.color)
         cv2.imshow('result', result)
         cv2.waitKey(1)
         #print(line_info)
@@ -224,8 +153,13 @@ class Robot:
 
 
     def find_edge(self): #find_corner_for_outroom
-        self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-        time.sleep(1)
+        # self.box_pos 반대로 돌면서 yellow edge 찾기
+        if self.box_pos == 'RIGHT':
+            self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+            time.sleep(1)
+        if self.box_pos == 'LEFT':
+            self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+            time.sleep(1)
 
     def return_line(self): # 안씀
         self._motion.walk(dir='FOWARD', loop=2)
@@ -234,13 +168,12 @@ class Robot:
     def find_V(self): # 안씀
         self._motion.turn(self.direction, 1)
 
+
+    # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
     def setting_mode(self):
         line_info, edge_info = self.line_tracing()
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
         # edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
-
-
-        # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
 
         print(self.mode)
         # 방위 인식
@@ -288,6 +221,7 @@ class Robot:
                 self.walk_info = None # 'modify_angle'
                 self.walk(line_info)      
 
+        # 화살표 방향 인식
         elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
             if self.mode == 'detect_direction: fail':
                 self._motion.walk("BACKWARD", 1)
@@ -298,8 +232,6 @@ class Robot:
                 self.detect_direction()
             else:
                 self.mode = 'walk' 
-
-     
 
         # 미션 진입 판별
         elif self.mode == 'walk' and self.walk_info == '┐':
@@ -328,7 +260,30 @@ class Robot:
                 print('The Robot has not direction, Please Set **self.direction**')
 
         # elif self.mode == 'start_mission':
+        # 0. 확진 / 안전 구역 확인 : self.color 바꿔주세요
 
+
+
+        # 1. red, blue 알파벳 구별: edge_info["EDGE_UP_Y"] 기준으로 윗 공간, self.alphabet_color 알파벳 색깔 넣어주세요
+        # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, RIGHT)
+
+
+
+        # 3. 박스 구역의 평행선 H 기준으로 안으로 또는 밖으로 옮기기
+            # 1) 박스 grap on 하면 손 내리고 고개든다
+            # 2) H 찾을 때까지 돈다
+                # self.box_pos == 'RIGHT' -> turn LEFT
+                # self.box_pos == 'LEFT' -> turn RIGHT
+            # 3) H 가장 끝 x값이 화면 끝라인에 근접하면? 돌기 멈춤
+                # self.box_pos == 'RIGHT' -> ' max x > 600 ' -> 멈춤
+                # self.box_pos == 'LEFT'  -> ' min_x < 50 '  -> 멈춤
+            # 4) H 감지해서 얼추 맞추면 손 올리고 고개 내린다
+            # 5) H에 가까워질 때까지 걷는다
+            # 6) 화면에 그냥 lines 감지되면 mean y값이 일정범위 이상이 되면 멈춘다
+            # 7) H 감지될 때까지 보정한다
+                # H_degree가 몇이냐에 따라 turn LEFT, RIGHT 보정들어감
+            # 8) 한두걸음 가서 놓는다.
+        # 4. grap off 동작하면서 self.mode = 'end_mission', self.color = 'YELLOW'로 바꿔주세요
 
 
 
@@ -339,7 +294,6 @@ class Robot:
 
 
         # 미션 끝나면? - self.mode == 'end_mission'
-        
         # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
@@ -380,17 +334,6 @@ class Robot:
                     self.progress_of_roobot.insert(0, self.mode)   
                     
         elif self.mode == 'find_V':
-            #self._motion.turn(self.direction, 1)
-            #if line_info["V"] == True :
-                # self.mode = 'walk'
-                #self._motion.walk(dir='FORWARD', loop=4)
-                #self.mode = 'walk'
-
-            #else:
-                #self.mode = 'find_V'
-                # self.find_V()
-                #self._motion.turn(self.direction, 1)
-
             if line_info["V"] == True :
                 if 300 < line_info["V_X"][0] <340:
                     self._motion.walk(dir='FORWARD', loop=2)
@@ -411,7 +354,7 @@ class Robot:
             if self.count < 3:
                 self._motion.walk(dir='FORWARD', loop=8)
                 self.mode = 'walk'
-                self.count += 1
+                # self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
             else:
                 self.mode = 'finish' # --> stop!
                 if self.progress_of_roobot[0] != self.mode:

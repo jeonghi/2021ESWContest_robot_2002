@@ -142,9 +142,14 @@ class LineDetector:
             max_x = int(lines.max(axis=0)[0])
             result = [max_x, middle, min_x, middle]
             return result
-        elif what_line == 'edge':
-            #max_y=int(lines.max(axis=0)[1])
-            max_y=int(lines.min(axis=0)[1])
+        elif what_line == 'edge_UP':
+            min_y=int(lines.min(axis=0)[1])
+            min_x = int(lines.min(axis=0)[0]) 
+            max_x = int(lines.max(axis=0)[0]) 
+            result = [max_x, min_y, min_x, min_y]
+            return result
+        elif what_line == 'edge_DOWN':
+            max_y=int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0]) 
             max_x = int(lines.max(axis=0)[0]) 
             result = [max_x, max_y, min_x, max_y]
@@ -181,78 +186,109 @@ class LineDetector:
 
     def get_all_lines(self, src, color='YELLOW', line_visualization = False, edge_visualization = False):
 
-        line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
-        edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0], "EDGE_UP_Y": 0}
-
         lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L,edge_lines_R = self.get_lines(src, color)
-
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
 
-        if len(lines)!=0:
-            size = int(lines.shape[0]*2)
-            fit_line = self.get_fitline__(src, lines)
-            line_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
-            line_info["DEGREE"] = line_degree
-            if line_visualization is True:
-                self.draw_lines(temp, fit_line, 'lines', 'fit')
-                src = cv2.addWeighted(src, 1, temp, 1., 0.)
+        if color == 'YELLOW':
+            line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
+            edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0]}
 
-        if len(vertical_lines)!=0:
-            size = int(vertical_lines.shape[0]*vertical_lines.shape[2]/2)
-            vertical_fit_line = self.get_fitline(src, vertical_lines, size, 'vertical')
-            line_info["V"] = True
-            line_info["V_X"] = [vertical_fit_line[2], vertical_fit_line[0]] #[x1,y1,x2,y2]
-            line_info["V_Y"] = [vertical_fit_line[3], vertical_fit_line[1]]
-            if line_visualization is True:
-                self.draw_lines(temp, vertical_fit_line, 'vertical', 'fit')
-                src = cv2.addWeighted(src, 1, temp, 1., 0.)
+            if len(lines)!=0:
+                size = int(lines.shape[0]*2)
+                fit_line = self.get_fitline__(src, lines)
+                line_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
+                line_info["DEGREE"] = line_degree
+                if line_visualization is True:
+                    self.draw_lines(temp, fit_line, 'lines', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
-        if len(horizontal_lines)!=0:
-            size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
-            horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
-            line_info["H"] = True
-            line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]] #[min_x, middle, max_x, middle]
-            line_info["H_Y"] =  [horizontal_fit_line[1], horizontal_fit_line[2]]
-            if line_visualization is True:
-                self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
-                src = cv2.addWeighted(src, 1, temp, 1., 0.)
+            if len(vertical_lines)!=0:
+                size = int(vertical_lines.shape[0]*vertical_lines.shape[2]/2)
+                vertical_fit_line = self.get_fitline(src, vertical_lines, size, 'vertical')
+                line_info["V"] = True
+                line_info["V_X"] = [vertical_fit_line[2], vertical_fit_line[0]] #[x1,y1,x2,y2]
+                line_info["V_Y"] = [vertical_fit_line[3], vertical_fit_line[1]]
+                if line_visualization is True:
+                    self.draw_lines(temp, vertical_fit_line, 'vertical', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
-        if len(edge_lines) != 0:
-            size = int(edge_lines.shape[0]*edge_lines.shape[2]/2)
-            edge_fit_line = self.get_fitline(src, edge_lines, size, 'edge')
-            edge_info["EDGE_UP_Y"]= edge_fit_line[1]
-            if edge_visualization is True:
-                self.draw_lines(temp, edge_fit_line, 'edge', 'fit')
-                src = cv2.addWeighted(src, 1, temp, 1., 0.)
+            if len(horizontal_lines)!=0:
+                size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
+                horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
+                line_info["H"] = True
+                line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]] #[min_x, middle, max_x, middle]
+                line_info["H_Y"] =  [horizontal_fit_line[1], horizontal_fit_line[2]]
+                if line_visualization is True:
+                    self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
-        if len(edge_lines_L)!=0:
-            size = int(edge_lines_L.shape[0]*edge_lines_L.shape[2]/2)
-            edge_line_L = self.get_fitline(src, edge_lines_L, size, 'edge_L')
-            edge_info["EDGE_L"] = True
-            edge_info["L_X"] = [edge_line_L[0], edge_line_L[2]] # [min_x, min_y, max_x, max_y] 
-            edge_info["L_Y"] = [edge_line_L[1], edge_line_L[3]] 
-            if edge_visualization is True:
-                self.draw_lines(temp, edge_line_L, 'edge_L', 'fit')
-                src = cv2.addWeighted(src, 1, temp, 1., 0.)
-        
-        if len(edge_lines_R)!=0:
-            size = int(edge_lines_R.shape[0]*edge_lines_R.shape[2]/2)
-            edge_line_R = self.get_fitline(src, edge_lines_R, size, 'edge_R')
-            edge_info["EDGE_R"] = True
-            edge_info["R_X"] = [edge_line_R[2], edge_line_R[0]] # [max_x, min_y, min_x, max_y] 
-            edge_info["R_Y"] = [edge_line_R[1], edge_line_R[3]]
-            if edge_visualization is True: 
-                self.draw_lines(temp, edge_line_R, 'edge_R', 'fit')
-                src = cv2.addWeighted(src, 1, temp, 1., 0.)
+            if len(edge_lines) != 0:
+                size = int(edge_lines.shape[0]*edge_lines.shape[2]/2)
+                edge_fit_line_DOWN = self.get_fitline(src, edge_lines, size, 'edge_DOWN')
+                if edge_visualization is True:
+                    self.draw_lines(temp, edge_fit_line_DOWN, 'edge', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
-        if len(edge_lines) != 0 and len(edge_lines_L)!=0 and len(edge_lines_R)!=0:
-            x_center = int((edge_line_L[2]+edge_line_R[2])/2)
-            y_center = edge_fit_line[1] # [max_x, max_y, min_x, max_y] 
-            edge_info["EDGE_POS"] = [x_center, y_center]
-        else:
-            edge_info["EDGE_POS"] = None
+            if len(edge_lines_L)!=0:
+                size = int(edge_lines_L.shape[0]*edge_lines_L.shape[2]/2)
+                edge_line_L = self.get_fitline(src, edge_lines_L, size, 'edge_L')
+                edge_info["EDGE_L"] = True
+                edge_info["L_X"] = [edge_line_L[0], edge_line_L[2]] # [min_x, min_y, max_x, max_y] 
+                edge_info["L_Y"] = [edge_line_L[1], edge_line_L[3]] 
+                if edge_visualization is True:
+                    self.draw_lines(temp, edge_line_L, 'edge_L', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
+            
+            if len(edge_lines_R)!=0:
+                size = int(edge_lines_R.shape[0]*edge_lines_R.shape[2]/2)
+                edge_line_R = self.get_fitline(src, edge_lines_R, size, 'edge_R')
+                edge_info["EDGE_R"] = True
+                edge_info["R_X"] = [edge_line_R[2], edge_line_R[0]] # [max_x, min_y, min_x, max_y] 
+                edge_info["R_Y"] = [edge_line_R[1], edge_line_R[3]]
+                if edge_visualization is True:
+                    self.draw_lines(temp, edge_line_R, 'edge_R', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
-        return line_info,edge_info, src
+            if len(edge_lines) != 0 and len(edge_lines_L)!=0 and len(edge_lines_R)!=0:
+                x_center = int((edge_line_L[2]+edge_line_R[2])/2)
+                y_center = edge_fit_line_DOWN[1] # [max_x, max_y, min_x, max_y] 
+                edge_info["EDGE_POS"] = [x_center, y_center]
+            else:
+                edge_info["EDGE_POS"] = None
+
+            return line_info,edge_info, src
+
+        if color == 'GREEN':
+            line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}    
+            edge_info ={"EDGE_POS": None,"EDGE_L": False, "L_X" : [0 ,0], "L_Y" : [0 ,0],"EDGE_R": False, "R_X" : [0 ,0], "R_Y" : [0 ,0], "EDGE_UP_Y": 0}
+
+            if len(lines)!=0:
+                size = int(lines.shape[0]*2)
+                fit_line = self.get_fitline__(src, lines)
+                line_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
+                line_info["DEGREE"] = line_degree
+                if line_visualization is True:
+                    self.draw_lines(temp, fit_line, 'lines', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
+
+            if len(horizontal_lines)!=0:
+                size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
+                horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
+                line_info["H"] = True
+                line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]] #[min_x, middle, max_x, middle]
+                line_info["H_Y"] =  [horizontal_fit_line[1], horizontal_fit_line[2]]
+                if line_visualization is True:
+                    self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
+
+            if len(edge_lines) != 0:
+                size = int(edge_lines.shape[0]*edge_lines.shape[2]/2)
+                edge_fit_line_UP = self.get_fitline(src, edge_lines, size, 'edge_UP')
+                edge_info["EDGE_UP_Y"]= edge_fit_line_UP[1]
+                if edge_visualization is True:
+                    self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
+                    src = cv2.addWeighted(src, 1, temp, 1., 0.)
+
 
 
 if __name__ == "__main__":
