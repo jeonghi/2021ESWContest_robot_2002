@@ -271,18 +271,23 @@ class Robot:
 
         # 3. 박스 구역의 평행선 H 기준으로 안으로 또는 밖으로 옮기기
             # 1) 박스 grap on 하면 손 내리고 고개든다
-            # 2) H 찾을 때까지 돈다
+            # 2) 초록 구역이 적합하게 보일 때까지 돈다
                 # self.box_pos == 'RIGHT' -> turn LEFT
                 # self.box_pos == 'LEFT' -> turn RIGHT
-            # 3) H 가장 끝 x값이 화면 끝라인에 근접하면? 돌기 멈춤
+            # 3) 모든 선분의 가장 끝 x값이 화면 끝라인에 근접하면? 돌기 멈춤     ### lines의 minx, maxx
                 # self.box_pos == 'RIGHT' -> ' max x > 600 ' -> 멈춤
                 # self.box_pos == 'LEFT'  -> ' min_x < 50 '  -> 멈춤
-            # 4) H 감지해서 얼추 맞추면 손 올리고 고개 내린다
-            # 5) H에 가까워질 때까지 걷는다
-            # 6) 화면에 그냥 lines 감지되면 mean y값이 일정범위 이상이 되면 멈춘다
-            # 7) H 감지될 때까지 보정한다
+            # 4) 초록 구역이 크게 보이지 않아 걸음으로 보정한다
+                # self.box_pos == 'RIGHT' -> ' min x < 200 ' -> 오른쪽 이동 -> 멈춤
+                # self.box_pos == 'LEFT'  -> ' max_x > 400 '  -> 왼쪽 이동 -> 멈춤
+            # 5) 공간 위치 인지 
+                # H 감지되면 측면 구간 -> H에 가까워지게 가서 그냥 넣으면 됨     ### H : True/False, H의 mean y
+                # H 감지안되면 정중앙 구간 -> edge_DOWN 선에서 조금 더 가서 넣으면 됨 -> 7번으로 감안될듯 ### edge_DOWN : True/False, edge_DOWN의 mean y
+            # 6) 팔 앞으로 뻗고 고개 내리고 H/edge_DOWN에 가까워질 때까지 걷는다
+            # 7) 화면에 그냥 lines 감지되면 min y값이 일정범위 이상이 되면 멈춘다 ### lines의 miny
+            # 8) edge_DOWN이면 한두걸음 가서 그냥 넣고 H이면 fit_H 감지될 때까지 보정한다    ### H의 degree 또는 fit_H: True/False
                 # H_degree가 몇이냐에 따라 turn LEFT, RIGHT 보정들어감
-            # 8) 한두걸음 가서 놓는다.
+            # 9) 한두걸음 가서 놓는다.
         # 4. grap off 동작하면서 self.mode = 'end_mission', self.color = 'YELLOW'로 바꿔주세요
 
 

@@ -390,7 +390,6 @@ class ImageProcessor:
         cv2.imshow("result", cv2.vconcat([v1, v2]))
         cv2.waitKey(1)
 
-
     def mask_color(self, src):
 #        yellow_lower = np.array([10,40,95])
 #        yellow_upper = np.array([56, 200, 255])
