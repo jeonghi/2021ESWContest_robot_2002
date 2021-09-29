@@ -6,14 +6,14 @@ from Sensor.ImageProcessor import ImageProcessor
 from Sensor.VideoRecorder import VideoRecorder
 
 import cv2
-import kbhit # press any key to exit
+#import kbhit # press any key to exit
 
 def main():
     robot = Robot()
     #====================== debug ======================
 
     #video_recorder = VideoRecorder()
-    kb = kbhit.KBHit()
+    #kb = kbhit.KBHit()
 
     #print("Press ESC key to exit")
     while True:
@@ -28,7 +28,7 @@ def main():
 
     #===================== function ======================
 
-        robot.setting_mode_test()
+        robot.setting_mode()
     
 
     #=====================================================

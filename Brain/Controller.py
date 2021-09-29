@@ -1,6 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
-#from Actuator.Motion import Motion
+from Actuator.Motion import Motion
 import numpy as np
 import cv2
 import time
@@ -9,11 +9,11 @@ import sys
 class Robot:
 
     def __init__(self, video_path =""):
-        #self._motion = Motion()
-        #self._image_processor = ImageProcessor(video_path=video_path)
-        self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
+        self._motion = Motion()
+        self._image_processor = ImageProcessor(video_path=video_path)
+        #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
         self._line_detector = LineDetector()
-        self.direction = None
+        self.direction = 'LEFT'
         # self.mode = 'start'
         self.mode = 'end_mission'
         self.cube_grabbed = False
@@ -343,7 +343,7 @@ class Robot:
         # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
-                if 320 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
+                if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     self.mode = 'return_line' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
@@ -359,14 +359,18 @@ class Robot:
 
         elif self.mode == 'return_line':
             if edge_info["EDGE_POS"] != None :
-                if edge_info["EDGE_POS"][1] > 380: # yellow edge y 좌표 가까이 O
-                    self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+                if edge_info["EDGE_POS"][1] > 478: # yellow edge y 좌표 가까이 O
+                    #self._motion.walk(dir='FORWARD', loop=2)
+                    #self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+                    self._motion.turn(self.direction, 1) ##
+                    self.walk_info = None
+                    self.mode = 'walk' ##
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
                 else: # yellow edge y 좌표 가까이 X
                     self.mode = 'return_line' # --> find_V
                     # self.return_line()
-                    self._motion.walk(dir='FOWARD', loop=2)
+                    self._motion.walk(dir='FORWARD', loop=1)
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
             else: # yellow edge 감지 X 
@@ -376,16 +380,31 @@ class Robot:
                     self.progress_of_roobot.insert(0, self.mode)   
                     
         elif self.mode == 'find_V':
-            self._motion.turn(self.direction, 1)
-            if line_info["V"] == True :
+            #self._motion.turn(self.direction, 1)
+            #if line_info["V"] == True :
                 # self.mode = 'walk'
-                self._motion.walk(dir='FOWARD', loop=4)
-                self.mode = 'walk'
+                #self._motion.walk(dir='FORWARD', loop=4)
+                #self.mode = 'walk'
 
+            #else:
+                #self.mode = 'find_V'
+                # self.find_V()
+                #self._motion.turn(self.direction, 1)
+
+            if line_info["V"] == True :
+                if 300 < line_info["V_X"][0] <340:
+                    self._motion.walk(dir='FORWARD', loop=2)
+                    self.mode = 'walk'
+                else:
+                    if line_info["V_X"][0] < 300:
+                        self._motion.walk(dir='LEFT', loop=1)
+                    elif line_info["V_X"][0] > 340:
+                        self._motion.walk(dir='RIGHT', loop=1)
             else:
                 self.mode = 'find_V'
                 # self.find_V()
                 self._motion.turn(self.direction, 1)
+
 
         # 나가기
         elif self.mode == 'is_finish_line':
@@ -521,7 +540,7 @@ class Robot:
         # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
-                if 320 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
+                if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지:: yellow edge x 좌표 중앙 O')
                     self.mode = 'return_line' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
@@ -543,7 +562,7 @@ class Robot:
 
         elif self.mode == 'return_line':
             if edge_info["EDGE_POS"] != None :
-                if edge_info["EDGE_POS"][1] > 380: # yellow edge y 좌표 가까이 O
+                if edge_info["EDGE_POS"][1] > 478: # yellow edge y 좌표 가까이 O
                     print('yellow edge y 좌표 가까이 O')
                     self.mode = 'find_V' # --> 걸을 직선 찾고 walk
                     if self.progress_of_roobot[0] != self.mode:
