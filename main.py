@@ -28,13 +28,13 @@ def main():
 
     #===================== function ======================
 
-        #robot.tracking_cube()
-        robot.find_yellow_corner_for_out_room()
+        robot.tracking_cube()
+        #robot.find_yellow_corner_for_out_room()
 
 
 
     #=====================================================
-    
+
     #video_recorder.stop()
     robot.set_basic_form()
 

@@ -312,25 +312,25 @@ class ImageProcessor:
             cv2.imshow("line", src)
             cv2.waitKey(1)
         return pos
-    
+
     def get_cube_saferoom(self):
         img = self.get_image()
-        
+
         red_lower = np.array([160, 100, 20])
         red_upper = np.array([179, 255, 255])
 
         blue_lower = np.array([100, 60, 60])
         blue_upper = np.array([140, 255, 255])
-        
+
         kernel = np.ones((5, 5), np.uint8)
-        
+
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        
+
         red_mask = cv2.inRange(hsv, red_lower, red_upper)
         red_mask = cv2.erode(red_mask, kernel, iterations=2)
         red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
         red_mask = cv2.dilate(red_mask, kernel, iterations=1)
-        
+
         (cnts, _) = cv2.findContours(red_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         center = None
         if len(cnts) > 0:
@@ -338,10 +338,10 @@ class ImageProcessor:
             ((x, y), radius) = cv2.minEnclosingCircle(cnt)
             M = cv2.moments(cnt)
             center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
-            
+
             return center
         return None, None
-    
+
     def get_saferoom_position(self):
         def draw_lines(src, lines, mode = 'all', thickness=2):
             if mode == 'all':
@@ -355,7 +355,7 @@ class ImageProcessor:
                 color=[0,255,0]
                 for line in lines:
                     cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
-        
+
         def get_fitline(f_lines, size):
             lines = np.squeeze(f_lines)
             lines = lines.reshape(size,2)
@@ -365,9 +365,9 @@ class ImageProcessor:
             H = [max_x, middle, min_x, middle]
             H_degree = (np.arctan2(H[1] - H[3], H[0] - H[2]) * 180) / np.pi
             return H, H_degree
-        
+
         img = self.get_image()
-        
+
         h, w = img.shape[:2]
 
         frame_center_x = w / 2
@@ -375,23 +375,23 @@ class ImageProcessor:
 
         green_lower = np.array([40, 40, 40])
         green_upper = np.array([70, 255, 255])
-        
+
         kernel = np.ones((5, 5), np.uint8)
-        
+
         hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
         _, saturation, _ = cv2.split(hsv)
-        
+
         green_mask = cv2.inRange(hsv, green_lower, green_upper)
         green_mask = cv2.erode(green_mask, kernel, iterations=2)
         green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
         green_mask = cv2.dilate(green_mask, kernel, iterations=1)
-        
+
         _, binary = cv2.threshold(saturation, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         green_area_mask = cv2.bitwise_and(green_mask, binary)
-        
+
         edge = auto_canny(green_area_mask)
         lines = cv2.HoughLinesP(edge, 1, np.pi / 180, 90, minLineLength = 100, maxLineGap = 100)
-        
+
         lines = np.squeeze(lines)
 
         if len(lines.shape) == 0:
@@ -405,17 +405,21 @@ class ImageProcessor:
         horizontal_lines = lines[np.abs(slope_degree) > 160]
         horizontal_slope_degree = slope_degree[np.abs(slope_degree)>160]
         horizontal_lines = horizontal_lines[:,None]
-        
+
         size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
+        print(horizontal_lines)
+        print(horizontal_lines.shape)
+        print(size)
+        #size = int(horizontal_lines.shape[0]*2)
         lines = lines.reshape(size,2)
 
         middle=int(lines.mean(axis=0)[1])
         min_x = int(lines.min(axis=0)[0])
         max_x = int(lines.max(axis=0)[0])
-        
+
         H = [max_x, middle, min_x, middle]
         H_degree = (np.arctan2(H[1] - H[3], H[0] - H[2]) * 180) / np.pi
-        
+
         return H_degree
 
     def line_tracing(self, line_visualization=False, edge_visualization=False):
