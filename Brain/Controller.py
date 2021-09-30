@@ -18,7 +18,7 @@ class Robot:
         self.mode = 'catch_box'
         # self.color = 'YELLOW'
         self.color = 'GREEN'
-        self.box_pos = 'RIGHT'
+        self.box_pos = 'MIDDLE'
         self.alphabet_color = 'RED'
         self.cube_grabbed = False
         self.curr_room_color = "GREEN"
@@ -186,17 +186,20 @@ class Robot:
         if self.box_pos == 'RIGHT':
             if line_info["H"] == True:
                 self.mode = 'fit_area'
+                time.sleep(1)
             else:
                 self._motion.turn(dir='LEFT', loop=1, grab=True)
                 #time.sleep(1)
         elif self.box_pos == 'LEFT':
             if line_info["H"] == True:
                 self.mode = 'fit_area'
+                time.sleep(1)
             else:
                 self._motion.turn(dir='RIGHT', loop=1, grab=True)
                 #time.sleep(1)
         elif self.box_pos == 'MIDDLE':
             self.mode = 'fit_area'
+            time.sleep(1)
         else:
             print("self.box_pos is None, Please check it")
         
@@ -204,8 +207,8 @@ class Robot:
     def fit_area(self, line_info, edge_info):
         print(line_info["ALL_X"])
         if self.box_pos == 'RIGHT':
-            if line_info["ALL_X"][1] > 400:
-                if line_info["ALL_X"][0] < 100:
+            if line_info["ALL_X"][1] > 420:
+                if line_info["ALL_X"][0] < 180:
                     print('find!!!!!!!!!!!!')
                     self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     time.sleep(1)
@@ -217,8 +220,9 @@ class Robot:
                 self._motion.walk(dir='RIGHT', loop=1, grab=True)
                 time.sleep(1)
         elif self.box_pos == 'LEFT':
-            if line_info["ALL_X"][0] < 100 :
-                if line_info["ALL_X"][1] < 500:
+            if line_info["ALL_X"][0] < 150 :
+                if line_info["ALL_X"][1] > 400:
+                    print('find!!!!!!!!!!!!')
                     self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     time.sleep(1)
                     self.mode = 'move_into_area'
@@ -227,6 +231,7 @@ class Robot:
                     time.sleep(1)
             else:
                 self._motion.walk(dir='LEFT', loop=1)
+                time.sleep(1)
         elif self.box_pos == 'MIDDLE':
             if edge_info["EDGE_DOWN_X"] < 300:
                 self._motion.walk(dir='RIGHT', loop=1, grab=True)
