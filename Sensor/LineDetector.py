@@ -56,6 +56,10 @@ class LineDetector:
 
     def get_lines(self, src):
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+        src = cv2.bitwise_and(src,src,mask=mask)
         yellow_mask = self.mask_color(src)
         yellow_edges = cv2.Canny(yellow_mask, 75, 150)
         lines = cv2.HoughLinesP(yellow_edges, 1, 1 * np.pi/180, 30, np.array([]), minLineLength=100, maxLineGap=150)

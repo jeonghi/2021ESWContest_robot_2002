@@ -33,11 +33,13 @@ class Motion:
         self.serial_t.start()
         time.sleep(0.1)
 
+
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
         self.lock.acquire()
 
         self.serial_port.write(serial.to_bytes([one_byte]))  # python3
         time.sleep(0.02)
+
 
     def RX_data(self):
         if self.serial_port.inWaiting() > 0:
@@ -47,8 +49,10 @@ class Motion:
         else:
             return 0
 
+
     def getRx(self):
         return self.lock
+
 
     def Receiving(self, ser):
         self.receiving_exit = 1
@@ -72,17 +76,20 @@ class Motion:
                 elif RX != 200:
                      self.distance = RX
 
+
     def notice_direction(self, dir):
         """dir={'E', 'W', 'S', 'N'}
         """
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
         self.TX_data_py2(dir_list[dir])
 
+
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
         area_list = {'GREEN':66,'BLACK':67}
         self.TX_data_py2(area_list[area])
+
 
     def set_head(self, dir, angle=0):
         """parameter 설명
@@ -125,6 +132,7 @@ class Motion:
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
 
+
     def turn(self, dir, loop=1, sleep=0.5, grab=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
@@ -135,6 +143,7 @@ class Motion:
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
 
+
     def get_IR(self) -> int:
         """get IR value and return self.distance
         """
@@ -142,9 +151,11 @@ class Motion:
         self.TX_data_py2(5)
         return self.distance
 
+
     def open_door(self, loop=1):
         for _ in range(loop):
             self.TX_data_py2(66)
+
 
     def grab(self, switch=True):
         """if switch=True then grab ON, else then grab OFF
@@ -152,15 +163,18 @@ class Motion:
         tx = 64 if switch else 65
         self.TX_data_py2(tx)
 
+
     def get_head(self):
         """Return vertical, horizontal head angle
         """
         return (self.head_angle1, self.head_angle2)
 
+
     def basic_form(self):
         self.TX_data_py2(45)
         self.TX_data_py2(54)
         self.TX_data_py2(10)
+
 
     def move_arm(self, dir='HIGH'):
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
@@ -170,19 +184,11 @@ class Motion:
         level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
         self.TX_data_py2(75+level[dir])
         time.sleep(0.1)
-        self.set_head(dir='DOWN', angle=angle_list[level[dir-1]])
+        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
 
 
-# **************************************************
 # **************************************************
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
     motion.TX_data_py2(16)
-
-
-
-
-
-
-
