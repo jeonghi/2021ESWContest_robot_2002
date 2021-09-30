@@ -15,8 +15,9 @@ class Robot:
         self._line_detector = LineDetector()
         self.direction = 'LEFT'
         # self.mode = 'start'
-        self.mode = 'end_mission'
-        self.color = 'YELLOW'
+        self.mode = 'catch_box'
+        # self.color = 'YELLOW'
+        self.color = 'GREEN'
         self.box_pos = 'RIGHT'
         self.alphabet_color = 'RED'
         self.cube_grabbed = False
@@ -27,6 +28,11 @@ class Robot:
 
     def set_basic_form(self):
         self._motion.basic_form()
+    
+    def check_turn(self):
+        self._motion.grab()
+        while True:
+            self._motion.turn('LEFT', grab=True)
 
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
@@ -160,68 +166,134 @@ class Robot:
         if self.box_pos == 'LEFT':
             self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
             time.sleep(1)
-
-    def check_area(self, line_info, edge_info):
+            
+    def catch_box(self):
+        self._motion.grab()
         if self.box_pos == 'RIGHT':
-            if line_info["ALL_X"][1] > 600 and line_info["H"] == True:
-                if line_info["ALL_X"][0] < 200:
-                    self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
-                    self.mode = 'box_into_area'
-                else:
-                    self._motion.walk(dir='RIGHT', loop=1)
-            else:
-                self._motion.turn(dir='LEFT', loop=1)
+            self._motion.turn(dir='LEFT', loop=5, grab=True)
+            self._motion.move_arm(dir = 'LOW')
+            self.mode = 'check_area'
         elif self.box_pos == 'LEFT':
-            if line_info["ALL_X"][0] < 50 :
-                if line_info["ALL_X"][1] < 400:
+            self._motion.turn(dir='RIGHT', loop=5, grab=True)
+            self._motion.move_arm(dir = 'LOW')
+            self.mode = 'check_area'
+        else:
+            self._motion.move_arm(dir = 'LOW')
+            self.mode = 'check_area'
+            
+    def check_area(self, line_info, edge_info):
+        print(line_info["ALL_X"], line_info["H"])
+        if self.box_pos == 'RIGHT':
+            if line_info["H"] == True:
+                self.mode = 'fit_area'
+            else:
+                self._motion.turn(dir='LEFT', loop=1, grab=True)
+                #time.sleep(1)
+        elif self.box_pos == 'LEFT':
+            if line_info["H"] == True:
+                self.mode = 'fit_area'
+            else:
+                self._motion.turn(dir='RIGHT', loop=1, grab=True)
+                #time.sleep(1)
+        elif self.box_pos == 'MIDDLE':
+            self.mode = 'fit_area'
+        else:
+            print("self.box_pos is None, Please check it")
+        
+
+    def fit_area(self, line_info, edge_info):
+        print(line_info["ALL_X"])
+        if self.box_pos == 'RIGHT':
+            if line_info["ALL_X"][1] > 400:
+                if line_info["ALL_X"][0] < 100:
+                    print('find!!!!!!!!!!!!')
                     self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
-                    self._motion.move_arm(dir = 'HIGH')
-                    self.mode = 'box_into_area'
+                    time.sleep(1)
+                    self.mode = 'move_into_area'
+                else:
+                    self._motion.walk(dir='RIGHT', loop=1, grab=True)
+                    time.sleep(1)
+            else:
+                self._motion.walk(dir='RIGHT', loop=1, grab=True)
+                time.sleep(1)
+        elif self.box_pos == 'LEFT':
+            if line_info["ALL_X"][0] < 100 :
+                if line_info["ALL_X"][1] < 500:
+                    self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
+                    time.sleep(1)
+                    self.mode = 'move_into_area'
                 else:
                     self._motion.walk(dir='LEFT', loop=1)
+                    time.sleep(1)
             else:
-                self._motion.turn(dir='RIGHT', loop=1)
+                self._motion.walk(dir='LEFT', loop=1)
         elif self.box_pos == 'MIDDLE':
             if edge_info["EDGE_DOWN_X"] < 300:
-                self._motion.walk(dir='RIGHT', loop=1)
+                self._motion.walk(dir='RIGHT', loop=1, grab=True)
+                time.sleep(1)
             elif edge_info["EDGE_DOWN_X"] > 360 :
-                self._motion.walk(dir='LEFT', loop=1)
+                self._motion.walk(dir='LEFT', loop=1, grab=True)
+                time.sleep(1)
             else: # elif 300 < edge_info["EDGE_DOWN_X"] < 360 :
                 self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
-                self._motion.move_arm(dir = 'HIGH')
-                self.mode = 'box_into_area'
+                time.sleep(1)
+                self.mode = 'move_into_area'
         else:
             print("self.box_pos is None, Please check it")
             
-    def box_into_area(self, line_info, edge_info):
+# ---------------------- set head mode 45 ----------------------------------------------------------------          
+    def move_into_area(self, line_info, edge_info):
+        print(line_info['ALL_Y'])
         if self.box_pos == 'LEFT' or 'RIGHT':
-            if line_info['ALL_Y'][0] > 240: # 발 나온다는 생각으로 절반 아래에 오면 발 앞이라고 생각할 것임 -- 수정 예정
-                if line_info["H"] == True and line_info['H_DEGREE'] < 2 :
-                    self._motion.walk(dir='FORWARD', loop=1)
-                    self._motion.grab(self, switch=False) # 앉고 잡은 박스 놓는 모션 넣기
-                    self.mode = 'end_mission'
-                    self.color = 'YELLOW'
-                else:
-                    #line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
-                    self._motion.walk(dir='FORWARD', loop=4)
-                    self._motion.grab(self, switch=False) # 앉고 잡은 박스 놓는 모션 넣기
-                    self.mode = 'end_mission'
-                    self.color = 'YELLOW'
+            if line_info['ALL_Y'][1] > 460: # 발 나온다는 생각으로 절반 아래에 오면 발 앞이라고 생각할 것임 -- 수정 예정
+                self.mode = 'box_into_area'
             else:
-                self._motion.walk(dir='FORWARD', loop=1)
-
-
+                self._motion.walk(dir='FORWARD', loop=1, grab=True)
         elif self.box_pos == 'MIDDLE':
-            if line_info['ALL_Y'][0] > 240:
-                #line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
-                self._motion.walk(dir='FORWARD', loop=4)
-                self._motion.grab(self, switch=False) # 앉고 잡은 박스 놓는 모션 넣기
-                self.mode = 'end_mission'
-                self.color = 'YELLOW'
+            if line_info['ALL_Y'][1] > 460:
+                self.mode = 'box_into_area'
             else:
-                self._motion.walk(dir='FORWARD', loop=1)
+                self._motion.walk(dir='FORWARD', loop=1, grab=True)
         else:
             print("self.box_pos is None, Please check it")
+
+# ---------------------- set head mode 35 ----------------------------------------------------------------
+    #def box_into_area(self, line_info, edge_info):
+        #if self.box_pos == 'LEFT' or 'RIGHT':
+            #if line_info['ALL_Y'][1] > 240: # 발 나온다는 생각으로 절반 아래에 오면 발 앞이라고 생각할 것임 -- 수정 예정
+                #if line_info["H"] == True and line_info['H_DEGREE'] < 2 :
+                    #self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                    #self._motion.grab(switch=False) # 앉고 잡은 박스 놓는 모션 넣기
+                    #self.mode = 'end_mission'
+                    #self.color = 'YELLOW'
+               # else:
+                #    #line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
+                 #   self._motion.walk(dir='FORWARD', loop=4, grab=True)
+                  #  self._motion.grab(witch=False) # 앉고 잡은 박스 놓는 모션 넣기
+                   # self.mode = 'end_mission'
+                    #self.color = 'YELLOW'
+           # else:
+             #   self._motion.walk(dir='FORWARD', loop=1, grab=True)
+
+
+       # elif self.box_pos == 'MIDDLE':
+          #  if line_info['ALL_Y'][1] > 240:
+                #line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
+              #  self._motion.walk(dir='FORWARD', loop=4, grab=True)
+              #  self._motion.grab(switch=False) # 앉고 잡은 박스 놓는 모션 넣기
+              #  self.mode = 'end_mission'
+              #  self.color = 'YELLOW'
+           # else:
+               # self._motion.walk(dir='FORWARD', loop=1, grab=True)
+       # else:
+      #      print("self.box_pos is None, Please check it")
+    
+    def box_into_area(self, line_info, edge_info):
+        self._motion.walk(dir='FORWARD', loop=2, grab=True)
+        self._motion.grab(switch=False) # 앉고 잡은 박스 놓는 모션 넣기
+        self._motion.set_head(dir ='DOWN', angle=60)
+        self.mode = 'end_mission'
+        self.color = 'YELLOW'
 
 
     # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
@@ -286,6 +358,9 @@ class Robot:
             if self.direction == None:
                 self.detect_direction()
             else:
+                self._motion.walk("FORWARD", 2)
+                self._motion.walk(self.direction, 2)
+                self._motion.turn(self.direction, 7)
                 self.mode = 'walk' 
 
         # 미션 진입 판별
@@ -326,7 +401,7 @@ class Robot:
         # elif self.mode == 'box_tracking':
         # 1. red, blue 알파벳 구별: edge_info["EDGE_UP_Y"] 기준으로 윗 공간, self.alphabet_color 알파벳 색깔 넣어주세요
         # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, MIDDLE, RIGHT)
-        ## grap on 과 동시에 self.mode = 'box_into_area'로 바꾸기
+        ## grap on 과 동시에 self.mode = 'check_area'로 바꾸기
         ## # 1) 박스 grap on 하면 손 내리고 고개든다 (MIDDLE이면 고개 좀 많이 내려주기, LEFT RIGHT는 30 정도면 될 듯?아마??)
 
             # ++ 집은 채로 손내리는 모션
@@ -335,29 +410,23 @@ class Robot:
 
 
 
-
+        elif self.mode == 'catch_box':
+            self.catch_box()
 
 
         # 3. 박스 구역의 평행선 H 기준으로 안으로 또는 밖으로 옮기기
         elif self.mode == 'check_area':
-            self.box_into_area(line_info, edge_info)
+            self.check_area(line_info, edge_info)
+            
+        elif self.mode == 'fit_area':
+            self.fit_area(line_info, edge_info)
+            
+        elif self.mode == 'move_into_area':
+            self.move_into_area(line_info, edge_info)
 
         elif self.mode == 'box_into_area':
             self.box_into_area(line_info, edge_info)
-        
-        
 
-
-            
-
-
-
-
-
-
-
-
-        # 미션 끝나면? - self.mode == 'end_mission'
         # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None : # yellow edge 감지

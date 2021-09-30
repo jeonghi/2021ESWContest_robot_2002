@@ -35,9 +35,9 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
-            self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
-            self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
-            self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
+            self.hash_detector4door = HashDetector(file_path='EWSN/')
+            self.hash_detector4room = HashDetector(file_path='ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
 
         else:
 
@@ -371,7 +371,7 @@ class ImageProcessor:
 
     def line_tracing(self, color='YELLOW'):
         src = self.get_image()
-        return self.line_detector.get_all_lines(src, color, line_visualization = False, edge_visualization = True)
+        return self.line_detector.get_all_lines(src, color, line_visualization = True, edge_visualization = True)
 
     def test(self):
         src = self.get_image(visualization=True)
@@ -422,7 +422,8 @@ if __name__ == "__main__":
     while True:
         
         line_info,edge_info, src = imageProcessor.line_tracing(color='GREEN')
-        print(line_info["H_DEGREE"])
+        print(line_info)
+        print(edge_info)
         cv2.imshow('src',src)
         key = cv2.waitKey(1)
         if key == 27:

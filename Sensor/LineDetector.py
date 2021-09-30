@@ -60,8 +60,8 @@ class LineDetector:
 
     def mask_color(self, src, color = 'YELLOW'):
         if color == 'YELLOW':
-            hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-            h, s, v = cv2.split(hsv)
+            hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+            h, l, s = cv2.split(hls)
             ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask = mask)
             match_lower = np.array([10,40,95]) #yellow_lower
@@ -72,7 +72,7 @@ class LineDetector:
             h, l, s = cv2.split(hls)
             ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask = mask)
-            match_lower = np.array([20, 30, 30]) #green_lower
+            match_lower = np.array([20, 20, 20]) #green_lower
             match_upper = np.array([80,  255, 255]) #green_upper  
 
         # if color == 'BLACK':      
@@ -264,18 +264,19 @@ class LineDetector:
             line_info = {'ALL_X': [0,0] , 'ALL_Y': [0,0], 'H' : False, 'H_DEGREE': 0,'H_X':[0,0], 'H_Y':[0,0]}
             edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X':0,'EDGE_DOWN_Y':0, 'EDGE_UP_Y': 0}
 
-            if len(lines)!=0:
-                size = int(lines.shape[0]*lines.shape[2]/2)
-                lines = self.get_fitline(src, lines, size, 'all')
-                line_info["ALL_X"] = [lines[0], lines[2]] # [min_x, min_y, max_x, max_y] 
-                line_info["ALL_Y"] = [lines[1], lines[3]] 
+            if len(edge_lines)!=0:
+                size = int(edge_lines.shape[0]*edge_lines.shape[2]/2)
+                line = self.get_fitline(src, edge_lines, size, 'all')
+                line_info["ALL_X"] = [line[0], line[2]] # [min_x, min_y, max_x, max_y] 
+                line_info["ALL_Y"] = [line[1], line[3]] 
 
                 #size = int(lines.shape[0]*2)
                 #fit_line = self.get_fitline__(src, lines)
                 #line_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
                 #line_info["DEGREE"] = line_degree
                 if line_visualization is True:
-                    self.draw_lines(temp, lines, 'lines')
+                    self.draw_lines(temp, edge_lines, 'lines')
+                    self.draw_lines(temp, line, 'lines', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(horizontal_lines)!=0:
@@ -283,7 +284,11 @@ class LineDetector:
                 horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
                 # [max_x, max_y, min_x, min_y]
                 H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
-                line_info["H"] = True
+                a = horizontal_fit_line[1] - horizontal_fit_line[3]
+                b = horizontal_fit_line[0] - horizontal_fit_line[2]
+                c = math.sqrt((a * a) + (b * b))
+                if c >= 100:
+                    line_info["H"] = True
                 line_info["H_DEGREE"] = H_degree
                 line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]] #[min_x, middle, max_x, middle]
                 line_info["H_Y"] =  [horizontal_fit_line[1], horizontal_fit_line[2]]
