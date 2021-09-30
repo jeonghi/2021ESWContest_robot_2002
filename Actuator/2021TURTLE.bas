@@ -3582,7 +3582,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     SPEED 6
     MOVE G6D,  90,  74, 144,  94, 109
-    MOVE G6A, 108,  76, 146,  94, 97
+    MOVE G6A, 108,  76, 146,  93, 96
     WAIT
 
     SPEED 8
@@ -3603,7 +3603,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     SPEED 보행속도
 
-    MOVE G6D, 90,  56, 145, 114, 111
+    MOVE G6D, 90,  56, 145, 114, 109
     MOVE G6A,108,  76, 147,  89,  95
     WAIT
 
