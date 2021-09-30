@@ -63,7 +63,7 @@ class HashDetector:
 
 
     def detect_alphabet_hash(self, img : np.ndarray, threshold=0.3) -> str:
-        if self.check_white_rate(img) < 0.3 or self.check_white_rate(img) > 0.7:
+        if self.check_white_rate(img) < 0.1 or self.check_white_rate(img) > 0.9:
             print(self.check_white_rate(img))
             return None, None
         img_hash = self.image_to_hash(img)
