@@ -2241,7 +2241,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     '******************************************
 
- '   <<<<<<< HEAD
+    '   <<<<<<< HEAD
     '**********************************************
 집고왼쪽턴10:
 
@@ -3573,29 +3573,29 @@ Number_Play: '  BUTTON_NO = 숫자대입
     'DELAY 20
     SPEED 6
     GOSUB All_motor_mode3
-    MOVE G6B, 190, 10, 50
-    MOVE G6C, 190, 10, 50
+    MOVE G6B,185,  10,  60
+    MOVE G6C,185,  10,  60
     WAIT
 
     DELAY 20
     'HIGHSPEED SETON
 
     SPEED 6
-    MOVE G6D,  90,  74, 144,  95, 110
-    MOVE G6A, 108,  76, 146,  93, 96
+    MOVE G6D,  90,  74, 144,  94, 109
+    MOVE G6A, 108,  76, 146,  94, 97
     WAIT
 
     SPEED 8
-    MOVE G6D,90, 90, 120, 102, 110,100
-    MOVE G6A,108,  76, 147,  93,  96,100
+    MOVE G6D,90, 90, 120, 101, 109,99
+    MOVE G6A,108,  76, 147,  92,  95,99
     WAIT
 
     'HIGHSPEED SETOFF
     GOTO 집고전진_2	
 
 집고전진_2:
-    MOVE G6A,110,  76, 147,  93, 100,100
-    MOVE G6D,96, 90, 120, 102, 107,100
+    MOVE G6A,110,  76, 147,  92, 99,99
+    MOVE G6D,96, 90, 120, 101, 106,99
     WAIT
 
 집고전진_3:
@@ -3603,13 +3603,13 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     SPEED 보행속도
 
-    MOVE G6D, 90,  56, 145, 115, 110
-    MOVE G6A,108,  76, 147,  90,  96
+    MOVE G6D, 90,  56, 145, 114, 111
+    MOVE G6A,108,  76, 147,  89,  95
     WAIT
 
     SPEED 좌우속도
-    MOVE G6D,108,  76, 147, 90,  98
-    MOVE G6A,90, 100, 142,  69, 108
+    MOVE G6D,108,  76, 147, 89,  97
+    MOVE G6A,90, 100, 142,  68, 107
     WAIT
 
     SPEED 보행속도
@@ -3645,16 +3645,17 @@ Number_Play: '  BUTTON_NO = 숫자대입
     ENDIF
 집고전진_4:
     SPEED 9
-    MOVE G6A,95, 90, 120, 102, 111,100
-    MOVE G6D,108,  76, 146,  93,  96,100
+    MOVE G6A,95, 90, 120, 101, 110,99
+    MOVE G6D,108,  76, 146,  92,  95,99
     WAIT
 
     SPEED 7
-    MOVE G6A,100,  76, 145,  93, 100, 100
-    MOVE G6D,100,  76, 145,  93, 100, 100
+    MOVE G6A,100,  76, 145,  92, 99, 100
+    MOVE G6D,100,  76, 145,  92, 99, 100
     WAIT
 
     RETURN
+    '*******************
 횟수_집고후진:
     GOSUB All_motor_mode3
     넘어진확인 = 0
