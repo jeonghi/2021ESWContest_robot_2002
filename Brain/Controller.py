@@ -16,7 +16,7 @@ class Robot:
         self._line_detector = LineDetector()
         self.direction = 'LEFT'
         # self.mode = 'start'
-        self.mode = 'end_mission'
+        self.mode = 'start_mission'
         self.color = 'YELLOW'
         self.box_pos = 'RIGHT'
         self.alphabet_color = 'RED'
