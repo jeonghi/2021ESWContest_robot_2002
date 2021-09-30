@@ -21,7 +21,6 @@ class Robot:
         self.box_pos = 'RIGHT'
         self.alphabet_color = 'RED'
         self.cube_grabbed = False
-        self.curr_room_color = "GREEN"
         self.count = 0
         self.progress_of_roobot = [None, ]
         self.walk_info = None
@@ -197,13 +196,13 @@ class Robot:
             if line_info['ALL_Y'][0] > 240:  # 발 나온다는 생각으로 절반 아래에 오면 발 앞이라고 생각할 것임 -- 수정 예정
                 if line_info["H"] == True and line_info['H_DEGREE'] < 2:
                     self._motion.walk(dir='FORWARD', loop=1)
-                    self._motion.grab(self, switch=False)  # 앉고 잡은 박스 놓는 모션 넣기
+                    self._motion.grab(switch=False)  # 앉고 잡은 박스 놓는 모션 넣기
                     self.mode = 'end_mission'
                     self.color = 'YELLOW'
                 else:
                     # line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
                     self._motion.walk(dir='FORWARD', loop=4)
-                    self._motion.grab(self, switch=False)  # 앉고 잡은 박스 놓는 모션 넣기
+                    self._motion.grab(switch=False)  # 앉고 잡은 박스 놓는 모션 넣기
                     self.mode = 'end_mission'
                     self.color = 'YELLOW'
             else:
@@ -214,7 +213,7 @@ class Robot:
             if line_info['ALL_Y'][0] > 240:
                 # line_info['H_DEGREE'] 따라 수평선 찾는 거 넣을 예정인데 우선은 다른 걸로 대체
                 self._motion.walk(dir='FORWARD', loop=4)
-                self._motion.grab(self, switch=False)  # 앉고 잡은 박스 놓는 모션 넣기
+                self._motion.grab(switch=False)  # 앉고 잡은 박스 놓는 모션 넣기
                 self.mode = 'end_mission'
                 self.color = 'YELLOW'
             else:
@@ -312,16 +311,42 @@ class Robot:
             else:
                 print('The Robot has not direction, Please Set **self.direction**')
 
-
-
-
-
-
-        # elif self.mode == 'start_mission':
         # 0. 확진 / 안전 구역 확인 : self.color 바꿔주세요, self.mode = 'box_tracking'로 바꿔주세요.
+        elif self.mode == 'start_mission':
+            self._motion.set_head(dir=self.direction, angle=45)
+            self._motion.set_head(dir="DOWN", angle=45)
+            self.color = self._image_processor.get_area_color()
+            self._motion.notice_area(area=self.color)
+            self._motion.set_head(dir="LEFTRIGHT_CENTER")
+            self.mode = 'room_alphabet_detecting'
 
-        # elif self.mode == 'box_tracking':
+
+
+        elif self.mode == 'room_alphabet_detecting':
+
+            if self.alphabet_color is None:
+                self._motion.set_head(dir="DOWN", angle=60)
+                time.sleep(0.3)
+                alphabet = self._image_processor.get_alphabet_info()
+                if alphabet is None:
+                    print("감지되는 알파벳 정보가 없습니다")
+                    pass
+                (color, _ ) = alphabet
+                self.alphabet_color = color
+
+            if self.alphabet_color :
+                self.mode = 'box_tracking'
+
+
+
+            # self.mode == box_tracking 으로 바꿔주기
+
+
+
+        elif self.mode == 'box_tracking':
+            print("box_tracking 실행")
         # 1. red, blue 알파벳 구별: edge_info["EDGE_UP_Y"] 기준으로 윗 공간, self.alphabet_color 알파벳 색깔 넣어주세요
+            pass
         # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, MIDDLE, RIGHT)
         ## grap on 과 동시에 self.mode = 'box_into_area'로 바꾸기
         ## # 1) 박스 grap on 하면 손 내리고 고개든다 (MIDDLE이면 고개 좀 많이 내려주기, LEFT RIGHT는 30 정도면 될 듯?아마??)
@@ -335,17 +360,6 @@ class Robot:
 
         elif self.mode == 'box_into_area':
             self.box_into_area(line_info, edge_info)
-
-
-
-
-
-
-
-
-
-
-
 
 
         # 미션 끝나면? - self.mode == 'end_mission'
