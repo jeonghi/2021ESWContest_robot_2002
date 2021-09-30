@@ -172,13 +172,16 @@ class Robot:
         if self.box_pos == 'RIGHT':
             self._motion.turn(dir='LEFT', loop=5, grab=True)
             self._motion.move_arm(dir = 'LOW')
+            time.sleep(1)
             self.mode = 'check_area'
         elif self.box_pos == 'LEFT':
             self._motion.turn(dir='RIGHT', loop=5, grab=True)
             self._motion.move_arm(dir = 'LOW')
+            time.sleep(1)
             self.mode = 'check_area'
         else:
             self._motion.move_arm(dir = 'LOW')
+            time.sleep(1)
             self.mode = 'check_area'
             
     def check_area(self, line_info, edge_info):
@@ -233,10 +236,10 @@ class Robot:
                 self._motion.walk(dir='LEFT', loop=1)
                 time.sleep(1)
         elif self.box_pos == 'MIDDLE':
-            if edge_info["EDGE_DOWN_X"] < 300:
+            if edge_info["EDGE_DOWN_X"] < 280:
                 self._motion.walk(dir='RIGHT', loop=1, grab=True)
                 time.sleep(1)
-            elif edge_info["EDGE_DOWN_X"] > 360 :
+            elif edge_info["EDGE_DOWN_X"] > 380 :
                 self._motion.walk(dir='LEFT', loop=1, grab=True)
                 time.sleep(1)
             else: # elif 300 < edge_info["EDGE_DOWN_X"] < 360 :
