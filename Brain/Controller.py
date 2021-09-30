@@ -30,9 +30,9 @@ class Robot:
         self._motion.basic_form()
     
     def check_turn(self):
-        self._motion.grab()
-        while True:
-            self._motion.turn('LEFT', grab=True)
+        self._motion.turn("SLIDING_RIGHT",loop=6,sleep=1,grab=True,sliding=True)
+
+
 
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
@@ -236,10 +236,10 @@ class Robot:
                 self._motion.walk(dir='LEFT', loop=1)
                 time.sleep(1)
         elif self.box_pos == 'MIDDLE':
-            if edge_info["EDGE_DOWN_X"] < 280:
+            if edge_info["EDGE_DOWN_X"] < 300:
                 self._motion.walk(dir='RIGHT', loop=1, grab=True)
                 time.sleep(1)
-            elif edge_info["EDGE_DOWN_X"] > 380 :
+            elif edge_info["EDGE_DOWN_X"] > 340 :
                 self._motion.walk(dir='LEFT', loop=1, grab=True)
                 time.sleep(1)
             else: # elif 300 < edge_info["EDGE_DOWN_X"] < 360 :
@@ -257,11 +257,13 @@ class Robot:
                 self.mode = 'box_into_area'
             else:
                 self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                time.sleep(1)
         elif self.box_pos == 'MIDDLE':
             if line_info['ALL_Y'][1] > 460:
                 self.mode = 'box_into_area'
             else:
                 self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                time.sleep(1)
         else:
             print("self.box_pos is None, Please check it")
 

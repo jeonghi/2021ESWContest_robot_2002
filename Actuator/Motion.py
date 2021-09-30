@@ -133,12 +133,15 @@ class Motion:
             self.TX_data_py2(dir_list[dir])
 
 
-    def turn(self, dir, loop=1, sleep=0.5, grab=False):
+    def turn(self, dir, loop=1, sleep=0.5, grab=False,sliding=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
-        if grab: dir_list[dir] += 11  # if grab is true, change walk motion with grab
+        if grab:
+            dir_list[dir] += 11 # if grab is true, change walk motion with grab
+            if sliding:
+                dir_list[dir]+=9
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
@@ -191,4 +194,4 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.TX_data_py2(16)
+    motion.turn("SLIDING_RIGHT",loop=6,sleep=0.5,grab=True,sliding=True)

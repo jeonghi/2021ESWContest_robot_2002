@@ -422,8 +422,7 @@ if __name__ == "__main__":
     while True:
         
         line_info,edge_info, src = imageProcessor.line_tracing(color='GREEN')
-        print(line_info)
-        print(edge_info)
+        print(line_info['ALL_Y'])
         cv2.imshow('src',src)
         key = cv2.waitKey(1)
         if key == 27:
