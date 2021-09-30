@@ -33,11 +33,13 @@ class Motion:
         self.serial_t.start()
         time.sleep(0.1)
 
+
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
         self.lock.acquire()
 
         self.serial_port.write(serial.to_bytes([one_byte]))  # python3
         time.sleep(0.02)
+
 
     def RX_data(self):
         if self.serial_port.inWaiting() > 0:
@@ -47,8 +49,10 @@ class Motion:
         else:
             return 0
 
+
     def getRx(self):
         return self.lock
+
 
     def Receiving(self, ser):
         self.receiving_exit = 1
@@ -72,17 +76,20 @@ class Motion:
                 elif RX != 200:
                      self.distance = RX
 
+
     def notice_direction(self, dir):
         """dir={'E', 'W', 'S', 'N'}
         """
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
         self.TX_data_py2(dir_list[dir])
 
+
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
         area_list = {'GREEN':66,'BLACK':67}
         self.TX_data_py2(area_list[area])
+
 
     def set_head(self, dir, angle=0):
         """parameter 설명
@@ -93,9 +100,9 @@ class Motion:
         }
         """
         if dir == 'DOWN':
-            self.head_angle1 = (dir, angle)
-        elif dir == 'LEFT' or dir == 'RIGHT':
-            self.head_angle2 = (dir, angle)
+            self.head_angle1 = angle
+        elif dir == 'LEFT' and dir == 'RIGHT':
+            self.head_angle2 = angle
         elif dir == 'UPDOWN_CENTER':
             self.head_angle1 = dir
         elif dir == 'LEFTRIGHT_CENTER':
@@ -126,11 +133,15 @@ class Motion:
             self.TX_data_py2(dir_list[dir])
 
 
-    def turn(self, dir, loop=1, grab=False):
+    def turn(self, dir, loop=1, sleep=0.5, grab=False):
+        """parameter 설명
+        dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
+        """
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
         if grab: dir_list[dir] += 11  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
+            time.sleep(sleep)
 
 
     def get_IR(self) -> int:
@@ -140,66 +151,44 @@ class Motion:
         self.TX_data_py2(5)
         return self.distance
 
-    def open_door_1(self):
-        self.turn('LEFT', loop=7)
-        self.TX_data_py2(63)
-        self.walk('RIGHT', loop=20)
 
-    def open_door_2(self, loop=1):
+    def open_door(self, loop=1):
         for _ in range(loop):
             self.TX_data_py2(66)
+
 
     def grab(self, switch=True):
         """if switch=True then grab ON, else then grab OFF
         """
-        if switch:
-            self.TX_data_py2(64)
-        else:
-            self.TX_data_py2(65)
+        tx = 64 if switch else 65
+        self.TX_data_py2(tx)
+
 
     def get_head(self):
         """Return vertical, horizontal head angle
         """
         return (self.head_angle1, self.head_angle2)
 
+
     def basic_form(self):
         self.TX_data_py2(45)
         self.TX_data_py2(54)
         self.TX_data_py2(10)
 
-    def move_arm(self, grab=True, level=2):
-        """level: if grab is True, {1,2,3} else grab is False, {1,2}
+
+    def move_arm(self, dir='HIGH'):
+        """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
+        팔을 위로 하면 머리는 아래로 숙임.
         """
         angle_list = [30, 90, 60]
-        if grab:
-            self.TX_data_py2(75+level)
-            time.sleep(0.5)
-            self.set_head(dir='DOWN', angle=angle_list[level-1])
-        else:
-            self.TX_data_py2(73+level)
-            time.sleep(0.5)
-            self.set_head(dir='DOWN', angle=100)
-            
-            
+        level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
+        self.TX_data_py2(75+level[dir])
+        time.sleep(0.1)
+        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
 
 
-
-
-# **************************************************
 # **************************************************
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    #motion.TX_data_py2(16) # power on/off
-    motion.move_arm(grab=True, level=1)
-    time.sleep(2)
-    motion.move_arm(grab=True, level=3)
-#    motion.TX_data_py2(65)
-
-
-
-
-
-
-
-
+    motion.TX_data_py2(16)
