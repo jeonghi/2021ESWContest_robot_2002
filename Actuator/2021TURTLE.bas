@@ -3587,14 +3587,14 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     SPEED 8
     MOVE G6D,90, 90, 120, 101, 109,99
-    MOVE G6A,108,  76, 147,  92,  95,99
+    MOVE G6A,108,  76, 147,  92,  96,100
     WAIT
 
     'HIGHSPEED SETOFF
     GOTO 집고전진_2	
 
 집고전진_2:
-    MOVE G6A,110,  76, 147,  92, 99,99
+    MOVE G6A,110,  76, 147,  92, 100,100
     MOVE G6D,96, 90, 120, 101, 106,99
     WAIT
 
