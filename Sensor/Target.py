@@ -52,6 +52,7 @@ class Target:
 
     def get_color(self):
         return self._color
+
     def get_center_pos(self):
         return self._center_pos
 

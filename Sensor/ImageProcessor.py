@@ -132,7 +132,7 @@ class ImageProcessor:
 
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         canny = auto_canny(mask)
         candidates = []
 
@@ -141,7 +141,7 @@ class ImageProcessor:
         for cnt in cnts:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if vertice <= 8 and 1500 <= cv2.contourArea(cnt):
+            if vertice <= 4 and 2000 <= cv2.contourArea(cnt):
                 target = Target(contour=cnt)
                 candidates.append(target)
 
@@ -399,6 +399,7 @@ class ImageProcessor:
             cv2.waitKey(1)
         return result
 
+
     def test(self):
         src = self.get_image(visualization=True)
         ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
@@ -464,7 +465,7 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         #g = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
-        _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
         green_upper = 80
         green_lower = 20
         ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
@@ -481,21 +482,58 @@ class ImageProcessor:
         cv2.imshow("mask", ycrcb)
         cv2.waitKey(1)
 
-    def test3(self):
+    def get_alphabet_color(self, visualization=False) -> str:
         src = self.get_image()
-        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        if visualization:
+            canvas = src.copy()
+        candidates = []
+        blur = cv2.GaussianBlur(src, (5, 5), 0)
+        hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
 
         red_mask = self.color_preprocessor.get_red_mask(h)
-        mask = cv2.bitwise_and(mask, red_mask)
+        blue_mask = self.color_preprocessor.get_blue_mask(h)
+        color_mask = cv2.bitwise_or(blue_mask, red_mask)
+        mask = cv2.bitwise_and(mask, color_mask)
+        _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
+            if stats[idx][0] == 0 and stats[idx][1] == 0:
+                continue
 
-        green_mask = self.color_preprocessor.get_green_mask(h)
-        self.line_tracing()
-        #mask = cv2.bitwise_and(mask, green_mask)
+            if np.any(np.isnan(centroid)): # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
+                continue
+            _, _, width, height, area = stats[idx]
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            if 800 < area < 8000 and area_ratio <= 1.7:
+                candidates.append(Target(name=str(area_ratio),stats=stats[idx], centroid=centroid))
+        candidates.sort(key=lambda candidate:candidate.get_center_pos()[1])
 
-        cv2.imshow("mask", mask)
-        cv2.waitKey(1)
+
+        if visualization:
+            for idx, candidate in enumerate(candidates):
+                if idx == 0:
+                    roi = candidate.get_target_roi(src, pad=5)
+                    roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
+                    _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+                    cv2.imshow("roi_mask", roi_mask)
+                    alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+                    color = self.color_preprocessor.check_red_or_blue(roi)
+                    candidate.set_color(color)
+                    candidate.set_name(f"ratio: {candidate.get_name()}, name: {alphabet}")
+                    setLabel(canvas, candidate.get_pts(), label=f"{idx}: {candidate.get_name()}", color=(0, 0, 255))
+                else:
+                    setLabel(canvas, candidate.get_pts(), label=f"{idx}: {candidate.get_name()}", color=(255, 255, 255))
+            # cv2.imshow("mask", mask)
+            dst = cv2.hconcat([canvas, cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)])
+            cv2.imshow("src", dst)
+            cv2.waitKey(1)
+
+        if candidates:
+            return candidates[0].get_color()
+        else:
+            return None
 
 
 
@@ -504,10 +542,10 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
     while True:
-        #imageProcessor.get_room_alphabet(visualization=True)
-        #imageProcessor.test3()
-        imageProcessor.line_tracing(color="GREEN", line_visualization=True)
+        imageProcessor.get_alphabet_color(visualization=True)
+        #imageProcessor.line_tracing(color="GREEN", line_visualization=True)
+        #imageProcessor.get_image(visualization=True)
 
