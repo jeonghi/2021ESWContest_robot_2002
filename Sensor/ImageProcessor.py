@@ -529,9 +529,13 @@ class ImageProcessor:
             else:
                 thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
             _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-            candidate_alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
 
-            cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+            ### 정확도 향상을 위해 아래 함수 수정 요망 ###
+            candidate_alphabet,_ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+            ####################################
+
+            #if visualization:
+            #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
 
             if candidate_alphabet is None:
                 continue
@@ -547,7 +551,6 @@ class ImageProcessor:
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
                 setLabel(canvas, selected.get_pts(), color=(0, 0, 255))
-
 
         if visualization:
             cv2.imshow("src", canvas)
