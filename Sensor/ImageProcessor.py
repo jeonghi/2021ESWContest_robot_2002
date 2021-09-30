@@ -535,6 +535,25 @@ class ImageProcessor:
         else:
             return None
 
+    def get_green_area_corner(self, visualization=True):
+        src = self.get_image()
+        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src=src, color="GREEN",
+                                                                                line_visualization=False,
+                                                                                edge_visualization=False)
+        pos = edge_info["EDGE_POS"]
+        if visualization:
+            if pos:
+                (x, y) = pos
+                cv2.circle(src, pos, 10, (0, 0, 255), -1)
+            cv2.imshow("result", src)
+            cv2.waitKey(1)
+        return pos
+
+
+
+
+
+
 
 
 
@@ -545,7 +564,8 @@ if __name__ == "__main__":
     imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.get_alphabet_color(visualization=True)
+        #imageProcessor.get_alphabet_color(visualization=True)
         #imageProcessor.line_tracing(color="GREEN", line_visualization=True)
         #imageProcessor.get_image(visualization=True)
+        imageProcessor.get_green_area_corner()
 
