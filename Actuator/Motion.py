@@ -94,7 +94,7 @@ class Motion:
     def set_head(self, dir, angle=0):
         """parameter 설명
         dir: {DOWN, LEFT, RIGHT, UPDOWN_CENTER, LEFTRIGHT_CENTER}
-        angle: {DOWN:{10,20,30,45,60,75,90,100},
+        angle: {DOWN:{35,20,30,45,60,75,90,100},
         LEFT:{30,45,60,90},
         RIGHT:{30,45,60,90}
         }
@@ -111,7 +111,7 @@ class Motion:
         center_list = {'UPDOWN_CENTER':44, 'LEFTRIGHT_CENTER':54}
         dir_list = {
             'DOWN':{
-            10:37, 20:38, 30:39, 45:40, 60:41, 75:42, 90:43, 100:44
+            35:37, 20:38, 30:39, 45:40, 60:41, 75:42, 90:43, 100:44
             },
             'LEFT':{
                 30:46, 45:47, 60:48, 90:49
