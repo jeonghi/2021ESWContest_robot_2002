@@ -101,7 +101,7 @@ class Motion:
         """
         if dir == 'DOWN':
             self.head_angle1 = angle
-        elif dir == 'LEFT' and dir == 'RIGHT':
+        elif dir == 'LEFT' or dir == 'RIGHT':
             self.head_angle2 = angle
         elif dir == 'UPDOWN_CENTER':
             self.head_angle1 = dir
