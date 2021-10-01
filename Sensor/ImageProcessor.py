@@ -201,6 +201,7 @@ class ImageProcessor:
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
         mask = cv2.bitwise_not(mask)
+        _, s_mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
 
         # background : white, target: green, red, blue, black
         # ostu thresholding inverse : background -> black, target -> white
@@ -211,25 +212,25 @@ class ImageProcessor:
         # subtract blue and red mask to ostu thresholded mask
         # masking
         roi_mask = cv2.bitwise_and(mask, roi_mask)
+        roi_mask = cv2.bitwise_and(roi_mask, s_mask)
         h = cv2.bitwise_and(h, h, mask=roi_mask)
 
         # get mean value about non_zero value
-        h_mean = self.color_preprocessor.get_mean_value_for_non_zero(h)
+        #h_mean = self.color_preprocessor.get_mean_value_for_non_zero(h)
 
         # green
         green_upper = 85
         green_lower = 35
         green = np.where(h > green_lower, h, 0)
         green = np.where(green < green_upper, green, 0)
-
-        pixel_rate = np.count_nonzero(green) / np.count_nonzero(h)
-
+        sz = green.shape[:2][0] * green.shape[:2][1]
+        pixel_rate = np.count_nonzero(green) / sz
         if visualization:
             dst = cv2.bitwise_and(src, src, mask=roi_mask)
             cv2.imshow("dst", dst)
             cv2.waitKey(1)
 
-        if green_lower <= h_mean <= green_upper and pixel_rate >= threshold:
+        if pixel_rate >= threshold:
             return "GREEN"
         else:
             return "BLACK"
@@ -406,7 +407,7 @@ class ImageProcessor:
         blur = cv2.GaussianBlur(src, (5, 5), 0)
         hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
 
         #red_mask = self.color_preprocessor.get_red_mask(h)
         #blue_mask = self.color_preprocessor.get_blue_mask(h)
@@ -428,7 +429,7 @@ class ImageProcessor:
                 continue
 
             candidate = Target(stats=stats[idx], centroid=centroid)
-            roi = candidate.get_target_roi(src, pad=5)
+            roi = candidate.get_target_roi(src, pad=10)
 
             # ycrcb 색공간을 이용해
 
@@ -465,10 +466,11 @@ class ImageProcessor:
             selected = candidates[0]
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
-                setLabel(canvas, selected.get_pts(), color=(0, 0, 255))
+                setLabel(canvas, selected.get_pts(), label="",color=(0, 0, 255))
 
         if visualization:
             cv2.imshow("src", canvas)
+            cv2.imshow("mask", mask)
             cv2.waitKey(1)
 
         return alphabet_info
@@ -476,15 +478,7 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="Sensor/src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        
-        line_info,edge_info, src = imageProcessor.line_tracing(color='GREEN')
-        print(line_info['ALL_Y'])
-        cv2.imshow('src',src)
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
-    cv2.destroyAllWindows()
-
+        imageProcessor.get_alphabet_info4room(visualization=True)

@@ -16,12 +16,12 @@ class Robot:
         self.direction = 'LEFT'
         # self.mode = 'start'
         self.mode = 'start_mission'
-        # self.color = 'YELLOW'
-        self.color = 'GREEN'
+        self.color = 'YELLOW'
+        #self.color = ''
         self.box_pos = 'MIDDLE'
-        self.alphabet_color = 'RED'
+        self.alphabet_color = None
         self.cube_grabbed = False
-        self.curr_room_color = "GREEN"
+        self.curr_room_color = ""
         self.count = 0
         self.progress_of_roobot= [None, ]
         self.walk_info = None
@@ -410,8 +410,9 @@ class Robot:
             self._motion.set_head(dir=self.direction, angle=45)
             self._motion.set_head(dir="DOWN", angle=45)
             time.sleep(1)
-            self.color = self._image_processor.get_area_color()
-            self._motion.notice_area(area=self.color)
+            self.curr_room_color = self._image_processor.get_area_color()
+            #print(self.color)
+            self._motion.notice_area(area=self.curr_room_color)
             self._motion.set_head(dir="LEFTRIGHT_CENTER")
             self.mode = 'room_alphabet_detecting'
 
@@ -423,17 +424,19 @@ class Robot:
 
             # 만약 알파벳 정보가 없다면 영상처리 측면을 개선하거나, 약간의 움직임을 통해 프레임 refresh가 필요하다.
             if self.alphabet_color is None:
-                self._motion.set_head(dir="DOWN", angle=60)
-                time.sleep(0.3)
+                self._motion.set_head(dir="DOWN", angle=90)
+                time.sleep(0.6)
                 alphabet = self._image_processor.get_alphabet_info4room()
                 if alphabet is None:
                     print("감지되는 알파벳 정보가 없습니다")
-                    pass
+                    return
                 (color, _ ) = alphabet
                 self.alphabet_color = color
+                print(alphabet)
 
             if self.alphabet_color:
-                if self.alphabet_color == "GREEN":
+                print(f"Milk box color is {self.alphabet_color}")
+                if self.curr_room_color == "GREEN":
                     self.mode = 'box_finding_at_green'
                 else:
                     self.mode = 'box_finding_at_black'
