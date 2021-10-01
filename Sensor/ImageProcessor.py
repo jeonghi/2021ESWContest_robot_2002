@@ -373,23 +373,6 @@ class ImageProcessor:
         src = self.get_image()
         return self.line_detector.get_all_lines(src, color, line_visualization = True, edge_visualization = True)
 
-    def test(self):
-        src = self.get_image(visualization=True)
-        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
-        y, cr, cb = cv2.split(ycrcb)
-        # cb = cv2.equalizeHist(cb)
-        # cr = cv2.equalizeHist(cr)
-        #_, b_mask = cv2.threshold(cb, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
-        #_, r_mask = cv2.threshold(cr, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
-        _, b_mask = cv2.threshold(cb, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
-        _, r_mask = cv2.threshold(cr, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
-
-
-        v1 = cv2.hconcat([cb, cr])
-        v2 = cv2.hconcat([b_mask,r_mask])
-        cv2.imshow("result", cv2.vconcat([v1, v2]))
-        cv2.waitKey(1)
-
     def mask_color(self, src):
 #        yellow_lower = np.array([10,40,95])
 #        yellow_upper = np.array([56, 200, 255])
@@ -413,6 +396,82 @@ class ImageProcessor:
         yellow_edges = cv2.Canny(yellow_mask, 75, 150)
 
         return src, yellow_mask, yellow_edges
+
+    def get_alphabet_info4room(self, visualization=False) -> tuple:
+        src = self.get_image()
+        if visualization:
+            canvas = src.copy()
+        alphabet_info = None
+        candidates = []
+        blur = cv2.GaussianBlur(src, (5, 5), 0)
+        hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+
+        #red_mask = self.color_preprocessor.get_red_mask(h)
+        #blue_mask = self.color_preprocessor.get_blue_mask(h)
+        #color_mask = cv2.bitwise_or(blue_mask, red_mask)
+        #mask = cv2.bitwise_and(mask, color_mask)
+        _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
+            if stats[idx][0] == 0 and stats[idx][1] == 0:
+                continue
+
+            if np.any(np.isnan(centroid)): # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
+                continue
+            _, _, width, height, area = stats[idx]
+
+            # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            if not (800 < area < 8000 and area_ratio <= 1.7):
+                continue
+
+            candidate = Target(stats=stats[idx], centroid=centroid)
+            roi = candidate.get_target_roi(src, pad=5)
+
+            # ycrcb 색공간을 이용해
+
+            candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
+            candidate_color = candidate.get_color()
+
+            thresholding = None
+            ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
+            y, cr, cb = cv2.split(ycrcb)
+            if candidate_color == "RED":
+                thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
+
+            else:
+                thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
+            _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+            ### 정확도 향상을 위해 아래 함수 수정 요망 ###
+            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+            ####################################
+
+            #if visualization:
+            #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+
+            if candidate_alphabet is None:
+                continue
+            candidate.set_name(candidate_alphabet)
+            if visualization:
+
+                setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
+            candidates.append(candidate)
+
+        if candidates:
+            candidates.sort(key=lambda candidate: candidate.get_center_pos()[1])
+            selected = candidates[0]
+            alphabet_info = (selected.get_color(), selected.get_name())
+            if visualization:
+                setLabel(canvas, selected.get_pts(), color=(0, 0, 255))
+
+        if visualization:
+            cv2.imshow("src", canvas)
+            cv2.waitKey(1)
+
+        return alphabet_info
 
 
 if __name__ == "__main__":
