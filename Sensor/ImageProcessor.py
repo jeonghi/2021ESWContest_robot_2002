@@ -182,11 +182,11 @@ class ImageProcessor:
             return "BLACK"
 
     def line_tracing(self, src= None, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
-        if src is None :
-            src = self.get_image()
-        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
+        
+        src = self.get_image()
+        result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         if line_visualization or edge_visualization :
-            cv2.imshow("line", src)
+            cv2.imshow("line", dst)
             cv2.waitKey(1)
         return result
 
@@ -199,7 +199,7 @@ class ImageProcessor:
         blur = cv2.GaussianBlur(src, (5, 5), 0)
         hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
 
         #red_mask = self.color_preprocessor.get_red_mask(h)
         #blue_mask = self.color_preprocessor.get_blue_mask(h)
@@ -221,7 +221,7 @@ class ImageProcessor:
                 continue
 
             candidate = Target(stats=stats[idx], centroid=centroid)
-            roi = candidate.get_target_roi(src, pad=5)
+            roi = candidate.get_target_roi(src, pad=15)
 
             # ycrcb 색공간을 이용해
 
@@ -239,11 +239,11 @@ class ImageProcessor:
             _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
             ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
             ####################################
 
-            #if visualization:
-            #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+            if visualization:
+               cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
 
             if candidate_alphabet is None:
                 continue
@@ -258,7 +258,7 @@ class ImageProcessor:
             selected = candidates[0]
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
-                setLabel(canvas, selected.get_pts(), color=(0, 0, 255))
+                setLabel(canvas, selected.get_pts(), label=f"{selected.get_name()}", color=(0, 0, 255))
 
         if visualization:
             cv2.imshow("src", canvas)
@@ -327,7 +327,7 @@ class ImageProcessor:
             cv2.waitKey(1)
         return (line_info, edge_info, dst)
 
-    def get_milk_info(self, color="BLUE", visualization=False) -> tuple:
+    def get_milk_info(self, color="RED", visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -339,7 +339,7 @@ class ImageProcessor:
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None
-
+        cv2.imshow("s", mask)
         ### 색상 이진화를 이용한 마스킹 과정 ###
         if color == "BLUE":
             color_mask = self.color_preprocessor.get_blue_mask(h)
@@ -361,7 +361,7 @@ class ImageProcessor:
         ######################################
 
         ### 라벨링을 이용한 객체 구별 ###############
-        _, y, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
 
         for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
             if stats[idx][0] == 0 and stats[idx][1] == 0:
@@ -377,7 +377,7 @@ class ImageProcessor:
             area_ratio = round(area_ratio, 2)
             print(area_ratio)
 
-            if not (3000 < width*height < 8000 and area_ratio <= 1.7):
+            if not (2000 < width*height and area_ratio <=2.2):
                 continue
             ############################################################
 
@@ -414,9 +414,11 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
-    #imageProcessor = ImageProcessor(video_path="")
+    #imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        #imageProcessor.get_milk_info(color="BLUE", visualization=True)
-        imageProcessor.get_green_area_corner(visualization=True)
+        imageProcessor.get_alphabet_info4room(visualization=True)
+        #imageProcessor.get_milk_info(color="RED", visualization=True)
+        #print(imageProcessor.get_green_area_corner(visualization=True))
+        #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)

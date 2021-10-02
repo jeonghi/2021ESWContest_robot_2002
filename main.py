@@ -10,6 +10,7 @@ import cv2
 
 def main():
     robot = Robot()
+    robot.set_basic_form()
     #====================== debug ======================
 
     #video_recorder = VideoRecorder()

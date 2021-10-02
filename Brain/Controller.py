@@ -14,7 +14,7 @@ class Robot:
         self._image_processor = ImageProcessor(video_path=video_path)
         #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
         self._line_detector = LineDetector()
-        self.direction = 'LEFT'
+        self.direction = 'RIGHT'
         # self.mode = 'start'
         self.mode = 'start_mission'
         self.color = 'YELLOW'
@@ -26,13 +26,13 @@ class Robot:
         self.count = 0
         self.progress_of_roobot= [None, ]
         self.walk_info = None
-        self.curr_head = deque([75,60,45,30])
+        self.curr_head = deque([60,45,35])
         self.curr_activating_pos = "" # 방에서 활동중인 위치
 
     def set_basic_form(self):
         self._motion.basic_form()
 
-    def get_distance_from_baseline(self, box_info, baseline=(320, 420)):
+    def get_distance_from_baseline(self, box_info, baseline=(320, 380)):
         # if bx - cx > 0
         # 왼쪽에 박스가 있는 것이므로 왼쪽으로 움직여야함,
         # if bx - cx < 0
@@ -66,16 +66,29 @@ class Robot:
             flag = not flag
         self._motion.notice_direction(dir=alphabet)
 
-    def update_activating_pos(self, edge_info):
+    
+    def update_box_pos(self, edge_info:dict, box_info:tuple):
         if edge_info["EDGE_DOWN"]:
-            pos = (x, y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+            center_x = 320
+            (cor_x, cor_y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+            (box_x, box_y) = box_info
 
-            if x <= 180:
-                self.curr_activating_pos = "RIGHT"
-            elif x > 400:
-                self.curr_activating_pos = "LEFT"
+            if cor_x - 40 <= box_x <= cor_x + 40 :
+                if box_y <= cor_y:
+                    self.box_pos = "MIDDLE"
+                else:
+                    if box_x <= cor_x :
+                        self.box_pos = "RIGHT"
+                    else:
+                        self.box_pos = "LEFT"
+
+
+            elif box_x < cor_x -40:
+                self.box_pos = "LEFT"
+
             else:
-                self.curr_activating_pos = "MIDDLE"
+                self.box_pos = "RIGHT"
+            print(f"BOX POS -> {self.curr_activating_pos}:, {cor_x},{cor_y}")
         return
 
     def detect_room_alphabet(self):
@@ -99,9 +112,12 @@ class Robot:
 
     def recognize_area_color(self):
         self._motion.set_head(dir=self.direction, angle=45) # 화살표 방향과 동일한 방향으로 45도 고개를 돌린다
+        time.sleep(0.5)
         self._motion.set_head(dir="DOWN", angle=45) # 아래로 45도 고개를 내린다
+        time.sleep(0.5)
         self.color = self._image_processor.get_area_color() # 안전지역인지, 확진지역인지 색상을 구별한다. BLACK 또는 GREEN
         self._motion.notice_area(area=self.color) # 지역에 대한 정보를 말한다
+        time.sleep(0.5)
         self.mode = 'detect_room_alphabet' # 알파벳 인식 모드로 변경한다.
         return
 
@@ -159,7 +175,7 @@ class Robot:
                 self.cube_grabbed = True
 
     def line_tracing(self):
-        line_info, edge_info, result =  self._image_processor.line_tracing(self.color)
+        line_info, edge_info, result =  self._image_processor.line_tracing(color=self.color)
         cv2.imshow('result', result)
         cv2.waitKey(1)
         #print(line_info)
@@ -235,14 +251,14 @@ class Robot:
                 time.sleep(1)
             else:
                 self._motion.turn(dir='LEFT', loop=1, grab=True)
-                #time.sleep(1)
+                time.sleep(1)
         elif self.box_pos == 'LEFT':
             if line_info["H"] == True:
                 self.mode = 'fit_area'
                 time.sleep(1)
             else:
                 self._motion.turn(dir='RIGHT', loop=1, grab=True)
-                #time.sleep(1)
+                time.sleep(1)
         elif self.box_pos == 'MIDDLE':
             self.mode = 'fit_area'
             time.sleep(1)
@@ -460,15 +476,15 @@ class Robot:
         elif self.mode == 'find_box':
             ### 계속해서 안전/확진지역 영역의 코너 정보를 기반으로 현재 로봇이 방에서 어디에서 활동하고 있는지를 업데이트 해줍니다.
             self._motion.set_head("DOWN", self.curr_head[0])
-            self.update_activating_pos(edge_info=edge_info)
             box_info = self._image_processor.get_milk_info(color=self.alphabet_color)
             if box_info is None:
-                if self.curr_head[0] == 30:
+                if self.curr_head[0] == 35:
                     self._motion.turn(dir=self.direction, loop=1)
                 self.curr_head.rotate(-1)
             else:
                 self.mode = "track_box"
-                self.box_pos = self.curr_activating_pos
+                self.update_box_pos(edge_info=edge_info, box_info=box_info)
+                print("box_pos: ",self.box_pos)
 
         elif self.mode == 'track_box':
             self._motion.set_head("DOWN", self.curr_head[0])
@@ -482,22 +498,42 @@ class Robot:
                     if -40 <= dx <= 40:
                         print("기준점에서 적정범위. 전진 전진")
                         self._motion.walk(dir='FORWARD', loop=1)
-                    elif dx <= -50:  # 오른쪽
+                    elif  dx <= -90 :
+                        self._motion.turn(dir='RIGHT', loop=1)
+                    elif -90 < dx <= -50:  # 오른쪽
                         print("기준점에서 오른쪽으로 많이 치우침. 조정한다")
                         self._motion.walk(dir='RIGHT', loop=3)
                     elif -50 < dx < -40:
                         print("기준점에서 오른쪽으로 치우침. 조정한다")
                         self._motion.walk(dir='RIGHT', loop=1)
-                    elif dx >= 50:  # 왼쪽
+                    elif 90 > dx >= 50:  # 왼쪽
                         print("기준점에서 왼쪽으로 많이 치우침. 조정한다")
                         self._motion.walk(dir='LEFT', loop=3)
                     elif 50 > dx > 40:  # 왼쪽
                         print("기준점에서 왼쪽으로 치우침. 조정한다")
                         self._motion.walk(dir='LEFT', loop=1)
+                    elif dx >= 90:
+                        self._motion.turn(dir='LEFT', loop=1)
+                        
                 else:
-                    if self.curr_head[0] == 30:
+                    if self.curr_head[0] == 35:
                         self._motion.grab(switch=True)
-                        self.mode = "check_area"
+                        
+                        if self.box_pos == 'RIGHT':
+                            self._motion.turn(dir='LEFT', loop=5, grab=True)
+                            self._motion.move_arm(dir = 'LOW')
+                            time.sleep(1)
+                            self.mode = 'check_area'
+                        elif self.box_pos == 'LEFT':
+                            self._motion.turn(dir='RIGHT', loop=5, grab=True)
+                            self._motion.move_arm(dir = 'LOW')
+                            time.sleep(1)
+                            self.mode = 'check_area'
+                        else:
+                            self._motion.move_arm(dir = 'LOW')
+                            time.sleep(1)
+                            self.mode = 'check_area'
+                        
                     else:
                         self.curr_head.rotate(-1)
 

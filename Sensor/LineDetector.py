@@ -187,7 +187,6 @@ class LineDetector:
         return result
 
     def get_all_lines(self, src, color='YELLOW', line_visualization=False, edge_visualization=False):
-
         lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L, edge_lines_R = self.get_lines(src, color)
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
 
