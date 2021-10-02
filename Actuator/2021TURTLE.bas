@@ -83,7 +83,7 @@ OUT 52,0	'머리 LED 켜기
 
 
 TEMPO 230
-MUSIC "cdefg"
+'MUSIC "cdefg"
 
 
 
@@ -110,7 +110,7 @@ GOSUB 자이로ON
 
 
 PRINT "VOLUME 200 !"
-PRINT "SOUND 12 !" '안녕하세요
+'PRINT "SOUND 12 !" '안녕하세요
 
 GOSUB All_motor_mode3
 
@@ -132,12 +132,12 @@ GOTO MAIN	'시리얼 수신 루틴으로 가기
 '************************************************
 시작음:
     TEMPO 220
-    MUSIC "O23EAB7EA>3#C"
+    'MUSIC "O23EAB7EA>3#C"
     RETURN
     '************************************************
 종료음:
     TEMPO 220
-    MUSIC "O38GD<BGD<BG"
+    'MUSIC "O38GD<BGD<BG"
     RETURN
     '************************************************
 에러음:
@@ -1536,9 +1536,10 @@ GOSUB_RX_EXIT2:
     '************************************************
     '*********************************************
 
-왼쪽턴3:
+집고왼쪽턴3:
     MOTORMODE G6A,3,3,3,3,2
     MOTORMODE G6D,3,3,3,3,2
+    
 왼쪽턴3_LOOP:
 
     IF 보행순서 = 0 THEN
@@ -2230,7 +2231,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     적외선거리값 = AD(적외선AD포트)
 
     IF 적외선거리값 > 50 THEN '50 = 적외선거리값 = 25cm
-        MUSIC "C"
+        'MUSIC "C"
         DELAY 200
     ENDIF
 
@@ -3661,7 +3662,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     넘어진확인 = 0
     보행COUNT = 0
     SPEED 7
-    HIGHSPEED SETON
+    'HIGHSPEED SETON
 
 
     IF 보행순서 = 0 THEN
@@ -4285,11 +4286,11 @@ KEY71:
     GOTO RX_EXIT
 KEY72:
     ETX 4800, 72
-    GOSUB 집고왼쪽턴3_LOOP
+    GOSUB 집고왼쪽턴3
     GOTO RX_EXIT
 KEY73:
     ETX 4800, 73
-    GOSUB 집고오른쪽턴3_LOOP
+    GOSUB 집고오른쪽턴3
     GOTO RX_EXIT
 KEY74:
     ETX  4800,74
