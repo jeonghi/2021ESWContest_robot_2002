@@ -5,6 +5,7 @@ import numpy as np
 import cv2
 import time
 import sys
+from collections import deque
 
 
 class Robot:
@@ -12,23 +13,41 @@ class Robot:
     def __init__(self, video_path=""):
         self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
-        # self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
+        #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
         self._line_detector = LineDetector()
         self.direction = 'LEFT'
         # self.mode = 'start'
         self.mode = 'start_mission'
         self.color = 'YELLOW'
-        self.box_pos = 'RIGHT'
-        self.alphabet_color = 'RED'
+        #self.color = ''
+        self.box_pos = 'MIDDLE'
+        self.alphabet_color = None
         self.cube_grabbed = False
+        self.curr_room_color = ""
         self.count = 0
-        self.progress_of_roobot = [None, ]
+        self.progress_of_roobot= [None, ]
         self.walk_info = None
+        self.curr_head = deque([75,60,45,30])
+        self.curr_activating_pos = "" # 방에서 활동중인 위치
+
 
     def set_basic_form(self):
         self._motion.basic_form()
 
-    def detect_alphabet(self):
+    def get_distance_from_baseline(self, box_info, baseline=(320, 420)):
+        # if bx - cx > 0
+        # 왼쪽에 박스가 있는 것이므로 왼쪽으로 움직여야함,
+        # if bx - cx < 0
+        # 오른쪽에 박스가 있는 것이므로 오른쪽으로 움직여야함,
+        # if by - cy > 0
+        # 위쪽에 박스가 있는 것
+        # if by - cy < 0
+        # 아래쪽에 박스가 있는
+        (bx, by) = baseline
+        (cx, cy) = box_info
+        return (bx-cx, by-cy)
+
+    def detect_door_alphabet(self):
         self._motion.set_head('DOWN', 75)
         flag = True
         alphabet = None
@@ -46,68 +65,46 @@ class Robot:
             flag = not flag
         self._motion.notice_direction(dir=alphabet)
 
-    def recognize_area_color(self):
-        self._motion.set_head(self.direction, 45)
-        self._motion.set_head('DOWN', 60)
-        time.sleep(1)
-        color = self._image_processor.get_area_color()
-        self._motion.notice_area(area=color)
-        self._motion.set_head("UPDOWN_CENTER")
-        self._motion.set_head("LEFTRIGHT_CENTER")
+
+    def update_activating_pos(self, edge_info):
+        if edge_info["EDGE_DOWN"]:
+            pos = (x, y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+
+            if x <= 180:
+                self.curr_activating_pos = "RIGHT"
+            elif x > 400:
+                self.curr_activating_pos = "LEFT"
+            else:
+                self.curr_activating_pos = "MIDDLE"
         return
 
-    def tracking_cube(self):
-        if not self.cube_grabbed:
-            self._motion.set_head(dir='DOWN', angle=60)
-        else:
-            self._motion.set_head("UPDOWN_CENTER")
+    def detect_room_alphabet(self):
+        self._motion.set_head(dir="LEFTRIGHT_CENTER")  # 알파벳을 인식하기 위해 고개를 다시 정면으로 향하게 한다.
+        # 만약 알파벳 정보가 없다면 영상처리 측면을 개선하거나, 약간의 움직임을 통해 프레임 refresh가 필요하다.
+        if self.alphabet_color is None:
+            self._motion.set_head(dir="DOWN", angle=90)
+            time.sleep(0.6)
+            alphabet = self._image_processor.get_alphabet_info4room()
+            if alphabet is None:
+                print("감지되는 알파벳 정보가 없습니다")
+                return
+            (color, _ ) = alphabet
+            self.alphabet_color = color
+            print(alphabet)
 
-        src = self._image_processor.get_image(visualization=False)
-        h, w = src.shape[:2]
-        frame_center_x = w / 2
-        frame_center_y = h / 2
+        if self.alphabet_color:
+            print(f"Milk box color is {self.alphabet_color}")
+            self.mode = 'find_box'
+        return
 
-        cube_center_x, cube_center_y = self._image_processor.get_cube_saferoom()
-        saferoom_pos_x, saferoom_pos_y = self._image_processor.get_saferoom_position()
+    def recognize_area_color(self):
+        self._motion.set_head(dir=self.direction, angle=45) # 화살표 방향과 동일한 방향으로 45도 고개를 돌린다
+        self._motion.set_head(dir="DOWN", angle=45) # 아래로 45도 고개를 내린다
+        self.color = self._image_processor.get_area_color() # 안전지역인지, 확진지역인지 색상을 구별한다. BLACK 또는 GREEN
+        self._motion.notice_area(area=self.color) # 지역에 대한 정보를 말한다
+        self.mode = 'detect_room_alphabet' # 알파벳 인식 모드로 변경한다.
+        return
 
-        is_cube_found = True
-        if cube_center_x is None:
-            is_cube_found = False
-
-        is_saferoom_found = True
-        if saferoom_pos_x is None:
-            is_saferoom_found = False
-
-        # cur_ir = self._motion.get_IR()
-        # print('cur IR:: ', cur_ir)
-
-        # cube_grabbed = False if cur_ir < 100 else True
-
-        if self.cube_grabbed:
-            if not is_saferoom_found:
-                self._motion.turn('LEFT', grab=True)
-                print("saferoom not found")
-            else:
-                if abs(frame_center_x - saferoom_pos_x) < 20 and (frame_center_y - saferoom_pos_y) > 20:
-                    self._motion.walk('FORWARD', grab=True)
-                elif abs(frame_center_x - saferoom_pos_x) < 20 and saferoom_pos_y > 440:
-                    self._motion.grab(switch=False)
-                elif saferoom_pos_x < 300:
-                    self._motion.turn('LEFT', grab=True)
-                    print("saferoom found left")
-                elif saferoom_pos_x > 340:
-                    self._motion.turn('RIGHT', grab=True)
-                    print("saferoom found right")
-        else:
-            if abs(frame_center_x - cube_center_x) < 20:
-                self._motion.walk('FORWARD')
-            elif cube_center_x > 300:
-                self._motion.walk('RIGHT')
-            elif cube_center_x < 340:
-                self._motion.walk('LEFT')
-            if abs(frame_center_x - cube_center_x) < 20 and cube_center_y > 440:
-                self._motion.grab()
-                self.cube_grabbed = True
 
     def line_tracing(self):
         line_info, edge_info, result = self._image_processor.line_tracing(self.color)
@@ -221,7 +218,7 @@ class Robot:
         else:
             print("self.box_pos is None, Please check it")
 
-    # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
+    # start > detect_door_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
     def setting_mode(self):
         line_info, edge_info = self.line_tracing()
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}
@@ -233,13 +230,13 @@ class Robot:
             if self.progress_of_roobot[0] != self.walk_info:
                 self.progress_of_roobot.insert(0, self.walk_info)
 
-            self.mode = 'detect_alphabet'  # --> walk
+            self.mode = 'detect_door_alphabet'  # --> walk
 
             if self.progress_of_roobot[0] != self.mode:
                 self.progress_of_roobot.insert(0, self.mode)
 
-        elif self.mode == 'detect_alphabet':
-            self.detect_alphabet()
+        elif self.mode == 'detect_door_alphabet':
+            self.detect_door_alphabet()
             self.mode = 'walk'
 
         # 걷기 # 보정 추가로 넣기
@@ -313,50 +310,66 @@ class Robot:
 
         # 0. 확진 / 안전 구역 확인 : self.color 바꿔주세요, self.mode = 'box_tracking'로 바꿔주세요.
         elif self.mode == 'start_mission':
-            self._motion.set_head(dir=self.direction, angle=45)
-            self._motion.set_head(dir="DOWN", angle=45)
-            self.color = self._image_processor.get_area_color()
-            self._motion.notice_area(area=self.color)
-            self._motion.set_head(dir="LEFTRIGHT_CENTER")
-            self.mode = 'room_alphabet_detecting'
+            self.recognize_area_color()
 
-
-
-        elif self.mode == 'room_alphabet_detecting':
-
-            if self.alphabet_color is None:
-                self._motion.set_head(dir="DOWN", angle=60)
-                time.sleep(0.3)
-                alphabet = self._image_processor.get_alphabet_info()
-                if alphabet is None:
-                    print("감지되는 알파벳 정보가 없습니다")
-                    pass
-                (color, _ ) = alphabet
-                self.alphabet_color = color
-
-            if self.alphabet_color :
-                self.mode = 'box_tracking'
-
-
-
-            # self.mode == box_tracking 으로 바꿔주기
-
-
-
-        elif self.mode == 'box_tracking':
-            print("box_tracking 실행")
         # 1. red, blue 알파벳 구별: edge_info["EDGE_UP_Y"] 기준으로 윗 공간, self.alphabet_color 알파벳 색깔 넣어주세요
-            pass
+        elif self.mode == 'detect_room_alphabet':
+            self.detect_room_alphabet()
+
+
         # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, MIDDLE, RIGHT)
         ## grap on 과 동시에 self.mode = 'box_into_area'로 바꾸기
         ## # 1) 박스 grap on 하면 손 내리고 고개든다 (MIDDLE이면 고개 좀 많이 내려주기, LEFT RIGHT는 30 정도면 될 듯?아마??)
-
         # ++ 집은 채로 손내리는 모션
         # ++ 고개 드는 모션
+        elif self.mode == 'find_box':
+            ### 계속해서 안전/확진지역 영역의 코너 정보를 기반으로 현재 로봇이 방에서 어디에서 활동하고 있는지를 업데이트 해줍니다.
+            self._motion.set_head("DOWN", self.curr_head[0])
+            self.update_activating_pos(edge_info=edge_info)
+            box_info = self._image_processor.get_milk_info(color=self.alphabet_color)
+            if box_info is None:
+                if self.curr_head[0] == 30:
+                    self._motion.turn(dir=self.direction, loop=1)
+                self.curr_head.rotate(-1)
+            else:
+                self.mode = "track_box"
+
+
+        elif self.mode == 'track_box':
+            self._motion.set_head("DOWN", self.curr_head[0])
+            box_info = self._image_processor.get_milk_info(color=self.alphabet_color)
+            if box_info is None:
+                self.mode = 'find_box'
+            else:
+                (cx, cy) = box_info
+                (dx, dy) = self.get_distance_from_baseline(box_info=box_info)
+                if dy > 10:  # 기준선 보다 위에 있다면
+                    if -40 <= dx <= 40:
+                        print("기준점에서 적정범위. 전진 전진")
+                        self._motion.walk(dir='FORWARD', loop=1)
+                    elif dx <= -50:  # 오른쪽
+                        print("기준점에서 오른쪽으로 많이 치우침. 조정한다")
+                        self._motion.walk(dir='RIGHT', loop=3)
+                    elif -50 < dx < -40:
+                        print("기준점에서 오른쪽으로 치우침. 조정한다")
+                        self._motion.walk(dir='RIGHT', loop=1)
+                    elif dx >= 50:  # 왼쪽
+                        print("기준점에서 왼쪽으로 많이 치우침. 조정한다")
+                        self._motion.walk(dir='LEFT', loop=3)
+                    elif 50 > dx > 40:  # 왼쪽
+                        print("기준점에서 왼쪽으로 치우침. 조정한다")
+                        self._motion.walk(dir='LEFT', loop=1)
+                elif dy <= 10:
+                    if self.curr_head[0] == 30:
+                        self._motion.grab(switch=True)
+                        self.mode = "box_into_area"
+                    else:
+                        self.curr_head.rotate(-1)
 
         # 3. 박스 구역의 평행선 H 기준으로 안으로 또는 밖으로 옮기기
         elif self.mode == 'check_area':
             self.box_into_area(line_info, edge_info)
+
 
         elif self.mode == 'box_into_area':
             self.box_into_area(line_info, edge_info)

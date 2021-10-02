@@ -273,15 +273,25 @@ class ImageProcessor:
                                                                                 edge_visualization=True)
         down_pos = None
         up_pos = None
+        curr_activating_pos = ""
         if edge_info["EDGE_DOWN"]:
-            down_pos = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
-        if edge_info["EDGE_UP"]:
-            up_pos = (edge_info["EDGE_UP_X"], edge_info["EDGE_UP_Y"])
+            down_pos = (x, y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+            if x <= 180:
+                curr_activating_pos = "RIGHT"
+            elif x > 400:
+                curr_activating_pos = "LEFT"
+            else:
+                curr_activating_pos = "MIDDLE"
+        # if edge_info["EDGE_UP"]:
+        #     up_pos = (edge_info["EDGE_UP_X"], edge_info["EDGE_UP_Y"])
+
         if visualization:
             if down_pos:
                 (x, y) = pos = down_pos
                 cv2.circle(dst, pos, 10, (0, 0, 255), -1)
                 cv2.putText(dst, f"x: {x}, y: {y}", (pos[0]-100, pos[1]+30) , cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255))
+                cv2.putText(dst, curr_activating_pos, (pos[0] - 100, pos[1] + 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                            (0, 0, 255))
             if up_pos:
                 (x, y) = pos = up_pos
                 cv2.circle(dst, pos, 10, (0, 0, 255), -1)
@@ -395,7 +405,7 @@ class ImageProcessor:
         if candidates:
             return max(candidates, key=lambda candidate:candidate.get_area()).get_center_pos()
         ### 없다면 None 리턴
-        return (None, None)
+        return None
 
 
 
@@ -408,6 +418,6 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.get_milk_info(color="BLUE", visualization=True)
-        #imageProcessor.get_green_area_corner(visualization=True)
+        #imageProcessor.get_milk_info(color="BLUE", visualization=True)
+        imageProcessor.get_green_area_corner(visualization=True)
 
