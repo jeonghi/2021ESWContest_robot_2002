@@ -219,12 +219,24 @@ class Robot:
 
     def find_edge(self): #find_corner_for_outroom
         # self.box_pos 반대로 돌면서 yellow edge 찾기
-        if self.box_pos == 'RIGHT':
-            self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-            time.sleep(1)
-        if self.box_pos == 'LEFT':
-            self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-            time.sleep(1)
+        if direction == 'LEFT':
+            if self.box_pos == 'RIGHT':
+                self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                time.sleep(1)
+            if self.box_pos == 'LEFT':
+                self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                time.sleep(1)
+        elif direction == 'RIGHT':
+            if self.box_pos == 'LEFT':
+                self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                time.sleep(1)
+            if self.box_pos == 'RIGHT':
+                self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                time.sleep(1)
+        else:
+            print('no direction')
+            
+                
             
     def catch_box(self):
         self._motion.grab()
@@ -269,7 +281,7 @@ class Robot:
     def fit_area(self, line_info, edge_info):
         print(line_info["ALL_X"])
         if self.box_pos == 'RIGHT':
-            if line_info["ALL_X"][1] > 420:
+            if line_info["ALL_X"][1] > 440:
                 if line_info["ALL_X"][0] < 180:
                     print('find!!!!!!!!!!!!')
                     self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
@@ -283,7 +295,7 @@ class Robot:
                 time.sleep(1)
         elif self.box_pos == 'LEFT':
             if line_info["ALL_X"][0] < 150 :
-                if line_info["ALL_X"][1] > 400:
+                if line_info["ALL_X"][1] > 440:
                     print('find!!!!!!!!!!!!')
                     self._motion.move_arm(dir = 'HIGH') # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     time.sleep(1)
@@ -358,7 +370,7 @@ class Robot:
       #      print("self.box_pos is None, Please check it")
     
     def box_into_area(self, line_info, edge_info):
-        self._motion.walk(dir='FORWARD', loop=2, grab=True)
+        self._motion.walk(dir='FORWARD', loop=4, grab=True)
         self._motion.grab(switch=False) # 앉고 잡은 박스 놓는 모션 넣기
         self._motion.set_head(dir ='DOWN', angle=60)
         self.mode = 'end_mission'
@@ -558,14 +570,17 @@ class Robot:
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
+                    print('yellow edge 감지 중앙 O')
                     self.mode = 'return_line' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
                 else: # yellow edge 중앙 X
-                     self.find_edge()
-                     if self.progress_of_roobot[0] != self.mode:
+                    print('yellow edge 감지 중앙 X')
+                    self.find_edge()
+                    if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
-            else: # yellow edge 감지 X 
+            else: # yellow edge 감지 X
+                print('yellow edge 감지 X ')
                 self.mode = 'find_edge' # --> return_line
                 self.find_edge()
                 if self.progress_of_roobot[0] != self.mode:
