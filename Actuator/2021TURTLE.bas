@@ -1536,7 +1536,7 @@ GOSUB_RX_EXIT2:
     '************************************************
     '*********************************************
 
-집고왼쪽턴3:
+왼쪽턴3:
     MOTORMODE G6A,3,3,3,3,2
     MOTORMODE G6D,3,3,3,3,2
 
@@ -2701,7 +2701,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
 전방하향30도:
 
     SPEED 3
-    SERVO 16, 30
+    SERVO 16, 36
 
     RETURN
 
@@ -2758,8 +2758,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
     'SPEED 2
     MOVE G6A, 100, 150, 30,   150, 100,	
     MOVE G6D, 100, 150, 30,   150, 100,
-    MOVE G6B, 160, 30, 80,	  ,	  ,
-    MOVE G6C, 160, 30, 80,	  ,   ,
+    MOVE G6B, 140, 30, 80,	  ,	  ,
+    MOVE G6C, 140, 30, 80,	  ,   ,
     WAIT
 
     DELAY 50
@@ -2902,6 +2902,124 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     GOSUB 기본자세
     RETURN
+
+집고전진종종걸음:
+    GOSUB All_motor_mode3
+    보행COUNT = 0
+    SPEED 7
+    'HIGHSPEED SETON
+    MOVE G6B, 160, 10, 50
+    MOVE G6C, 160, 10, 50
+
+
+    IF 보행순서 = 0 THEN
+        보행순서 = 1
+        MOVE G6A,95,  76, 147,  93, 101
+        MOVE G6D,101,  76, 147,  93, 98
+        'MOVE G6B,100
+        'MOVE G6C,100
+        WAIT
+
+        GOTO 집고전진종종걸음_1
+    ELSE
+        보행순서 = 0
+        MOVE G6D,95,  76, 147,  93, 101
+        MOVE G6A,101,  76, 147,  93, 98
+        'MOVE G6B,100
+        'MOVE G6C,100
+        WAIT
+
+        GOTO 집고전진종종걸음_4
+    ENDIF
+
+
+    '**********************
+
+집고전진종종걸음_1:
+    MOVE G6A,95,  90, 125, 100, 104
+    MOVE G6D,104,  77, 147,  93,  102
+    'MOVE G6B, 85
+    'MOVE G6C,115
+    WAIT
+
+
+집고전진종종걸음_2:
+
+    MOVE G6A,103,   73, 140, 103,  100
+    MOVE G6D, 95,  85, 147,  85, 102
+    WAIT
+
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+
+        GOTO RX_EXIT
+    ENDIF
+
+    ' 보행COUNT = 보행COUNT + 1
+    'IF 보행COUNT > 보행횟수 THEN  GOTO 전진종종걸음_2_stop
+
+    ERX 4800,A, 집고전진종종걸음_4
+    IF A <> A_old THEN
+집고전진종종걸음_2_stop:
+        MOVE G6D,95,  90, 125, 95, 104
+        MOVE G6A,104,  76, 145,  91,  102
+        'MOVE G6C, 100
+        'MOVE G6B,100
+        WAIT
+        HIGHSPEED SETOFF
+        SPEED 15
+        GOSUB 안정화자세
+        SPEED 5
+        GOSUB 기본자세2
+
+        'DELAY 400
+        GOTO RX_EXIT
+    ENDIF
+
+    '*********************************
+
+집고전진종종걸음_4:
+    MOVE G6D,95,  95, 120, 100, 104
+    MOVE G6A,104,  77, 147,  93,  102
+    'MOVE G6C, 85
+    'MOVE G6B,115
+    WAIT
+
+
+집고전진종종걸음_5:
+    MOVE G6D,103,    73, 140, 103,  100
+    MOVE G6A, 95,  85, 147,  85, 102
+    WAIT
+
+
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+        GOTO RX_EXIT
+    ENDIF
+
+    ' 보행COUNT = 보행COUNT + 1
+    ' IF 보행COUNT > 보행횟수 THEN  GOTO 전진종종걸음_5_stop
+
+    ERX 4800,A, 집고전진종종걸음_1
+    IF A <> A_old THEN
+집고전진종종걸음_5_stop:
+        MOVE G6A,95,  90, 125, 95, 104
+        MOVE G6D,104,  76, 145,  91,  102
+        'MOVE G6B, 100
+        'MOVE G6C,100
+        WAIT
+        HIGHSPEED SETOFF
+        SPEED 15
+        GOSUB 안정화자세
+        SPEED 5
+        GOSUB 기본자세2
+
+        'DELAY 400
+        GOTO RX_EXIT
+    ENDIF
+
 물건집고전진:
     보행속도 = 8
     좌우속도 = 4
@@ -3358,7 +3476,7 @@ KEY8:
     '***************
 KEY9:
     ETX 4800, 9
-    GOSUB 집고전진
+    GOSUB 집고전진종종걸음
     GOTO RX_EXIT
     '***************
 KEY10: '0
