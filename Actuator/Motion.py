@@ -50,10 +50,6 @@ class Motion:
             return 0
 
 
-    def getRx(self):
-        return self.lock
-
-
     def Receiving(self, ser):
         self.receiving_exit = 1
         while True:
