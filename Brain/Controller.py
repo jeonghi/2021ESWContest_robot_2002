@@ -434,19 +434,19 @@ class Robot:
 
             elif line_info["V"]==True and line_info["H"]==True:
                 print(line_info["H_X"])
-                if line_info["H_X"][1] < 20 and line_info["H_X"][0] < 400:
+                if line_info["H_X"][0] < 20 and line_info["H_X"][1] < 400:
                     self.walk_info = '┐'
                     if self.progress_of_roobot[0] != self.walk_info:
                         self.progress_of_roobot.insert(0, self.walk_info)
                 
-                elif line_info["H_X"][1] < 400 and line_info["H_X"][0] > 600 :
+                elif line_info["H_X"][0] < 400 and line_info["H_X"][1] > 600 :
                     self.walk_info = '┌'
                     if self.progress_of_roobot[0] != self.walk_info:
                         self.progress_of_roobot.insert(0, self.walk_info)
                 else :
                     self.walk_info = 'T'
-                    print(line_info["H_Y"][0])
-                    if line_info["H_Y"][0] > 400:
+                    print(line_info["H_Y"][1])
+                    if line_info["H_Y"][1] > 400:
                         self.mode = 'detect_direction'
                         if self.progress_of_roobot[0] != self.walk_info:
                             self.progress_of_roobot.insert(0, self.walk_info)

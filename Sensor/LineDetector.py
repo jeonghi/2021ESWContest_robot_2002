@@ -136,7 +136,7 @@ class LineDetector:
             vx, vy, x, y = output[0], output[1], output[2], output[3]
             x1, y1 = int(((src.shape[0] - 1) - y) / vy * vx + x), src.shape[0] - 1
             x2, y2 = int(((src.shape[0] / 2 + 200) - y) / vy * vx + x), int(src.shape[0] / 2)
-            result = [x1, y1, x2, y2]
+            result = [x2, y2, x1, y1]
             return result
         elif what_line == 'horizontal':
             # middle=int(lines.mean(axis=0)[1])
@@ -145,7 +145,7 @@ class LineDetector:
             min_y = int(lines.min(axis=0)[1])
             max_y = int(lines.max(axis=0)[1])
             # result = [max_x, middle, min_x, middle]
-            result = [min_x, min_y, max_x, max_y]
+            result = [min_x, min_y, max_x, max_y ]
             return result
         elif what_line == 'edge_UP':
             min_y = int(lines.min(axis=0)[1])
@@ -164,7 +164,7 @@ class LineDetector:
             max_y = int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
-            result = [max_x, min_y, min_x, max_y]
+            result = [min_x, min_y, max_x, max_y ]
             return result
         elif what_line == 'edge_L' or 'all':
             min_y = int(lines.min(axis=0)[1])
@@ -210,8 +210,8 @@ class LineDetector:
                 size = int(vertical_lines.shape[0] * vertical_lines.shape[2] / 2)
                 vertical_fit_line = self.get_fitline(src, vertical_lines, size, 'vertical')
                 line_info["V"] = True
-                line_info["V_X"] = [vertical_fit_line[2], vertical_fit_line[0]]  # [x1,y1,x2,y2]
-                line_info["V_Y"] = [vertical_fit_line[3], vertical_fit_line[1]]
+                line_info["V_X"] = [vertical_fit_line[0], vertical_fit_line[2]]  # [x1,y1,x2,y2]
+                line_info["V_Y"] = [vertical_fit_line[1], vertical_fit_line[3]]
                 if line_visualization is True:
                     self.draw_lines(temp, vertical_fit_line, 'vertical', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
@@ -220,8 +220,8 @@ class LineDetector:
                 size = int(horizontal_lines.shape[0] * horizontal_lines.shape[2] / 2)
                 horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
                 line_info["H"] = True
-                line_info["H_X"] = [horizontal_fit_line[2], horizontal_fit_line[0]]  # [min_x, middle, max_x, middle]
-                line_info["H_Y"] = [horizontal_fit_line[1], horizontal_fit_line[2]]
+                line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]]  # [min_x, middle, max_x, middle]
+                line_info["H_Y"] = [horizontal_fit_line[1], horizontal_fit_line[3]]
                 if line_visualization is True:
                     # self.draw_lines(temp, horizontal_fit_line, 'horizontal')
                     self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
@@ -248,7 +248,7 @@ class LineDetector:
                 size = int(edge_lines_R.shape[0] * edge_lines_R.shape[2] / 2)
                 edge_line_R = self.get_fitline(src, edge_lines_R, size, 'edge_R')
                 edge_info["EDGE_R"] = True
-                edge_info["R_X"] = [edge_line_R[2], edge_line_R[0]]  # [max_x, min_y, min_x, max_y]
+                edge_info["R_X"] = [edge_line_R[0], edge_line_R[2]]  # [max_x, min_y, min_x, max_y]
                 edge_info["R_Y"] = [edge_line_R[1], edge_line_R[3]]
                 if edge_visualization is True:
                     self.draw_lines(temp, edge_line_R, 'edge_R', 'fit')
@@ -294,7 +294,7 @@ class LineDetector:
                     line_info["H"] = True
                 line_info["H_DEGREE"] = H_degree
                 line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]]  # [min_x, middle, max_x, middle]
-                line_info["H_Y"] = [horizontal_fit_line[1], horizontal_fit_line[2]]
+                line_info["H_Y"] = [horizontal_fit_line[1], horizontal_fit_line[3]]
                 if edge_visualization is True:
                     self.draw_lines(temp, horizontal_lines, 'horizontal')
                     # self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')

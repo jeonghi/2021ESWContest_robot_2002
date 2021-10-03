@@ -35,9 +35,9 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
-            self.hash_detector4door = HashDetector(file_path='EWSN/')
-            self.hash_detector4room = HashDetector(file_path='ABCD/')
-            self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
+            self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
+            self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
 
         else:
 
@@ -405,19 +405,20 @@ class ImageProcessor:
         
         src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
-
+        print(line_info)
+        print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
             cv2.waitKey(1)
-            print(line_info["H_Y"])
+            #print(line_info["H_Y"])
         return result
 
 
 
 if __name__ == "__main__":
 
-    #imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="Sensor/src/line_test/walk_horizon.h264")
+    #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         imageProcessor.line_tracing(color = "YELLOW", line_visualization=True, edge_visualization=False)
