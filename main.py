@@ -10,7 +10,7 @@ import cv2
 
 def main():
     robot = Robot()
-    robot.set_basic_form()
+    #robot.set_basic_form()
     #====================== debug ======================
 
     #video_recorder = VideoRecorder()
@@ -28,8 +28,8 @@ def main():
         #video_recorder.record_frame(frame)
 
     #===================== function ======================
-        #robot.check_turn()
-        robot.setting_mode()
+        robot.check_turn()
+        #robot.setting_mode()
     
 
     #=====================================================

@@ -111,17 +111,17 @@ class LineDetector:
             edge_lines_R_degree = slope_degree[(slope_degree) > 0]
             edge_lines_R = edge_lines_R[:, None]
 
-            horizontal_lines = lines[np.abs(slope_degree) > 178]
-            horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 178]
+            horizontal_lines = lines[np.abs(slope_degree) > 177]
+            horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 177]
             horizontal_lines = horizontal_lines[:, None]
 
             lines = lines[np.abs(slope_degree) < 150]
             slope_degree = slope_degree[np.abs(slope_degree) < 150]
 
-            vertical_lines = lines[np.abs(slope_degree) < 100]
-            vertical_slope_degree = slope_degree[np.abs(slope_degree) < 100]
-            vertical_lines = vertical_lines[np.abs(vertical_slope_degree) > 80]
-            vertical_slope_degree = vertical_slope_degree[np.abs(vertical_slope_degree) > 80]
+            vertical_lines = lines[np.abs(slope_degree) < 93]
+            vertical_slope_degree = slope_degree[np.abs(slope_degree) < 93]
+            vertical_lines = vertical_lines[np.abs(vertical_slope_degree) > 87]
+            vertical_slope_degree = vertical_slope_degree[np.abs(vertical_slope_degree) > 87]
             vertical_lines = vertical_lines[:, None]
 
             lines = lines[:, None]
@@ -145,7 +145,7 @@ class LineDetector:
             min_y = int(lines.min(axis=0)[1])
             max_y = int(lines.max(axis=0)[1])
             # result = [max_x, middle, min_x, middle]
-            result = [max_x, max_y, min_x, min_y]
+            result = [min_x, min_y, max_x, max_y]
             return result
         elif what_line == 'edge_UP':
             min_y = int(lines.min(axis=0)[1])
@@ -220,7 +220,7 @@ class LineDetector:
                 size = int(horizontal_lines.shape[0] * horizontal_lines.shape[2] / 2)
                 horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
                 line_info["H"] = True
-                line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]]  # [min_x, middle, max_x, middle]
+                line_info["H_X"] = [horizontal_fit_line[2], horizontal_fit_line[0]]  # [min_x, middle, max_x, middle]
                 line_info["H_Y"] = [horizontal_fit_line[1], horizontal_fit_line[2]]
                 if line_visualization is True:
                     # self.draw_lines(temp, horizontal_fit_line, 'horizontal')

@@ -181,15 +181,6 @@ class ImageProcessor:
         else:
             return "BLACK"
 
-    def line_tracing(self, src= None, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
-        
-        src = self.get_image()
-        result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
-
-        if line_visualization or edge_visualization :
-            cv2.imshow("line", dst)
-            cv2.waitKey(1)
-        return result
 
     def get_alphabet_info4room(self, visualization=False) -> tuple:
         src = self.get_image()
@@ -410,6 +401,16 @@ class ImageProcessor:
 
 
 
+    def line_tracing(self, src= None, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
+        
+        src = self.get_image()
+        result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
+
+        if line_visualization or edge_visualization :
+            cv2.imshow("line", dst)
+            cv2.waitKey(1)
+            print(line_info["H_Y"])
+        return result
 
 
 
@@ -419,7 +420,9 @@ if __name__ == "__main__":
     imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.line_tracing(color = "GREEN", line_visualization=False, edge_visualization=True)
+        imageProcessor.line_tracing(color = "YELLOW", line_visualization=True, edge_visualization=False)
+        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
