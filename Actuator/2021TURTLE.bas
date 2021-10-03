@@ -2430,22 +2430,22 @@ Number_Play: '  BUTTON_NO = 숫자대입
         보행순서 = 1
         SPEED 12
         MOVE G6A,100,  73, 145,  93, 100, 100
-        MOVE G6D,100,  79, 145,  93, 100, 100
+        MOVE G6D,100,  79, 140,  93, 100, 100
         WAIT
 
 
         SPEED 5
         MOVE G6A,100,  84, 145,  78, 100, 100
-        MOVE G6D,100,  68, 145,  108, 100, 100
+        MOVE G6D,100,  68, 140,  108, 100, 100
         WAIT
 
         SPEED 7
         MOVE G6A,90,  90, 145,  78, 102, 100
-        MOVE G6D,104,  71, 145,  105, 100, 100
+        MOVE G6D,104,  71, 140,  105, 100, 100
         WAIT
         SPEED 6
         MOVE G6A,90,  80, 130, 102, 104
-        MOVE G6D,105,  76, 146,  93,  100
+        MOVE G6D,105,  76, 141,  93,  100
         WAIT
 
 
@@ -2454,18 +2454,18 @@ Number_Play: '  BUTTON_NO = 숫자대입
         보행순서 = 0
         SPEED 12
         MOVE G6A,100,  73, 145,  93, 100, 100
-        MOVE G6D,100,  79, 145,  93, 100, 100
+        MOVE G6D,100,  79, 140,  93, 100, 100
         WAIT
 
 
         SPEED 5
         MOVE G6A,100,  88, 145,  78, 100, 100
-        MOVE G6D,100,  65, 145,  108, 100, 100
+        MOVE G6D,100,  65, 140,  108, 100, 100
         WAIT
 
         SPEED 7
         MOVE G6A,104,  86, 146,  80, 100, 100
-        MOVE G6D,90,  58, 145,  110, 100, 100
+        MOVE G6D,90,  58, 140,  110, 100, 100
         WAIT
 
         SPEED 6
@@ -2477,7 +2477,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     SPEED 10
     'GOSUB 기본자세2
     MOVE G6A,100,  76, 145,  93, 100, 100
-    MOVE G6D,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 140,  93, 100, 100
     WAIT
 
 
@@ -3497,14 +3497,14 @@ KEY12: ' ▼
     '***************
 KEY13: '▶
     ETX  4800,13
-    GOSUB 집고오른쪽턴3_LOOP
+    GOTO 집고오른쪽턴3_LOOP
 
 
     GOTO RX_EXIT
     '***************
 KEY14: ' ◀
     ETX  4800,14
-    GOSUB 집고오른쪽턴10
+    GOTO 집고왼쪽턴3_LOOP
 
 
     GOTO RX_EXIT
@@ -3833,11 +3833,11 @@ KEY71:
     GOTO RX_EXIT
 KEY72:
     ETX 4800, 72
-    GOSUB 집고왼쪽턴3
+    GOTO 집고왼쪽턴3
     GOTO RX_EXIT
 KEY73:
     ETX 4800, 73
-    GOSUB 집고오른쪽턴3
+    GOTO 집고오른쪽턴3
     GOTO RX_EXIT
 KEY74:
     ETX  4800,74
