@@ -111,17 +111,17 @@ class LineDetector:
             edge_lines_R_degree = slope_degree[(slope_degree) > 0]
             edge_lines_R = edge_lines_R[:, None]
 
-            horizontal_lines = lines[np.abs(slope_degree) > 170]
-            horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 170]
+            horizontal_lines = lines[np.abs(slope_degree) > 175]
+            horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 175]
             horizontal_lines = horizontal_lines[:, None]
 
             lines = lines[np.abs(slope_degree) < 150]
             slope_degree = slope_degree[np.abs(slope_degree) < 150]
 
-            vertical_lines = lines[np.abs(slope_degree) < 93]
-            vertical_slope_degree = slope_degree[np.abs(slope_degree) < 93]
-            vertical_lines = vertical_lines[np.abs(vertical_slope_degree) > 87]
-            vertical_slope_degree = vertical_slope_degree[np.abs(vertical_slope_degree) > 87]
+            vertical_lines = lines[np.abs(slope_degree) < 100]
+            vertical_slope_degree = slope_degree[np.abs(slope_degree) < 100]
+            vertical_lines = vertical_lines[np.abs(vertical_slope_degree) > 80]
+            vertical_slope_degree = vertical_slope_degree[np.abs(vertical_slope_degree) > 80]
             vertical_lines = vertical_lines[:, None]
 
             lines = lines[:, None]

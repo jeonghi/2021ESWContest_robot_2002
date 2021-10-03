@@ -47,8 +47,8 @@ class Robot:
         return (bx-cx, by-cy)
     
     def check_turn(self):
-        while True:
-            self._motion.TX_data_py2(73)
+        #self._motion.move_arm(dir = 'LOW')
+        self._motion.set_head(dir='DOWN', angle = 20)
 
     def detect_alphabet(self):
         self._motion.set_head('DOWN', 75)
@@ -196,15 +196,16 @@ class Robot:
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
         if self.walk_info == '│':
             if 300 < line_info["V_X"][0] <340:
+                print('walk')
                 print('│', line_info)
                 self._motion.walk(dir='FORWARD', loop=1)
                 time.sleep(1)
             else:
-                if line_info["V_X"][0] < 300:
+                if line_info["V_X"][0] < 250:
                     print('← ←', line_info["V_X"][0])
                     self._motion.walk(dir='LEFT', loop=1)
                     time.sleep(1)
-                elif line_info["V_X"][0] > 340:
+                elif line_info["V_X"][0] > 400:
                     print('→ →', line_info["V_X"][0])
                     self._motion.walk(dir='RIGHT', loop=1)
                     time.sleep(1)
@@ -427,48 +428,44 @@ class Robot:
         elif self.mode == 'walk' and self.walk_info != '┐' and self.walk_info != '┌' :
             self._motion.set_head(dir='DOWN', angle = 20)
             if line_info["V"]==True and line_info["H"]==False:
+                print('go')
                 self.walk_info = '│'
                 self.walk(line_info)
                 if self.progress_of_roobot[0] != self.walk_info:
                     self.progress_of_roobot.insert(0, self.walk_info)
+                    
+            elif line_info["V"]==False and line_info["H"]==False:
+                print('no line')
+                self.walk_info = None # 'modify_angle'
+                self.walk(line_info)     
 
-            elif line_info["V"]==True and line_info["H"]==True:
+            else:
                 print(line_info["H_X"])
-                if line_info["H_X"][0] < 20 and line_info["H_X"][1] < 400:
-                    if line_info["H_Y"][1] > 300 :
-                        self.walk_info = '┐'
-                        if self.progress_of_roobot[0] != self.walk_info:
-                            self.progress_of_roobot.insert(0, self.walk_info)
-                    else:
-                        self.walk_info = '│'
-                        self.walk(line_info)
-                
-                elif line_info["H_X"][0] < 400 and line_info["H_X"][1] > 600 :
-                    if line_info["H_Y"][1] > 300 :
-                        self.walk_info = '┌'
-                        if self.progress_of_roobot[0] != self.walk_info:
-                            self.progress_of_roobot.insert(0, self.walk_info)
-                    else:
-                        self.walk_info = '│'
-                        self.walk(line_info)
-                else :
+                if line_info["H_X"][0] < 30 and line_info["H_X"][1] > 600 :
                     self.walk_info = 'T'
                     print(line_info["H_Y"][1])
-                    if line_info["H_Y"][1] > 400:
+                    if line_info["H_Y"][1] > 220:
                         self.mode = 'detect_direction'
                         if self.progress_of_roobot[0] != self.walk_info:
                             self.progress_of_roobot.insert(0, self.walk_info)
                     else:
                         self._motion.walk("FORWARD", 1)
                         time.sleep(1)
+                        
+                else:
+                    if line_info["H_X"][0] < 200 and line_info["H_X"][1] < 450:
+                        self.walk_info = '┌'
+                        if self.progress_of_roobot[0] != self.walk_info:
+                            self.progress_of_roobot.insert(0, self.walk_info)
 
-            elif line_info["V"]==False and line_info["H"]==True: 
-                self.mode = 'detect_direction'
-                if self.progress_of_roobot[0] != self.walk_info:
-                    self.progress_of_roobot.insert(0, self.walk_info)
-            else:
-                self.walk_info = None # 'modify_angle'
-                self.walk(line_info)      
+                    elif line_info["H_X"][0] > 200 and line_info["H_X"][1] > 450 :
+                        self.walk_info = '┌'
+                        if self.progress_of_roobot[0] != self.walk_info:
+                            self.progress_of_roobot.insert(0, self.walk_info)
+                    else:
+                        print('out of range')
+
+            
 
         # 화살표 방향 인식
         elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
@@ -488,7 +485,7 @@ class Robot:
         # 미션 진입 판별
         elif self.mode == 'walk' and self.walk_info == '┐':
             self._motion.set_head(dir='DOWN', angle = 20)
-            if line_info["H_Y"][1] > 420:
+            if line_info["H_Y"][1] > 280:
                 if self.direction == 'RIGHT':
                     self.mode = 'start_mission' # --> end_mission --> return_line
                     if self.progress_of_roobot[0] != self.mode:
@@ -506,7 +503,7 @@ class Robot:
 
         elif self.mode == 'walk' and self.walk_info =='┌':
             self._motion.set_head(dir='DOWN', angle = 20)
-            if line_info["H_Y"][0] > 420:
+            if line_info["H_Y"][0] > 280:
                 if self.direction == 'LEFT':
                     self.mode = 'start_mission' # --> end_mission
                     if self.progress_of_roobot[0] != self.mode:

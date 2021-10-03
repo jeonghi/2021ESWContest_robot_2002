@@ -74,9 +74,10 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s =cv2.split(hls)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-        canny = auto_canny(l)
+        _, mask = cv2.threshold(l, 70, 255, cv2.THRESH_BINARY_INV)
+        
+        canny = auto_canny(mask)
+        cv2.imshow("l",canny)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
@@ -392,7 +393,7 @@ class ImageProcessor:
             area_ratio = round(area_ratio, 2)
             print(area_ratio)
 
-            if not (2000 < width*height and area_ratio <=2.2):
+            if not (1000 < width*height and area_ratio <=2.2):
                 continue
             ############################################################
 
@@ -429,7 +430,7 @@ class ImageProcessor:
         src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         print(line_info)
-        print(edge_info)
+        #print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
             cv2.waitKey(1)
@@ -444,9 +445,10 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.line_tracing(color = "YELLOW", line_visualization=True, edge_visualization=False)
+        imageProcessor.line_tracing(color = "GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
+        #imageProcessor.get_alphabet_info4room(visualization=True)
