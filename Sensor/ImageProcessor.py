@@ -81,22 +81,42 @@ class ImageProcessor:
         for cnt in cnts1:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if vertice == 4 and cv2.contourArea(cnt) > 2500:
-                target = Target(contour=cnt)
-                no_canny_targets.append(target)
-                if visualization:
-                    setLabel(canvas, cnt, "no_canny")
+
+
+            _, _, width, height = cv2.boundingRect(cnt)
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+
+            if not (vertice == 4 and cv2.contourArea(cnt) > 2500 and area_ratio <= 1.3):
+                continue
+
+
+            target = Target(contour=cnt)
+            no_canny_targets.append(target)
+            if visualization:
+                setLabel(canvas, cnt, "no_canny")
 
         for cnt in cnts2:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if vertice == 4 and cv2.contourArea(cnt) > 2500:
-                target = Target(contour=cnt)
-                canny_targets.append(target)
-                if visualization:
-                    setLabel(canvas, cnt, "canny", color=(0,0,255))
 
-        target = Target.non_maximum_suppression4targets(canny_targets, no_canny_targets, threshold=0.7)
+            _, _, width, height = cv2.boundingRect(cnt)
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+
+            if not (vertice == 4 and cv2.contourArea(cnt) > 2500 and area_ratio <= 1.3):
+                continue
+            target = Target(contour=cnt)
+            canny_targets.append(target)
+            if visualization:
+                setLabel(canvas, cnt, "canny", color=(0, 0, 255))
+
+        if len(canny_targets) > 0 and len(no_canny_targets) == 0 :
+            target = max(canny_targets, key=lambda candidate: candidate.get_area())
+        elif len(canny_targets) == 0 and len(no_canny_targets) > 0:
+            target = max(no_canny_targets, key=lambda candidate: candidate.get_area())
+        else:
+            target = Target.non_maximum_suppression4targets(canny_targets, no_canny_targets, threshold=0.5)
 
         if visualization:
             cv2.imshow("src", cv2.hconcat([canvas, roi_canvas]))
@@ -107,13 +127,13 @@ class ImageProcessor:
 
         if target is None:
             return None
+
         roi = target.get_target_roi(src=src)
         roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         if visualization:
             pos = target.get_pts()
-            setLabel(roi_canvas, target.get_pts(), label="roi", color=(255,0,0))
-            roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
+            setLabel(roi_canvas, target.get_pts(), label="roi", color=(255, 0, 0))
             cv2.imshow("src", cv2.hconcat(
                 [canvas, roi_canvas]))
             cv2.waitKey(1)
