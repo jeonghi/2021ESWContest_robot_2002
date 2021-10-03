@@ -213,23 +213,23 @@ class ImageProcessor:
         h, l, s = cv2.split(hls)
         _, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
 
-        #red_mask = self.color_preprocessor.get_red_mask(h)
-        #blue_mask = self.color_preprocessor.get_blue_mask(h)
-        #color_mask = cv2.bitwise_or(blue_mask, red_mask)
-        #mask = cv2.bitwise_and(mask, color_mask)
+        red_mask = self.color_preprocessor.get_red_mask(h)
+        blue_mask = self.color_preprocessor.get_blue_mask(h)
+        color_mask = cv2.bitwise_or(blue_mask, red_mask)
+        mask = cv2.bitwise_and(mask, color_mask)
         _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
         for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
             if stats[idx][0] == 0 and stats[idx][1] == 0:
                 continue
 
-            if np.any(np.isnan(centroid)): # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
+            if np.any(np.isnan(centroid)):  # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
                 continue
             _, _, width, height, area = stats[idx]
 
             # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
-            if not (800 < area < 8000 and area_ratio <= 1.7):
+            if not (1000 < area < 8000 and area_ratio <= 1.5):
                 continue
 
             candidate = Target(stats=stats[idx], centroid=centroid)
@@ -251,22 +251,24 @@ class ImageProcessor:
             _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
             ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
+            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.25)
             ####################################
 
-            if visualization:
-               cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+            # if visualization:
+            #     cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
 
             if candidate_alphabet is None:
                 continue
             candidate.set_name(candidate_alphabet)
             if visualization:
-
                 setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
             candidates.append(candidate)
 
         if candidates:
+            ##y값 기준으로 정령###################
             candidates.sort(key=lambda candidate: candidate.get_center_pos()[1])
+            #candidates.sort(key=lambda candidate: candidate.get_area())
+            #################################
             selected = candidates[0]
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
