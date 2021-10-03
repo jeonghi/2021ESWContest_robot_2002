@@ -68,7 +68,8 @@ class LineDetector:
             match_lower = np.array([10, 40, 95])  # yellow_lower
             match_upper = np.array([40, 220, 220])  # yellow_upper
 
-        if color == 'GREEN':
+        #if color == 'GREEN':
+        else:
             hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
             h, l, s = cv2.split(hls)
             ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
@@ -77,7 +78,7 @@ class LineDetector:
             match_upper = np.array([80, 255, 255])  # green_upper
 
         # if color == 'BLACK':
-
+        
         src = cv2.GaussianBlur(src, (5, 5), 0)
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         mask = cv2.inRange(hsv, match_lower, match_upper)
@@ -260,7 +261,8 @@ class LineDetector:
             else:
                 edge_info["EDGE_POS"] = None
 
-        if color == 'GREEN':
+        #if color == 'GREEN':
+        else:
             line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'H': False, 'H_DEGREE': 0, 'H_X': [0, 0], 'H_Y': [0, 0]}
             edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
@@ -312,6 +314,8 @@ class LineDetector:
                     self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
                     self.draw_lines(temp, edge_fit_line_DOWN, 'edge', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
+
+            
 
         return line_info, edge_info, src
 

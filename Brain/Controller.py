@@ -14,7 +14,7 @@ class Robot:
         self._image_processor = ImageProcessor(video_path=video_path)
         #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
         self._line_detector = LineDetector()
-        self.direction = 'RIGHT'
+        self.direction = 'LEFT'
         # self.mode = 'start'
         self.mode = 'start_mission'
         self.color = 'YELLOW'
@@ -116,6 +116,7 @@ class Robot:
         self._motion.set_head(dir="DOWN", angle=45) # 아래로 45도 고개를 내린다
         time.sleep(0.5)
         self.color = self._image_processor.get_area_color() # 안전지역인지, 확진지역인지 색상을 구별한다. BLACK 또는 GREEN
+        self.curr_room_color = self._image_processor.get_area_color()
         self._motion.notice_area(area=self.color) # 지역에 대한 정보를 말한다
         time.sleep(0.5)
         self.mode = 'detect_room_alphabet' # 알파벳 인식 모드로 변경한다.
@@ -218,24 +219,35 @@ class Robot:
 
 
     def find_edge(self): #find_corner_for_outroom
-        # self.box_pos 반대로 돌면서 yellow edge 찾기
-        if direction == 'LEFT':
-            if self.box_pos == 'RIGHT':
-                self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+
+                
+        if self.curr_room_color=='BLACK':
+            if self.direction == 'LEFT':
+                self._motion.turn(dir='RIGHT', loop=1, grab=True) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
                 time.sleep(1)
-            if self.box_pos == 'LEFT':
-                self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+            elif self.direction == 'RIGHT':
+                self._motion.turn(dir='LEFT', loop=1, grab=True) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
                 time.sleep(1)
-        elif direction == 'RIGHT':
-            if self.box_pos == 'LEFT':
-                self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                time.sleep(1)
-            if self.box_pos == 'RIGHT':
-                self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                time.sleep(1)
-        else:
-            print('no direction')
-            
+            else:
+                print('no direction')
+
+        elif self.curr_room_color == 'GREEN':
+            if self.direction == 'LEFT':
+                if self.box_pos == 'RIGHT':
+                    self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                    time.sleep(1)
+                if self.box_pos == 'LEFT':
+                    self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                    time.sleep(1)
+            elif self.direction == 'RIGHT':
+                if self.box_pos == 'LEFT':
+                    self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                    time.sleep(1)
+                if self.box_pos == 'RIGHT':
+                    self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+                    time.sleep(1)
+            else:
+                print('no direction')
                 
             
     def catch_box(self):
@@ -495,8 +507,10 @@ class Robot:
                 self.curr_head.rotate(-1)
             else:
                 self.mode = "track_box"
-                self.update_box_pos(edge_info=edge_info, box_info=box_info)
-                print("box_pos: ",self.box_pos)
+                if self.curr_room_color == "GREEN":
+                    self.update_box_pos(edge_info=edge_info, box_info=box_info)
+                print("box_pos: ", self.box_pos)
+
 
         elif self.mode == 'track_box':
             self._motion.set_head("DOWN", self.curr_head[0])
@@ -530,28 +544,39 @@ class Robot:
                 else:
                     if self.curr_head[0] == 35:
                         self._motion.grab(switch=True)
-                        
-                        if self.box_pos == 'RIGHT':
-                            self._motion.turn(dir='LEFT', loop=5, grab=True)
-                            self._motion.move_arm(dir = 'LOW')
-                            time.sleep(1)
-                            self.mode = 'check_area'
-                        elif self.box_pos == 'LEFT':
-                            self._motion.turn(dir='RIGHT', loop=5, grab=True)
-                            self._motion.move_arm(dir = 'LOW')
-                            time.sleep(1)
-                            self.mode = 'check_area'
-                        else:
-                            self._motion.move_arm(dir = 'LOW')
-                            time.sleep(1)
-                            self.mode = 'check_area'
-                        
+                        if self.color == 'GREEN':
+                            if self.box_pos == 'RIGHT':
+                                self._motion.turn(dir='LEFT', loop=5, grab=True)
+                                self._motion.move_arm(dir = 'LOW')
+                                time.sleep(1)
+                                self.mode = 'check_area'
+                            elif self.box_pos == 'LEFT':
+                                self._motion.turn(dir='RIGHT', loop=5, grab=True)
+                                self._motion.move_arm(dir = 'LOW')
+                                time.sleep(1)
+                                self.mode = 'check_area'
+                            else:
+                                self._motion.move_arm(dir = 'LOW')
+                                time.sleep(1)
+                                self.mode = 'check_area'
+                        elif self.color == 'BLACK':
+                            if self.direction == 'RIGHT':
+                                self._motion.turn(dir='LEFT', loop=9, grab=True)
+                                time.sleep(1)
+                                self.mode = 'end_mission'
+                                self.color = 'YELLOW'
+                            if self.direction == 'LEFT':
+                                self._motion.turn(dir='RIGHT', loop=9, grab=True)
+                                time.sleep(1)
+                                self.mode = 'end_mission'
+                                self.color = 'YELLOW'
+                            
                     else:
                         self.curr_head.rotate(-1)
 
 
-        #elif self.mode == 'catch_box':
-            #self.catch_box()
+        elif self.mode == 'catch_box':
+            self.catch_box()
 
         # 3. 박스 구역의 평행선 H 기준으로 안으로 또는 밖으로 옮기기
         elif self.mode == 'check_area':
@@ -568,6 +593,7 @@ class Robot:
 
         # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
+            self._motion.set_head(dir ='DOWN', angle = 60)
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
@@ -587,26 +613,56 @@ class Robot:
                     self.progress_of_roobot.insert(0, self.mode)        
 
         elif self.mode == 'return_line':
-            if edge_info["EDGE_POS"] != None :
-                if edge_info["EDGE_POS"][1] > 478: # yellow edge y 좌표 가까이 O
-                    #self._motion.walk(dir='FORWARD', loop=2)
-                    #self.mode = 'find_V' # --> 걸을 직선 찾고 walk
-                    self._motion.turn(self.direction, 1) ##
-                    self.walk_info = None
-                    self.mode = 'walk' ##
+                        
+            if self.curr_room_color == 'BLACK':
+                self._motion.set_head(dir='DOWN', angle=35)
+                if edge_info["EDGE_POS"] != None :
+                    print(self.curr_room_color, edge_info["EDGE_POS"][1])
+                    if edge_info["EDGE_POS"][1] > 478: # yellow edge y 좌표 가까이 O
+                        #self._motion.walk(dir='FORWARD', loop=2)
+                        #self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+                        self._motion.turn(self.direction, 1, grab=True) ##
+                        self.walk_info = None
+                        self._motion.grab(switch = False)
+                        self.mode = 'walk' ##
+                        self._motion.turn(dir=self.direction, loop = 3)
+                        self._motion.walk(dir='FORWARD', loop=2)
+                        if self.progress_of_roobot[0] != self.mode:
+                            self.progress_of_roobot.insert(0, self.mode)
+                    else: # yellow edge y 좌표 가까이 X
+                        self.mode = 'return_line' # --> find_V
+                        # self.return_line()
+                        self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                                                
+                        if self.progress_of_roobot[0] != self.mode:
+                            self.progress_of_roobot.insert(0, self.mode)
+                else: # yellow edge 감지 X
+                    self._motion.walk(dir='FORWARD', loop=1, grab=True)
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
-                else: # yellow edge y 좌표 가까이 X
-                    self.mode = 'return_line' # --> find_V
-                    # self.return_line()
-                    self._motion.walk(dir='FORWARD', loop=1)
+            elif self.curr_room_color == 'GREEN':
+                if edge_info["EDGE_POS"] != None :
+                    if edge_info["EDGE_POS"][1] > 478: # yellow edge y 좌표 가까이 O
+                        #self._motion.walk(dir='FORWARD', loop=2)
+                        #self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+                        self._motion.turn(self.direction, 1) ##
+                        self.walk_info = None
+                        self.mode = 'walk' ##
+                        self._motion.turn(dir=self.direction, loop = 3)
+                        self._motion.walk(dir='FORWARD', loop=2)
+                        if self.progress_of_roobot[0] != self.mode:
+                            self.progress_of_roobot.insert(0, self.mode)
+                    else: # yellow edge y 좌표 가까이 X
+                        self.mode = 'return_line' # --> find_V
+                        # self.return_line()
+                        self._motion.walk(dir='FORWARD', loop=1)
+                        if self.progress_of_roobot[0] != self.mode:
+                            self.progress_of_roobot.insert(0, self.mode)
+                else: # yellow edge 감지 X 
+                    self.mode = 'find_edge' # --> return_line
+                    self.find_edge()
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
-            else: # yellow edge 감지 X 
-                self.mode = 'find_edge' # --> return_line
-                self.find_edge()
-                if self.progress_of_roobot[0] != self.mode:
-                    self.progress_of_roobot.insert(0, self.mode)   
                     
         elif self.mode == 'find_V':
             if line_info["V"] == True :
