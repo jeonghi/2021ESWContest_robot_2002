@@ -35,9 +35,9 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
-            self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
-            self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
-            self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
+            self.hash_detector4door = HashDetector(file_path='EWSN/')
+            self.hash_detector4room = HashDetector(file_path='ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
 
         else:
 
@@ -71,9 +71,12 @@ class ImageProcessor:
         no_canny_targets = []
         canny_targets = []
         # 그레이스케일화
+        
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        #_, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(gray, 70, 255, cv2.THRESH_BINARY_INV)
+        cv2.imshow("test",mask)
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -87,7 +90,7 @@ class ImageProcessor:
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
 
-            if not (vertice == 4 and cv2.contourArea(cnt) > 2500 and area_ratio <= 1.3):
+            if not (vertice <= 8 and cv2.contourArea(cnt) > 2500 and area_ratio <= 1.3):
                 continue
 
 
@@ -104,7 +107,7 @@ class ImageProcessor:
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
 
-            if not (vertice == 4 and cv2.contourArea(cnt) > 2500 and area_ratio <= 1.3):
+            if not (vertice <= 8 and cv2.contourArea(cnt) > 2500 and area_ratio <= 1.3):
                 continue
             target = Target(contour=cnt)
             canny_targets.append(target)

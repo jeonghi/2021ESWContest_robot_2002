@@ -111,8 +111,8 @@ class LineDetector:
             edge_lines_R_degree = slope_degree[(slope_degree) > 0]
             edge_lines_R = edge_lines_R[:, None]
 
-            horizontal_lines = lines[np.abs(slope_degree) > 177]
-            horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 177]
+            horizontal_lines = lines[np.abs(slope_degree) > 170]
+            horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 170]
             horizontal_lines = horizontal_lines[:, None]
 
             lines = lines[np.abs(slope_degree) < 150]
@@ -139,13 +139,13 @@ class LineDetector:
             result = [x2, y2, x1, y1]
             return result
         elif what_line == 'horizontal':
-            # middle=int(lines.mean(axis=0)[1])
+            middle=int(lines.mean(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
             min_y = int(lines.min(axis=0)[1])
             max_y = int(lines.max(axis=0)[1])
-            # result = [max_x, middle, min_x, middle]
-            result = [min_x, min_y, max_x, max_y ]
+            result = [min_x, middle, max_x, middle]
+            #result = [min_x, min_y, max_x, max_y ]
             return result
         elif what_line == 'edge_UP':
             min_y = int(lines.min(axis=0)[1])
