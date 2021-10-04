@@ -63,12 +63,12 @@ class LineDetector:
 
     def mask_color(self, src, color='YELLOW'):
         if color == 'YELLOW':
-            hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
-            h, l, s = cv2.split(hls)
-            ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
-            src = cv2.bitwise_and(src, src, mask=mask)
-            match_lower = np.array([10, 40, 95])  # yellow_lower
-            match_upper = np.array([40, 220, 220])  # yellow_upper
+            #hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+            #h, l, s = cv2.split(hls)
+            #ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+            #src = cv2.bitwise_and(src, src, mask=mask)
+            match_lower = np.array([10, 40, 110])  # yellow_lower
+            match_upper = np.array([50, 255, 255])  # yellow_upper
 
         #if color == 'GREEN':
         else:
@@ -93,7 +93,7 @@ class LineDetector:
         cv2.imshow('mask', mask)
         cv2.imshow('yellow_edges', edges)
 
-        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=80, maxLineGap=150)
+        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=150, maxLineGap=150)
         lines = np.squeeze(lines)
 
         if len(lines.shape) == 0:
@@ -145,13 +145,13 @@ class LineDetector:
             result = [x2, y2, x1, y1]
             return result
         elif what_line == 'horizontal':
-            #middle=int(lines.mean(axis=0)[1])
+            middle=int(lines.mean(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
-            min_y = int(lines.min(axis=0)[1])+15
-            max_y = int(lines.max(axis=0)[1])-15
-            #result = [min_x, middle, max_x, middle]
-            result = [min_x, min_y, max_x, max_y ]
+            #min_y = int(lines.min(axis=0)[1])
+            #max_y = int(lines.max(axis=0)[1])
+            result = [min_x, middle, max_x, middle]
+            #result = [min_x, min_y, max_x, max_y ]
             return result
         elif what_line == 'compact_horizontal':
             middle=int(lines.mean(axis=0)[1])
@@ -230,8 +230,8 @@ class LineDetector:
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(horizontal_lines) != 0:
-                print(horizontal_lines)
-                print(horizontal_lines.shape)
+                #print(horizontal_lines)
+                #print(horizontal_lines.shape)
                 size = int(horizontal_lines.shape[0] * horizontal_lines.shape[2] / 2)
                 horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
                 line_info["H"] = True
@@ -240,16 +240,20 @@ class LineDetector:
                 line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]]  # [min_x, middle, max_x, middle]
                 line_info["H_Y"] = [horizontal_fit_line[1], horizontal_fit_line[3]]
                 if line_visualization is True:
-                    # self.draw_lines(temp, horizontal_fit_line, 'horizontal')
+                    self.draw_lines(temp, horizontal_lines, 'horizontal')
                     self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(compact_horizontal_lines) != 0:
-                print(compact_horizontal_lines)
-                print(compact_horizontal_lines.shape)
+                #print(compact_horizontal_lines)
+                #print(compact_horizontal_lines.shape)
                 size = int(compact_horizontal_lines.shape[0] * compact_horizontal_lines.shape[2] / 2)
                 compact_horizontal_line = self.get_fitline(src, compact_horizontal_lines, size, 'compact_horizontal')
-                line_info["compact_H"] = True
+                a = compact_horizontal_line[1] - compact_horizontal_line[3]
+                b = compact_horizontal_line[0] - compact_horizontal_line[2]
+                c = math.sqrt((a * a) + (b * b))
+                if c >= 100:
+                    line_info["H"] = True
                 #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                 #line_info["H_DEGREE"] = H_degree
                 line_info["compact_H_X"] = [compact_horizontal_line[0], compact_horizontal_line[2]]  # [min_x, middle, max_x, middle]
@@ -314,21 +318,23 @@ class LineDetector:
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(compact_horizontal_lines) != 0:
+                #print(compact_horizontal_lines)
+                #print(compact_horizontal_lines.shape)
                 size = int(compact_horizontal_lines.shape[0] * compact_horizontal_lines.shape[2] / 2)
                 compact_horizontal_line = self.get_fitline(src, compact_horizontal_lines, size, 'compact_horizontal')
-                # [max_x, max_y, min_x, min_y]
                 a = compact_horizontal_line[1] - compact_horizontal_line[3]
                 b = compact_horizontal_line[0] - compact_horizontal_line[2]
                 c = math.sqrt((a * a) + (b * b))
-                if c >= 100:
+                print('length:  ', c)
+                if c >= 300:
                     line_info["H"] = True
-                H_degree = (np.arctan2(compact_horizontal_line[1] - compact_horizontal_line[3],
-                                       compact_horizontal_line[0] - compact_horizontal_line[2]) * 180) / np.pi
+                #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
+                #line_info["H_DEGREE"] = H_degree
                 line_info["H_X"] = [compact_horizontal_line[0], compact_horizontal_line[2]]  # [min_x, middle, max_x, middle]
                 line_info["H_Y"] = [compact_horizontal_line[1], compact_horizontal_line[3]]
-                if edge_visualization is True:
-                    self.draw_lines(temp, compact_horizontal_line, 'compact_horizontal')
-                    # self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
+                if line_visualization is True:
+                    # self.draw_lines(temp, horizontal_fit_line, 'horizontal')
+                    self.draw_lines(temp, compact_horizontal_line, 'compact_horizontal', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
             # edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_Y':0, 'EDGE_UP_Y': 0}
             if len(edge_lines) != 0:

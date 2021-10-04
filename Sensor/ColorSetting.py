@@ -307,9 +307,9 @@ if __name__ == '__main__':
 
     cv2.imshow(Top_name, img)
     # ---------------------------
-    #camera = WebcamVideoStream(-1).start()
-    video_path = "Sensor/src/line_test/case2.h264"
-    camera = FileVideoStream(video_path).start()
+    camera = WebcamVideoStream(-1).start()
+    #video_path = "Sensor/src/line_test/case2.h264"
+    #camera = FileVideoStream(video_path).start()
     # ---------------------------
     #camera.set(3, W_View_size)
     #camera.set(4, H_View_size)
