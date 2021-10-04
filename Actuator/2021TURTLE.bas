@@ -3587,7 +3587,7 @@ KEY19: 'P2
     '***************
 KEY20: 'B
     ETX 4800, 20
-    GOSUB 전방하향30도
+    GOSUB 전방하향35도
     GOTO RX_EXIT
     '***************
 KEY21: ' △
@@ -3638,7 +3638,7 @@ KEY28: ' ◁
     '***************
 KEY29: ' □
     ETX 4800, 29
-    GOSUB 전방하향60도
+    GOSUB 전방하향10도
     GOTO RX_EXIT
     '***************
 KEY30: ' ▷
@@ -3684,15 +3684,15 @@ KEY36:
     'KEY37 ~ KEY54: 머리 각도 조절
 KEY37:
     ETX 4800, 37
-    GOSUB 전방하향35도
+    GOSUB 전방하향10도
     GOTO RX_EXIT
 KEY38:
     ETX 4800, 38
-    GOSUB 전방하향10도
+    GOSUB 전방하향30도
     GOTO RX_EXIT
 KEY39:
     ETX 4800, 39
-    GOSUB 전방하향30도
+    GOSUB 전방하향35도
     GOTO RX_EXIT
 KEY40:
     ETX 4800, 40
