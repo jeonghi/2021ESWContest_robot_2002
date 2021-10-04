@@ -51,7 +51,7 @@ class Robot:
         self._motion.set_head(dir='DOWN', angle = 20)
 
 
-    def line_tracing(self):
+    def old_line_tracing(self):
         self._motion.set_head('DOWN', 30)
         while True:
             src = self._image_processor.get_image(visualization=False)
