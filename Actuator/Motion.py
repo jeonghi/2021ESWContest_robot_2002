@@ -104,7 +104,7 @@ class Motion:
         elif dir == 'LEFTRIGHT_CENTER':
             self.head_angle2 = dir
 
-        center_list = {'UPDOWN_CENTER':44, 'LEFTRIGHT_CENTER':54}
+        center_list = {'UPDOWN_CENTER':46, 'LEFTRIGHT_CENTER':55}
         dir_list = {
             'DOWN':{
             10:37, 30:38, 35:39, 45:40, 60:41, 75:42, 80:43, 90:44, 100:45
