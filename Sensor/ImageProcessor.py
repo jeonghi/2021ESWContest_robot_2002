@@ -407,7 +407,7 @@ class ImageProcessor:
         src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         print(line_info)
-        #print(edge_info)
+        print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
             cv2.waitKey(1)
@@ -422,7 +422,7 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.line_tracing(color = "YELLOW", line_visualization=True, edge_visualization=False)
+        imageProcessor.line_tracing(color = "GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", visualization=True)

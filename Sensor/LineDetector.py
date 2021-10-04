@@ -93,7 +93,7 @@ class LineDetector:
         cv2.imshow('mask', mask)
         cv2.imshow('yellow_edges', edges)
 
-        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=150, maxLineGap=150)
+        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=50, maxLineGap=150)
         lines = np.squeeze(lines)
 
         if len(lines.shape) == 0:
@@ -234,7 +234,13 @@ class LineDetector:
                 #print(horizontal_lines.shape)
                 size = int(horizontal_lines.shape[0] * horizontal_lines.shape[2] / 2)
                 horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
-                line_info["H"] = True
+                
+                a = horizontal_fit_line[1] - horizontal_fit_line[3]
+                b = horizontal_fit_line[0] - horizontal_fit_line[2]
+                c = math.sqrt((a * a) + (b * b))
+                if c >= 200:
+                    line_info["H"] = True
+                
                 H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                 line_info["H_DEGREE"] = H_degree
                 line_info["H_X"] = [horizontal_fit_line[0], horizontal_fit_line[2]]  # [min_x, middle, max_x, middle]
@@ -252,7 +258,8 @@ class LineDetector:
                 a = compact_horizontal_line[1] - compact_horizontal_line[3]
                 b = compact_horizontal_line[0] - compact_horizontal_line[2]
                 c = math.sqrt((a * a) + (b * b))
-                if c >= 100:
+                print(c)
+                if c >= 200:
                     line_info["H"] = True
                 #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                 #line_info["H_DEGREE"] = H_degree

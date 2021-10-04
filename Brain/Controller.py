@@ -159,7 +159,8 @@ class Robot:
             else:
                 self.box_pos = "RIGHT"
             print(f"BOX POS -> {self.curr_activating_pos}:, {cor_x},{cor_y}")
-        return
+        else:
+            print('NO EDGE DOWN')
 
     def detect_room_alphabet(self):
         self._motion.set_head(dir="LEFTRIGHT_CENTER")  # 알파벳을 인식하기 위해 고개를 다시 정면으로 향하게 한다.
@@ -761,7 +762,7 @@ class Robot:
 
         # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
-            self._motion.set_head(dir ='DOWN', angle = 60)
+            self._motion.set_head(dir ='DOWN', angle = 45)
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
