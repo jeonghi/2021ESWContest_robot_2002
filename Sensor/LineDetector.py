@@ -97,9 +97,9 @@ class LineDetector:
         lines = np.squeeze(lines)
 
         if len(lines.shape) == 0:
-            return [], [], [], [], [], []
+            return [], [], [], [], [], [], []
         elif len(lines.shape) == 1:
-            return [], [], [], [], [], []
+            return [], [], [], [], [], [], []
         else:
             slope_degree = (np.arctan2(lines[:, 1] - lines[:, 3], lines[:, 0] - lines[:, 2]) * 180) / np.pi
 
@@ -118,8 +118,8 @@ class LineDetector:
             horizontal_lines = horizontal_lines[:, None]
             
             compact_horizontal_lines = lines[np.abs(slope_degree) > 175]
-            compact_horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 175]
-            compact_horizontal_lines = horizontal_lines[:, None]
+            compact_horizontal_lines = slope_degree[np.abs(slope_degree) > 175]
+            compact_horizontal_lines = compact_horizontal_lines[:, None]
 
             lines = lines[np.abs(slope_degree) < 150]
             slope_degree = slope_degree[np.abs(slope_degree) < 150]
@@ -132,7 +132,7 @@ class LineDetector:
 
             lines = lines[:, None]
 
-            return lines, horizontal_lines, compact_horizontal_lines, vertical_lines, edge_lines, edge_lines_L, edge_lines_R
+            return lines, horizontal_lines,vertical_lines, edge_lines, edge_lines_L, edge_lines_R ,compact_horizontal_lines
 
     def get_fitline(self, src, f_lines, size, what_line):
         lines = np.squeeze(f_lines)
@@ -200,7 +200,8 @@ class LineDetector:
         return result
 
     def get_all_lines(self, src, color='YELLOW', line_visualization=False, edge_visualization=False):
-        lines, horizontal_lines, compact_horizontal_lines, vertical_lines, edge_lines, edge_lines_L, edge_lines_R = self.get_lines(src, color)
+        #lines, horizontal_lines, vertical_lines, edge_lines, edge_lines_L, edge_lines_R = self.get_lines(src, color)
+        lines, horizontal_lines,vertical_lines,edge_lines,edge_lines_L,edge_lines_R ,compact_horizontal_lines = self.get_lines(src, color)
         temp = np.zeros((src.shape[0], src.shape[1], 3), dtype=np.uint8)
 
         if color == 'YELLOW':
@@ -238,18 +239,20 @@ class LineDetector:
                 line_info["H_Y"] = [horizontal_fit_line[1], horizontal_fit_line[3]]
                 if line_visualization is True:
                     # self.draw_lines(temp, horizontal_fit_line, 'horizontal')
-                    self.draw_lines(temp, horizontal_fit_line, 'compact_horizontal', 'fit')
+                    self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(compact_horizontal_lines) != 0:
                 size = int(compact_horizontal_lines.shape[0] * compact_horizontal_lines.shape[2] / 2)
-                compact_horizontal_lines = self.get_fitline(src, compact_horizontal_lines, size, 'compact_horizontal')
+                compact_horizontal_line = self.get_fitline(src, compact_horizontal_lines, size, 'compact_horizontal')
                 line_info["compact_H"] = True
-                line_info["compact_H_X"] = [compact_horizontal_lines[0], compact_horizontal_lines[2]]  # [min_x, middle, max_x, middle]
-                line_info["compact_H_Y"] = [compact_horizontal_lines[1], compact_horizontal_lines[3]]
+                #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
+                #line_info["H_DEGREE"] = H_degree
+                line_info["compact_H_X"] = [compact_horizontal_line[0], compact_horizontal_line[2]]  # [min_x, middle, max_x, middle]
+                line_info["compact_H_Y"] = [compact_horizontal_line[1], compact_horizontal_line[3]]
                 if line_visualization is True:
                     # self.draw_lines(temp, horizontal_fit_line, 'horizontal')
-                    self.draw_lines(temp, horizontal_fit_line, 'horizontal', 'fit')
+                    self.draw_lines(temp, compact_horizontal_line, 'compact_horizontal', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(edge_lines) != 0:
