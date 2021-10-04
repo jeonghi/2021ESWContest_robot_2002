@@ -2669,7 +2669,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
 전방하향60도:
 
     SPEED 3
-    SERVO 16, 65
+    SERVO 16, 70
 
     RETURN
 
