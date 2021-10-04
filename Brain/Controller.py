@@ -71,10 +71,10 @@ class Robot:
                         print('MODIFY walk --RIGHT', line_info)
                         self._motion.walk(dir='RIGHT', loop=1)
             elif not line_info["V"] and not line_info["H"]:
-                if line_info["DEGREE"] < 85:
+                if line_info["V_DEGREE"] < 85:
                     print('MODIFY angle --LEFT', line_info)
                     self._motion.turn(dir='LEFT', loop=1)
-                elif line_info["DEGREE"] > 95:
+                elif line_info["V_DEGREE"] > 95:
                     print('MODIFY angle --RIGHT', line_info)
                     self._motion.turn(dir='RIGHT', loop=1)
             else:
@@ -262,7 +262,7 @@ class Robot:
             print(self.direction)
 
     def walk(self, line_info):
-        # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
+        # line_info = {"V_DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
         if self.walk_info == '│':
             if 300 < line_info["V_X"][0] <340:
                 print('walk')
@@ -280,11 +280,11 @@ class Robot:
                     time.sleep(1)
 
         elif self.walk_info == None: # 'modify_angle'
-            if line_info["DEGREE"] < 85:
+            if line_info["V_DEGREE"] < 85:
                 print('MODIFY angle --LEFT', line_info)
                 self._motion.turn(dir='LEFT', loop=1)
                 time.sleep(1)
-            elif line_info["DEGREE"] > 95:
+            elif line_info["V_DEGREE"] > 95:
                 print('MODIFY angle --RIGHT', line_info)
                 self._motion.turn(dir='RIGHT', loop=1)
                 time.sleep(1)
@@ -493,9 +493,25 @@ class Robot:
             else:
                 self.mode = 'walk'
 
+        # 화살표 방향 인식
+        elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
+            if self.mode == 'detect_direction: fail':
+                self._motion.walk("BACKWARD", 1)
+            else:
+                pass
+
+            if self.direction == None:
+                self.detect_direction()
+            else:
+                self._motion.walk("FORWARD", 1)
+                self._motion.walk(self.direction, 2)
+                self._motion.turn(self.direction, 7)
+                self.mode = 'walk' 
+
+
         # 걷기 # 보정 추가로 넣기
         elif self.mode == 'walk' and self.walk_info != '┐' and self.walk_info != '┌' :
-            self._motion.set_head(dir='DOWN', angle = 20)
+            self._motion.set_head(dir='DOWN', angle = 10)
             if line_info["V"]==True and line_info["H"]==False:
                 print('go')
                 self.walk_info = '│'
@@ -534,23 +550,7 @@ class Robot:
                     else:
                         print('out of range')
 
-            
-
-        # 화살표 방향 인식
-        elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
-            if self.mode == 'detect_direction: fail':
-                self._motion.walk("BACKWARD", 1)
-            else:
-                pass
-
-            if self.direction == None:
-                self.detect_direction()
-            else:
-                self._motion.walk("FORWARD", 1)
-                self._motion.walk(self.direction, 2)
-                self._motion.turn(self.direction, 7)
-                self.mode = 'walk' 
-
+        
         # 미션 진입 판별
         elif self.mode == 'walk' and self.walk_info == '┐':
             self._motion.set_head(dir='DOWN', angle = 20)
