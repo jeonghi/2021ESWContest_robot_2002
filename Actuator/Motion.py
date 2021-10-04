@@ -50,10 +50,6 @@ class Motion:
             return 0
 
 
-    def getRx(self):
-        return self.lock
-
-
     def Receiving(self, ser):
         self.receiving_exit = 1
         while True:
@@ -94,14 +90,14 @@ class Motion:
     def set_head(self, dir, angle=0):
         """parameter 설명
         dir: {DOWN, LEFT, RIGHT, UPDOWN_CENTER, LEFTRIGHT_CENTER}
-        angle: {DOWN:{10,20,30,45,60,75,90,100},
+        angle: {DOWN:{10,30,35,45,60,75,80,90,100},
         LEFT:{30,45,60,90},
         RIGHT:{30,45,60,90}
         }
         """
         if dir == 'DOWN':
             self.head_angle1 = angle
-        elif dir == 'LEFT' and dir == 'RIGHT':
+        elif dir == 'LEFT' or dir == 'RIGHT':
             self.head_angle2 = angle
         elif dir == 'UPDOWN_CENTER':
             self.head_angle1 = dir
@@ -111,7 +107,7 @@ class Motion:
         center_list = {'UPDOWN_CENTER':44, 'LEFTRIGHT_CENTER':54}
         dir_list = {
             'DOWN':{
-            10:37, 20:38, 30:39, 45:40, 60:41, 75:42, 90:43, 100:44
+            10:37, 30:38, 35:39, 45:40, 60:41, 75:42, 80:43, 90:44, 100:45
             },
             'LEFT':{
                 30:46, 45:47, 60:48, 90:49
@@ -133,12 +129,15 @@ class Motion:
             self.TX_data_py2(dir_list[dir])
 
 
-    def turn(self, dir, loop=1, sleep=0.5, grab=False):
+    def turn(self, dir, loop=1, sleep=0.5, grab=False,sliding=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """
         dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
-        if grab: dir_list[dir] += 11  # if grab is true, change walk motion with grab
+        if grab:
+            dir_list[dir] += 11# if grab is true, change walk motion with grab
+            if sliding:
+                dir_list[dir]+=9
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
@@ -180,7 +179,7 @@ class Motion:
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
         팔을 위로 하면 머리는 아래로 숙임.
         """
-        angle_list = [30, 90, 60]
+        angle_list = [35, 90, 60]
         level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
         self.TX_data_py2(75+level[dir])
         time.sleep(0.1)
