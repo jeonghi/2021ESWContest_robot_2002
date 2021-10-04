@@ -3497,14 +3497,14 @@ KEY12: ' ▼
     '***************
 KEY13: '▶
     ETX  4800,13
-    GOTO 집고오른쪽턴3_LOOP
+    GOTO 집고오른쪽턴3
 
 
     GOTO RX_EXIT
     '***************
 KEY14: ' ◀
     ETX  4800,14
-    GOTO 집고왼쪽턴3_LOOP
+    GOTO 집고왼쪽턴3
 
 
     GOTO RX_EXIT
@@ -3608,12 +3608,12 @@ KEY23: 'G
     '***************
 KEY24: '#
     ETX 4800, 24
-    GOSUB 왼쪽턴3_LOOP
+    GOSUB 왼쪽턴3
     GOTO RX_EXIT
     '***************
 KEY25: 'P1
     ETX 4800, 25
-    GOSUB 오른쪽턴3_LOOP
+    GOSUB 오른쪽턴3
     GOTO RX_EXIT
     '***************
 KEY26: ' ■
@@ -3688,7 +3688,7 @@ KEY37:
     GOTO RX_EXIT
 KEY38:
     ETX 4800, 38
-    GOSUB 전방하향18도
+    GOSUB 전방하향10도
     GOTO RX_EXIT
 KEY39:
     ETX 4800, 39
@@ -3789,11 +3789,11 @@ KEY60:
     GOTO RX_EXIT
 KEY61:
     ETX 4800, 61
-    GOSUB 왼쪽턴3_LOOP
+    GOSUB 왼쪽턴3
     GOTO RX_EXIT
 KEY62:
     ETX 4800, 62
-    GOSUB 오른쪽턴3_LOOP
+    GOSUB 오른쪽턴3
     GOTO RX_EXIT
 KEY63:
     ETX 4800, 63
