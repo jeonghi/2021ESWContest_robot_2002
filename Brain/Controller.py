@@ -71,10 +71,10 @@ class Robot:
                         print('MODIFY walk --RIGHT', line_info)
                         self._motion.walk(dir='RIGHT', loop=1)
             elif not line_info["V"] and not line_info["H"]:
-                if line_info["V_DEGREE"] < 85:
+                if line_info["DEGREE"] < 85:
                     print('MODIFY angle --LEFT', line_info)
                     self._motion.turn(dir='LEFT', loop=1)
-                elif line_info["V_DEGREE"] > 95:
+                elif line_info["DEGREE"] > 95:
                     print('MODIFY angle --RIGHT', line_info)
                     self._motion.turn(dir='RIGHT', loop=1)
             else:
@@ -262,9 +262,9 @@ class Robot:
             print(self.direction)
 
     def walk(self, line_info):
-        # line_info = {"V_DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
+        # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
         if self.walk_info == '│':
-            if line_info["V_DEGREE"] < 85 and line_info["V_DEGREE"] < 95:
+            if line_info["DEGREE"] < 85 and line_info["DEGREE"] < 95:
                 if 290 < line_info["V_X"][0] <350:
                     print('walk')
                     print('│', line_info)
@@ -279,11 +279,11 @@ class Robot:
                         print('→ →', line_info["V_X"][0])
                         self._motion.walk(dir='RIGHT', loop=1)
                         time.sleep(1)
-            elif line_info["V_DEGREE"] < 85:
+            elif line_info["DEGREE"] < 85:
                 print('MODIFY angle --LEFT', line_info)
                 self._motion.turn(dir='LEFT', loop=1)
                 time.sleep(1)
-            elif line_info["V_DEGREE"] > 95:
+            elif line_info["DEGREE"] > 95:
                 print('MODIFY angle --RIGHT', line_info)
                 self._motion.turn(dir='RIGHT', loop=1)
                 time.sleep(1)
@@ -292,11 +292,11 @@ class Robot:
 
 
         elif self.walk_info == None: # 'modify_angle'
-            if line_info["V_DEGREE"] < 85:
+            if line_info["DEGREE"] < 85:
                 print('MODIFY angle --LEFT', line_info)
                 self._motion.turn(dir='LEFT', loop=1)
                 time.sleep(1)
-            elif line_info["V_DEGREE"] > 95:
+            elif line_info["DEGREE"] > 95:
                 print('MODIFY angle --RIGHT', line_info)
                 self._motion.turn(dir='RIGHT', loop=1)
                 time.sleep(1)
@@ -567,7 +567,7 @@ class Robot:
         
         # 미션 진입 판별
         elif self.mode == 'walk' and self.walk_info == '┐':
-            self._motion.set_head(dir='DOWN', angle = 20)
+            self._motion.set_head(dir='DOWN', angle = 10)
             if line_info["H_Y"][1] > 280:
                 if self.direction == 'RIGHT':
                     self.mode = 'start_mission' # --> end_mission --> return_line
@@ -585,7 +585,7 @@ class Robot:
                 time.sleep(1)
 
         elif self.mode == 'walk' and self.walk_info =='┌':
-            self._motion.set_head(dir='DOWN', angle = 20)
+            self._motion.set_head(dir='DOWN', angle = 10)
             if line_info["H_Y"][0] > 280:
                 if self.direction == 'LEFT':
                     self.mode = 'start_mission' # --> end_mission
