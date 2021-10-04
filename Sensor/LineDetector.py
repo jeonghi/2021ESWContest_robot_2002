@@ -33,7 +33,7 @@ class LineDetector:
             if what_line == 'vertical':
                 color = [0, 0, 255]
             elif what_line == 'compact_horizontal':
-                color = [0, 0, 0]
+                color = [255, 255, 255]
             elif what_line == 'horizontal':
                 color = [0, 255, 0]
             elif what_line == 'lines':
@@ -93,7 +93,7 @@ class LineDetector:
         cv2.imshow('mask', mask)
         cv2.imshow('yellow_edges', edges)
 
-        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=150, maxLineGap=150)
+        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=80, maxLineGap=150)
         lines = np.squeeze(lines)
 
         if len(lines.shape) == 0:
@@ -118,7 +118,7 @@ class LineDetector:
             horizontal_lines = horizontal_lines[:, None]
             
             compact_horizontal_lines = lines[np.abs(slope_degree) > 175]
-            compact_horizontal_lines = slope_degree[np.abs(slope_degree) > 175]
+            #compact_horizontal_lines = slope_degree[np.abs(slope_degree) > 175]
             compact_horizontal_lines = compact_horizontal_lines[:, None]
 
             lines = lines[np.abs(slope_degree) < 150]
@@ -230,6 +230,8 @@ class LineDetector:
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(horizontal_lines) != 0:
+                print(horizontal_lines)
+                print(horizontal_lines.shape)
                 size = int(horizontal_lines.shape[0] * horizontal_lines.shape[2] / 2)
                 horizontal_fit_line = self.get_fitline(src, horizontal_lines, size, 'horizontal')
                 line_info["H"] = True
@@ -243,6 +245,8 @@ class LineDetector:
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
             if len(compact_horizontal_lines) != 0:
+                print(compact_horizontal_lines)
+                print(compact_horizontal_lines.shape)
                 size = int(compact_horizontal_lines.shape[0] * compact_horizontal_lines.shape[2] / 2)
                 compact_horizontal_line = self.get_fitline(src, compact_horizontal_lines, size, 'compact_horizontal')
                 line_info["compact_H"] = True

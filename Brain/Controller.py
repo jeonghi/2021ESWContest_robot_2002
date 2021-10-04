@@ -586,20 +586,56 @@ class Robot:
 
         elif self.mode == 'walk' and self.walk_info =='┌':
             self._motion.set_head(dir='DOWN', angle = 10)
-            if line_info["H_Y"][0] > 280:
-                if self.direction == 'LEFT':
-                    self.mode = 'start_mission' # --> end_mission
-                    if self.progress_of_roobot[0] != self.mode:
-                        self.progress_of_roobot.insert(0, self.mode)
-                elif self.direction == 'RIGHT':
-                    self.mode = 'is_finish_line' # --> finish 
-                    if self.progress_of_roobot[0] != self.mode:
-                        self.progress_of_roobot.insert(0, self.mode)
-                else:
-                    print('The Robot has not direction, Please Set **self.direction**')
+            self._motion.walk("FORWARD", 2)
+            time.sleep(1)
+            if self.direction == 'RIGHT':
+                self.mode = 'is_finish_line' # --> end_mission --> return_line
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+
+            elif self.direction == 'LEFT':
+                self.mode = 'start_mission' # --> walk / finish
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
             else:
-                self._motion.walk("FORWARD", 1)
-                time.sleep(1)
+                print('The Robot has not direction, Please Set **self.direction**')
+
+
+        # 미션 진입 판별
+        elif self.mode == 'walk' and self.walk_info == '┐':
+            self._motion.set_head(dir='DOWN', angle = 10)
+            self._motion.walk("FORWARD", 2)
+            time.sleep(1)
+            if self.direction == 'RIGHT':
+                self.mode = 'start_mission' # --> end_mission --> return_line
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+
+            elif self.direction == 'LEFT':
+                self.mode = 'is_finish_line' # --> walk / finish
+                if self.progress_of_roobot[0] != self.mode:
+                    self.progress_of_roobot.insert(0, self.mode)
+            else:
+                print('The Robot has not direction, Please Set **self.direction**')
+            
+                
+
+        #elif self.mode == 'walk' and self.walk_info =='┌':
+            #self._motion.set_head(dir='DOWN', angle = 10)
+            #if line_info["H_Y"][0] > 280:
+                #if self.direction == 'LEFT':
+                    #self.mode = 'start_mission' # --> end_mission
+                    #if self.progress_of_roobot[0] != self.mode:
+                        #self.progress_of_roobot.insert(0, self.mode)
+                #elif self.direction == 'RIGHT':
+                    #self.mode = 'is_finish_line' # --> finish 
+                    #if self.progress_of_roobot[0] != self.mode:
+                        #self.progress_of_roobot.insert(0, self.mode)
+                #else:
+                    #print('The Robot has not direction, Please Set **self.direction**')
+            #else:
+                #self._motion.walk("FORWARD", 1)
+                #time.sleep(1)
 
 
                 # 0. 확진 / 안전 구역 확인 : self.color 바꿔주세요, self.mode = 'box_tracking'로 바꿔주세요.
