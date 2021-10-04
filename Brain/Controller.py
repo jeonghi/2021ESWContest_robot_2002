@@ -264,20 +264,32 @@ class Robot:
     def walk(self, line_info):
         # line_info = {"V_DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}   
         if self.walk_info == '│':
-            if 300 < line_info["V_X"][0] <340:
-                print('walk')
-                print('│', line_info)
-                self._motion.walk(dir='FORWARD', loop=1)
+            if line_info["V_DEGREE"] < 85 and line_info["V_DEGREE"] < 95:
+                if 290 < line_info["V_X"][0] <350:
+                    print('walk')
+                    print('│', line_info)
+                    self._motion.walk(dir='FORWARD', loop=1)
+                    time.sleep(1)
+                else:
+                    if line_info["V_X"][0] < 290:
+                        print('← ←', line_info["V_X"][0])
+                        self._motion.walk(dir='LEFT', loop=1)
+                        time.sleep(1)
+                    elif line_info["V_X"][0] > 350:
+                        print('→ →', line_info["V_X"][0])
+                        self._motion.walk(dir='RIGHT', loop=1)
+                        time.sleep(1)
+            elif line_info["V_DEGREE"] < 85:
+                print('MODIFY angle --LEFT', line_info)
+                self._motion.turn(dir='LEFT', loop=1)
+                time.sleep(1)
+            elif line_info["V_DEGREE"] > 95:
+                print('MODIFY angle --RIGHT', line_info)
+                self._motion.turn(dir='RIGHT', loop=1)
                 time.sleep(1)
             else:
-                if line_info["V_X"][0] < 250:
-                    print('← ←', line_info["V_X"][0])
-                    self._motion.walk(dir='LEFT', loop=1)
-                    time.sleep(1)
-                elif line_info["V_X"][0] > 400:
-                    print('→ →', line_info["V_X"][0])
-                    self._motion.walk(dir='RIGHT', loop=1)
-                    time.sleep(1)
+                print('else')
+
 
         elif self.walk_info == None: # 'modify_angle'
             if line_info["V_DEGREE"] < 85:
@@ -288,6 +300,8 @@ class Robot:
                 print('MODIFY angle --RIGHT', line_info)
                 self._motion.turn(dir='RIGHT', loop=1)
                 time.sleep(1)
+            else:
+                print('else')
 
         else:
             print('walk_info is not │ or None ------------>', self.walk_info)    
@@ -520,13 +534,13 @@ class Robot:
                     self.progress_of_roobot.insert(0, self.walk_info)
                     
             elif line_info["V"]==False and line_info["H"]==False:
-                print('no line')
+                print('modify_angle')
                 self.walk_info = None # 'modify_angle'
                 self.walk(line_info)     
 
             else:
                 print(line_info["H_X"])
-                if line_info["H_X"][0] < 30 and line_info["H_X"][1] > 600 :
+                if line_info["H_X"][0] < 50 and line_info["H_X"][1] > 600 :
                     self.walk_info = 'T'
                     print(line_info["H_Y"][1])
                     if line_info["H_Y"][1] > 220:
@@ -538,12 +552,12 @@ class Robot:
                         time.sleep(1)
                         
                 else:
-                    if line_info["H_X"][0] < 200 and line_info["H_X"][1] < 450:
-                        self.walk_info = '┌'
+                    if line_info["H_X"][0] < 100 and line_info["H_X"][1] < 400:
+                        self.walk_info = '┐'
                         if self.progress_of_roobot[0] != self.walk_info:
                             self.progress_of_roobot.insert(0, self.walk_info)
 
-                    elif line_info["H_X"][0] > 200 and line_info["H_X"][1] > 450 :
+                    elif line_info["H_X"][1] > 550 and line_info["H_X"][0] > 250 :
                         self.walk_info = '┌'
                         if self.progress_of_roobot[0] != self.walk_info:
                             self.progress_of_roobot.insert(0, self.walk_info)
@@ -730,6 +744,7 @@ class Robot:
                         self.walk_info = None
                         self._motion.grab(switch = False)
                         self.mode = 'walk' ##
+                        self.walk_info = '│'
                         self._motion.turn(dir=self.direction, loop = 3)
                         self._motion.walk(dir='FORWARD', loop=2)
                         if self.progress_of_roobot[0] != self.mode:
@@ -753,6 +768,7 @@ class Robot:
                         self._motion.turn(self.direction, 1) ##
                         self.walk_info = None
                         self.mode = 'walk' ##
+                        self.walk_info = '│'
                         self._motion.turn(dir=self.direction, loop = 3)
                         self._motion.walk(dir='FORWARD', loop=2)
                         if self.progress_of_roobot[0] != self.mode:
@@ -774,6 +790,7 @@ class Robot:
                 if 300 < line_info["V_X"][0] <340:
                     self._motion.walk(dir='FORWARD', loop=2)
                     self.mode = 'walk'
+                    self.walk_info = '│'
                 else:
                     if line_info["V_X"][0] < 300:
                         self._motion.walk(dir='LEFT', loop=1)
