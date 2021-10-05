@@ -2683,6 +2683,15 @@ Number_Play: '  BUTTON_NO = 숫자대입
 
     '******************************************
 
+전방하향50도:
+
+    SPEED 3
+    SERVO 16, 54
+
+    RETURN
+
+    '******************************************
+
 전방하향45도:
 
     SPEED 3
@@ -3388,7 +3397,7 @@ MAIN_2:
 
     '**** 입력된 A값이 0 이면 MAIN 라벨로 가고
     '**** 1이면 	 라벨, 2이면 key2로... 가는문
-    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65,KEY66,KEY67,KEY68,KEY69,KEY70,KEY71,KEY72,KEY73,KEY74,KEY75,KEY76,KEY77,KEY78,KEY79
+    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65,KEY66,KEY67,KEY68,KEY69,KEY70,KEY71,KEY72,KEY73,KEY74,KEY75,KEY76,KEY77,KEY78,KEY79,KEY80,KEY81,KEY82,KEY83,KEY84
 
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
@@ -3437,11 +3446,11 @@ KEY2:
     '***************
 KEY3:
     ETX 4800, 3
-    GOSUB 왼쪽옆으로20
+    GOTO 왼쪽옆으로20
     GOTO RX_EXIT
 KEY4:
     ETX 4800, 4
-    GOSUB 오른쪽옆으로20
+    GOTO 오른쪽옆으로20
     GOTO RX_EXIT
     '***************
 KEY5:
@@ -3476,7 +3485,7 @@ KEY8:
     '***************
 KEY9:
     ETX 4800, 9
-    GOSUB 집고전진종종걸음
+    GOTO 집고전진종종걸음
     GOTO RX_EXIT
     '***************
 KEY10: '0
@@ -3577,7 +3586,7 @@ KEY17: ' C
     '***************
 KEY18: ' E
     ETX 4800, 18
-    GOSUB 머리왼쪽30도
+    GOTO 머리왼쪽30도
     GOTO RX_EXIT
     '***************
 KEY19: 'P2
@@ -3587,7 +3596,7 @@ KEY19: 'P2
     '***************
 KEY20: 'B
     ETX 4800, 20
-    GOSUB 전방하향30도
+    GOSUB 전방하향35도
     GOTO RX_EXIT
     '***************
 KEY21: ' △
@@ -3598,22 +3607,22 @@ KEY21: ' △
     '***************
 KEY22: ' *
     ETX 4800, 22
-    GOSUB 머리오른쪽60도
+    GOTO 머리오른쪽60도
     GOTO RX_EXIT
     '***************
 KEY23: 'G
     ETX 4800, 23
-    GOSUB 머리오른쪽30도
+    GOTO 머리오른쪽30도
     GOTO RX_EXIT
     '***************
 KEY24: '#
     ETX 4800, 24
-    GOSUB 왼쪽턴3
+    GOTO 왼쪽턴3
     GOTO RX_EXIT
     '***************
 KEY25: 'P1
     ETX 4800, 25
-    GOSUB 오른쪽턴3
+    GOTO 오른쪽턴3
     GOTO RX_EXIT
     '***************
 KEY26: ' ■
@@ -3628,7 +3637,7 @@ KEY26: ' ■
     '***************
 KEY27: ' D
     ETX 4800, 27
-    GOSUB 머리상하정면
+    GOTO 머리상하정면
     GOTO RX_EXIT
     '***************
 KEY28: ' ◁
@@ -3638,7 +3647,7 @@ KEY28: ' ◁
     '***************
 KEY29: ' □
     ETX 4800, 29
-    GOSUB 전방하향60도
+    GOSUB 전방하향10도
     GOTO RX_EXIT
     '***************
 KEY30: ' ▷
@@ -3654,7 +3663,7 @@ KEY31: ' ▽
 
 KEY32: ' F
     ETX 4800, 32
-    GOSUB 머리왼쪽60도
+    GOTO 머리왼쪽60도
     GOTO RX_EXIT
     '***************
 
@@ -3684,15 +3693,15 @@ KEY36:
     'KEY37 ~ KEY54: 머리 각도 조절
 KEY37:
     ETX 4800, 37
-    GOSUB 전방하향35도
+    GOSUB 전방하향10도
     GOTO RX_EXIT
 KEY38:
     ETX 4800, 38
-    GOSUB 전방하향10도
+    GOSUB 전방하향30도
     GOTO RX_EXIT
 KEY39:
     ETX 4800, 39
-    GOSUB 전방하향30도
+    GOSUB 전방하향35도
     GOTO RX_EXIT
 KEY40:
     ETX 4800, 40
@@ -3720,43 +3729,43 @@ KEY45:
     GOTO RX_EXIT
 KEY46:
     ETX 4800, 46
-    GOSUB 머리상하정면
+    GOTO 머리상하정면
     GOTO RX_EXIT
 KEY47:
     ETX 4800, 47
-    GOSUB 머리왼쪽30도
+    GOTO 머리왼쪽30도
     GOTO RX_EXIT
 KEY48:
     ETX 4800, 48
-    GOSUB 머리왼쪽45도
+    GOTO 머리왼쪽45도
     GOTO RX_EXIT
 KEY49:
     ETX 4800, 49
-    GOSUB 머리왼쪽60도
+    GOTO 머리왼쪽60도
     GOTO RX_EXIT
 KEY50:
     ETX 4800, 50
-    GOSUB 머리왼쪽90도
+    GOTO 머리왼쪽90도
     GOTO RX_EXIT
 KEY51:
     ETX 4800, 51
-    GOSUB 머리오른쪽30도
+    GOTO 머리오른쪽30도
     GOTO RX_EXIT
 KEY52:
     ETX 4800, 52
-    GOSUB 머리오른쪽45도
+    GOTO 머리오른쪽45도
     GOTO RX_EXIT
 KEY53:
     ETX 4800, 53
-    GOSUB 머리오른쪽60도
+    GOTO 머리오른쪽60도
     GOTO RX_EXIT
 KEY54:
     ETX 4800, 54
-    GOSUB 머리오른쪽90도
+    GOTO 머리오른쪽90도
     GOTO RX_EXIT
 KEY55:
     ETX 4800, 55
-    GOSUB 머리좌우중앙
+    GOTO 머리좌우중앙
     GOTO RX_EXIT
 KEY56:
     ETX  4800,56
@@ -3777,27 +3786,27 @@ KEY57:
     GOTO RX_EXIT
 KEY58:
     ETX 4800, 58
-    GOSUB 왼쪽옆으로20
+    GOTO 왼쪽옆으로20
     GOTO RX_EXIT
 KEY59:
     ETX 4800, 59
-    GOSUB 오른쪽옆으로20
+    GOTO 오른쪽옆으로20
     GOTO RX_EXIT
 KEY60:
     ETX 4800, 60
-    GOSUB 왼쪽턴20
+    GOTO 왼쪽턴20
     GOTO RX_EXIT
 KEY61:
     ETX 4800, 61
-    GOSUB 오른쪽턴20
+    GOTO 오른쪽턴20
     GOTO RX_EXIT
 KEY62:
     ETX 4800, 62
-    GOSUB 왼쪽턴3
+    GOTO 왼쪽턴3
     GOTO RX_EXIT
 KEY63:
     ETX 4800, 63
-    GOSUB 오른쪽턴3
+    GOTO 오른쪽턴3
     GOTO RX_EXIT
 KEY64:
     ETX 4800, 64
@@ -3829,11 +3838,11 @@ KEY70:
     GOTO RX_EXIT
 KEY71:
     ETX 4800, 71
-    GOSUB 집고왼쪽옆으로
+    GOTO 집고왼쪽옆으로
     GOTO RX_EXIT
 KEY72:
     ETX 4800, 72
-    GOSUB 집고오른쪽옆으로
+    GOTO 집고오른쪽옆으로
     GOTO RX_EXIT
 KEY73:
     ETX 4800, 73
@@ -3864,4 +3873,29 @@ KEY78:
 KEY79:
     ETX 4800, 79
     GOSUB 우유깍잡기_3
+    GOTO RX_EXIT
+
+KEY80:
+    ETX 4800, 80
+    GOSUB 전방하향18도
+    GOTO RX_EXIT
+
+KEY81:
+    ETX 4800, 81
+    GOSUB 전방하향54도
+    GOTO RX_EXIT
+
+KEY82:
+    ETX 4800, 82
+    GOSUB 전방하향70도
+    GOTO RX_EXIT
+
+KEY83:
+    ETX 4800, 83
+    GOSUB 전방하향85도
+    GOTO RX_EXIT
+
+KEY84:
+    ETX 4800, 84
+    GOSUB 전방하향50도
     GOTO RX_EXIT

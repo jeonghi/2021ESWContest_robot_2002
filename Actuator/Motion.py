@@ -83,14 +83,14 @@ class Motion:
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
-        area_list = {'GREEN':66,'BLACK':67}
+        area_list = {'GREEN':67,'BLACK':68}
         self.TX_data_py2(area_list[area])
 
 
     def set_head(self, dir, angle=0):
         """parameter 설명
         dir: {DOWN, LEFT, RIGHT, UPDOWN_CENTER, LEFTRIGHT_CENTER}
-        angle: {DOWN:{10,30,35,45,60,75,80,90,100},
+        angle: {DOWN:{10,20,30,35,45,50,55,60,70,75,80,85,90,100},
         LEFT:{30,45,60,90},
         RIGHT:{30,45,60,90}
         }
@@ -104,16 +104,16 @@ class Motion:
         elif dir == 'LEFTRIGHT_CENTER':
             self.head_angle2 = dir
 
-        center_list = {'UPDOWN_CENTER':44, 'LEFTRIGHT_CENTER':54}
+        center_list = {'UPDOWN_CENTER':46, 'LEFTRIGHT_CENTER':55}
         dir_list = {
             'DOWN':{
-            10:37, 30:38, 35:39, 45:40, 60:41, 75:42, 80:43, 90:44, 100:45
+            10:37, 20:80, 30:38, 35:39, 45:40, 50:84, 55:81, 60:41, 70:82, 75:42, 80:43, 85:83, 90:44, 100:45
             },
             'LEFT':{
-                30:46, 45:47, 60:48, 90:49
+                30:47, 45:48, 60:49, 90:50
             },
             'RIGHT':{
-                30:50, 45:51, 60:52, 90:53
+                30:51, 45:52, 60:53, 90:54
             }
         }
         if dir in center_list:
@@ -123,7 +123,7 @@ class Motion:
 
 
     def walk(self, dir, loop=1, grab=False):
-        dir_list = {'FORWARD':55, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
+        dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
@@ -133,7 +133,7 @@ class Motion:
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """
-        dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
+        dir_list = {'SLIDING_LEFT':60, 'SLIDING_RIGHT':61, 'LEFT':62, 'RIGHT':63}
         if grab:
             dir_list[dir] += 11# if grab is true, change walk motion with grab
             if sliding:
@@ -159,7 +159,7 @@ class Motion:
     def grab(self, switch=True):
         """if switch=True then grab ON, else then grab OFF
         """
-        tx = 64 if switch else 65
+        tx = 65 if switch else 66
         self.TX_data_py2(tx)
 
 
@@ -170,8 +170,8 @@ class Motion:
 
 
     def basic_form(self):
-        self.TX_data_py2(45)
-        self.TX_data_py2(54)
+        self.TX_data_py2(46)
+        self.TX_data_py2(55)
         self.TX_data_py2(10)
 
 
@@ -181,7 +181,7 @@ class Motion:
         """
         angle_list = [35, 90, 60]
         level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
-        self.TX_data_py2(75+level[dir])
+        self.TX_data_py2(76+level[dir])
         time.sleep(0.1)
         self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
 
