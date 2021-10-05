@@ -50,7 +50,17 @@ class HashDetector:
         assert no_files_in_folder == no_files_allowed, "The extension in the folder should all be the same, but found more than one extensions"
         return extension_type
 
+    @staticmethod
+    def check_white_rate(img:np.array) -> float:
+        assert len(img.shape) == 2, "Only Binary Image"
+        h, w = img.shape[:2]
+        return np.count_nonzero(img)/(h*w)
+
+
     def detect_alphabet_hash(self, img : np.ndarray, threshold=0.3) -> str:
+        if self.check_white_rate(img) < 0.1 or self.check_white_rate(img) > 0.9:
+            print(self.check_white_rate(img))
+            return None, None
         img_hash = self.image_to_hash(img)
         hdist_dict = {}
         
