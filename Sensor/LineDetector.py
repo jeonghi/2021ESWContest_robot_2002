@@ -412,12 +412,12 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture("./Sensor/src/debug/room_red_A.h264")
+    video = cv2.VideoCapture("./Sensor/src/debug/black_area.h264")
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
         if not ret:
-            video = cv2.VideoCapture("./Sensor/src/debug/room_red_A.h264")
+            video = cv2.VideoCapture("./Sensor/src/debug/black_area.h264")
             continue
         src = cv2.resize(src, dsize=(640, 480))
 
