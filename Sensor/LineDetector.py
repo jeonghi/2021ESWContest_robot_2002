@@ -181,7 +181,7 @@ class LineDetector:
             max_y = int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
-            result = [min_x, min_y, max_x, max_y ]
+            result = [max_x, min_y, min_x, max_y]
             return result
         elif what_line == 'edge_L' or 'all':
             min_y = int(lines.min(axis=0)[1])

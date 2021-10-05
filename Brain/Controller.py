@@ -34,7 +34,7 @@ class Robot:
         self._motion.basic_form()
         
     def check_motion(self):
-        self._motion.set_head(dir ='DOWN', angle = 50)
+        self._motion.set_head(dir ='DOWN', angle = 45)
 
     def get_distance_from_baseline(self, box_info, baseline=(320, 380)):
         # if bx - cx > 0
