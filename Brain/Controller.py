@@ -106,11 +106,9 @@ class Robot:
 
 
     def line_tracing(self):
-        line_info, edge_info, result = self._image_processor.line_tracing(self.color)
+        line_info, edge_info, result = self._image_processor.line_tracing(color=self.color)
         cv2.imshow('result', result)
         cv2.waitKey(1)
-        # print(line_info)
-        # print(edge_info)
         return line_info, edge_info
 
     def detect_direction(self):
