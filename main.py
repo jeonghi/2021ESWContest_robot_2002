@@ -8,8 +8,8 @@ from Sensor.VideoRecorder import VideoRecorder
 import cv2
 import kbhit # press any key to exit
 
-VIDEO_PATH = -1    # test robot: -1    test video: [video path]
-DEBUG = False # test robot: False    test local: True
+VIDEO_PATH = "Sensor/src/debug/room_red_A.h264"    # test robot: -1    test video: [video path]
+DEBUG = True # test robot: False    test local: True
 
 def main():
     robot = Robot(VIDEO_PATH, DEBUG)
@@ -27,10 +27,12 @@ def main():
                 break
 
         frame = robot._image_processor.get_image()
+        cv2.imshow("frame", frame)
+        cv2.waitKey(10)
         video_recorder.record_frame(frame)
 
     #===================== function ======================
-    robot._image_processor.get_room_alphabet(visualization=True)
+        robot._image_processor.get_room_alphabet(visualization=True)
     #=====================================================
     
     video_recorder.stop()
