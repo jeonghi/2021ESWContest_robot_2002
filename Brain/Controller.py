@@ -52,7 +52,7 @@ class Robot:
     def check_turn(self):
         #self._motion.move_arm(dir = 'LOW')
         #self._motion.walk(dir='FORWARD', loop=1)
-        self._motion.set_head('DOWN', 60)
+        self._motion.set_head('DOWN', 30)
 
 
     def old_line_tracing(self):
