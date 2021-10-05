@@ -28,7 +28,7 @@ def main():
         #video_recorder.record_frame(frame)
 
     #===================== function ======================
-        robot.check_turn()
+        robot.check_motion()
         #robot.setting_mode()
     
 

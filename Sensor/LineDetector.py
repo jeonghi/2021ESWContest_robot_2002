@@ -63,11 +63,11 @@ class LineDetector:
 
     def mask_color(self, src, color='YELLOW'):
         if color == 'YELLOW':
-            #hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
-            #h, l, s = cv2.split(hls)
-            #ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
-            #src = cv2.bitwise_and(src, src, mask=mask)
-            match_lower = np.array([10, 40, 110])  # yellow_lower
+            hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+            h, l, s = cv2.split(hls)
+            ret, mask = cv2.threshold(s, 35, 255, cv2.THRESH_BINARY)
+            src = cv2.bitwise_and(src, src, mask=mask)
+            match_lower = np.array([10, 20, 20])  # yellow_lower
             match_upper = np.array([50, 255, 255])  # yellow_upper
 
         #if color == 'GREEN':
@@ -93,7 +93,7 @@ class LineDetector:
         cv2.imshow('mask', mask)
         cv2.imshow('yellow_edges', edges)
 
-        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=50, maxLineGap=150)
+        lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=30, maxLineGap=150)
         lines = np.squeeze(lines)
 
         if len(lines.shape) == 0:
@@ -176,7 +176,7 @@ class LineDetector:
             max_y = int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
-            result = [min_x, min_y, max_x, max_y ]
+            result = [max_x, min_y, min_x, max_y]
             return result
         elif what_line == 'edge_L' or 'all':
             min_y = int(lines.min(axis=0)[1])
@@ -291,8 +291,8 @@ class LineDetector:
                 size = int(edge_lines_R.shape[0] * edge_lines_R.shape[2] / 2)
                 edge_line_R = self.get_fitline(src, edge_lines_R, size, 'edge_R')
                 edge_info["EDGE_R"] = True
-                edge_info["R_X"] = [edge_line_R[0], edge_line_R[2]]  # [max_x, min_y, min_x, max_y]
-                edge_info["R_Y"] = [edge_line_R[1], edge_line_R[3]]
+                edge_info["R_X"] = [edge_line_R[2], edge_line_R[0]]  # [max_x, min_y, min_x, max_y]
+                edge_info["R_Y"] = [edge_line_R[1], edge_line_R[3]] 
                 if edge_visualization is True:
                     self.draw_lines(temp, edge_line_R, 'edge_R', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
