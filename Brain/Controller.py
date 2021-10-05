@@ -37,7 +37,7 @@ class Robot:
     def check_motion(self):
         self._motion.set_head(dir ='DOWN', angle = 45)
 
-    def get_distance_from_baseline(self, box_info, baseline=(320, 380)):
+    def get_distance_from_baseline(self, box_info, baseline=(320, 400)):
         # if bx - cx > 0
         # 왼쪽에 박스가 있는 것이므로 왼쪽으로 움직여야함,
         # if bx - cx < 0
