@@ -32,6 +32,9 @@ class Robot:
 
     def set_basic_form(self):
         self._motion.basic_form()
+        
+    def check_motion(self):
+        self._motion.set_head(dir ='DOWN', angle = 50)
 
     def get_distance_from_baseline(self, box_info, baseline=(320, 380)):
         # if bx - cx > 0
@@ -476,7 +479,7 @@ class Robot:
       #      print("self.box_pos is None, Please check it")
     
     def box_into_area(self, line_info, edge_info):
-        self._motion.walk(dir='FORWARD', loop=4, grab=True)
+        self._motion.walk(dir='FORWARD', loop=2, grab=True)
         self._motion.grab(switch=False) # 앉고 잡은 박스 놓는 모션 넣기
         self._motion.set_head(dir ='DOWN', angle=60)
         self.mode = 'end_mission'
