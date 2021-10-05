@@ -107,6 +107,24 @@ class ColorPreProcessor():
         answer = "RED" if np.mean(cr) > np.mean(cb) else "BLUE"
         return answer
 
+    @staticmethod
+    def get_yellow_mask4hue(hue: np.array) -> np.array:
+        yellow_upper = 60
+        yellow_lower = 10
+        if hue.dtype != np.uint8:
+            hue = hue.astype(dtype=np.uint8)
+        yellow_mask = np.where(hue > yellow_lower, hue, 0)
+        yellow_mask = np.where(hue < yellow_upper, yellow_mask, 0)
+        yellow_mask = np.where(yellow_mask == 0, yellow_mask, 255)
+        return yellow_mask
+
+    @staticmethod
+    def get_yellow_mask4hsv(src:np.array) -> np.array:
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        yellow_lower = np.array([10, 40, 95])
+        yellow_upper = np.array([40, 220, 220])
+        mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
+        return mask
 
 
 

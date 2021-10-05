@@ -36,6 +36,7 @@ class Motion:
             time.sleep(0.1)
 
 
+
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
         self.lock.acquire()
 
@@ -50,6 +51,7 @@ class Motion:
             return RX
         else:
             return 0
+
 
 
     def Receiving(self, ser):
@@ -86,6 +88,7 @@ class Motion:
             print(dir)
 
 
+
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
@@ -95,6 +98,7 @@ class Motion:
             self.TX_data_py2(area_list[area])
         else:
             print(area)
+
 
 
     def set_head(self, dir, angle=0):
@@ -186,6 +190,7 @@ class Motion:
                 print("TX 66")
 
 
+
     def grab(self, switch=True):
         """if switch=True then grab ON, else then grab OFF
         """
@@ -202,6 +207,11 @@ class Motion:
         """
         return (self.head_angle1, self.head_angle2)
 
+
+    def basic_form(self):
+        self.TX_data_py2(45)
+        self.TX_data_py2(54)
+        self.TX_data_py2(10)
 
     def basic_form(self):
         if not self.debug:

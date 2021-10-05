@@ -125,59 +125,6 @@ class ImageProcessor:
         src = self.get_image()
         return self.line_detector.get_slope_degree(src)
 
-    def get_room_alphabet(self, visualization: bool = False):
-
-        src = self.get_image()
-        if visualization:
-            canvas = src.copy()
-        _, roi_mask = cv2.threshold(cv2.cvtColor(src, cv2.COLOR_BGR2GRAY), 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        canny = auto_canny(roi_mask)
-        candidates = []
-
-
-        cnts, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        for cnt in cnts:
-            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
-            vertice = len(approx)
-            if vertice <= 8 and 1500 <= cv2.contourArea(cnt):
-                target = Target(contour=cnt)
-                candidates.append(target)
-
-        curr_candidate = None
-        curr_hamming_distance = 1
-
-        for candidate in candidates:
-            roi = candidate.get_target_roi(src)
-            roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-            _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-            roi_thresholded = cv2.bitwise_and(roi,roi,mask=roi_mask)
-
-            alphabet, hamming_distance = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.55)
-            if alphabet is None:
-                continue
-            if hamming_distance < curr_hamming_distance:
-                curr_candidate = candidate
-                curr_hamming_distance = hamming_distance
-                # h_value = self.color_preprocessor.get_mean_value_for_non_zero(roi_thresholded)
-                color = self.color_preprocessor.check_red_or_blue(roi)
-                # if 95 <= h_value <= 135:
-                #     candidate.set_color("BLUE")
-                # elif h_value <= 20 or h_value >= 140 :
-                #     candidate.set_color("RED")
-                candidate.set_color(color)
-                candidate.set_name(alphabet)
-
-        if visualization:
-            if curr_candidate:
-                setLabel(canvas, candidate.get_pts(), f"{candidate.get_name()}-:{candidate.get_color()}", color=(0, 0, 255))
-            cv2.imshow("src", cv2.hconcat([canvas, cv2.cvtColor(canny,cv2.COLOR_GRAY2BGR)]))
-            cv2.waitKey(1)
-
-        if curr_candidate:
-            return curr_candidate.get_name(), curr_candidate.get_color()
-
-        return None
-
     def get_arrow_direction(self):
         src = self.get_image()
         direction, _ = self.hash_detector4arrow.detect_arrow(src)
@@ -185,9 +132,9 @@ class ImageProcessor:
 
     def get_area_color(self, threshold: float = 0.5, visualization: bool = False):
         src = self.get_image()
-        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(hsv)
-        h = h.astype(v.dtype)
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        h = h.astype(l.dtype)
 
         # red mask
         red_mask = self.color_preprocessor.get_red_mask(h)
@@ -205,7 +152,7 @@ class ImageProcessor:
 
         # background : white, target: green, red, blue, black
         # ostu thresholding inverse : background -> black, target -> white
-        _, roi_mask = cv2.threshold(v, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        _, roi_mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_OPEN, kernel)
         roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_CLOSE, kernel)
 
@@ -235,224 +182,243 @@ class ImageProcessor:
         else:
             return "BLACK"
 
-    def get_yellow_line_corner_pos(self, visualization=False):
-        pos = None
-        src = self.get_image()
-        src, yellow_img_mask = self.get_color_binary_image(src=src, color=self.COLORS["YELLOW"]["HOME"])
-        yellow_img = cv2.bitwise_and(src,src,mask=yellow_img_mask)
-        canny_img = auto_canny(yellow_img_mask)
-        lines = cv2.HoughLinesP(canny_img, 2, np.pi / 180, threshold=50, minLineLength=50, maxLineGap=60)
-        if lines is not None:
-            if visualization:
-                for line in lines:
-                    x1, y1, x2, y2 = line[0]
-                    slope = (y2 - y1) / (x2 - x1)
-
-                    if 0 <= slope < 1: # 노란색선
-                        cv2.line(src, (x1, y1), (x2, y2), (0, 255, 255), 2)
-                    elif slope >= 1: # 하늘색선
-                        cv2.line(src, (x1, y1), (x2, y2), (255, 255, 0), 2)
-                    elif slope <= -1 : # 초록색선
-                        cv2.line(src, (x1, y1), (x2, y2), (0, 255, 0), 2)
-                    elif -1 < slope < 0: # 빨간색선
-                        cv2.line(src, (x1, y1), (x2, y2), (255, 0, 255), 2)
-                    else:
-                        cv2.line(src, (x1, y1), (x2, y2), (255, 255, 255), 2)
-
-            filtered_left_lns, filtered_right_lns = left_right_lines(lines)
-            median_left_f = median(filtered_left_lns, [], [])
-            median_right_f = median(filtered_right_lns, [], [])
-            if median_left_f is not None and median_right_f is not None:
-                intersect_pt = intersect(median_left_f, median_right_f)
-                if intersect_pt is not None:
-                    pos = tuple(intersect_pt)
-                    print(pos)
-                    if visualization :
-                        center = (cx, cy) = (self.width // 2, self.height // 2)
-                        x_range = 10
-                        y_range = 20
-                        if cx-x_range*10 <= pos[0] <= cx+x_range*10 :
-                            cv2.circle(src, pos, 10, (255, 0, 0), -1)
-                            cv2.putText(src, "IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1,(255, 0, 0), thickness=2)
-                        else:
-                            cv2.circle(src, pos, 10, (0, 0, 255), -1)
-                            cv2.putText(src, "NOT IN", pos, cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 0, 255), thickness=2)
-
-                        cv2.line(src, (cx - x_range * 10, cy), (cx + x_range * 10, cy), (255, 0, 0), 2)
-                        cv2.circle(src, center, 10, (255, 0, 0), 2)
-                        for x_r in range(x_range + 1):
-                            if x_r == 0 or x_r == x_range:
-                                x_r *= 10
-                                if x_r != 0:
-                                    cv2.putText(src, "-%d" % x_r, (cx - x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
-                                                (255, 0, 0), thickness=2)
-                                    cv2.putText(src, "-%d" % x_r, (cx + x_r, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
-                                                (255, 0, 0), thickness=2)
-                                else:
-                                    cv2.putText(src, "0", (cx, cy - y_range), cv2.FONT_HERSHEY_SIMPLEX, 1,
-                                                (255, 0, 0), thickness=2)
-
-                                cv2.line(src, (cx - x_r, cy - y_range), (cx - x_r, cy + y_range), (255, 0, 0), 2)
-                                cv2.line(src, (cx + x_r, cy - y_range), (cx + x_r, cy + y_range), (255, 0, 0), 2)
-                            else:
-                                y_r = y_range // 2
-                                x_r *= 10
-                                cv2.line(src, (cx - x_r, cy - y_r), (cx - x_r, cy + y_r), (255, 0, 0), 1)
-                                cv2.line(src, (cx + x_r, cy - y_r), (cx + x_r, cy + y_r), (255, 0, 0), 1)
-        else:
-            if visualization:
-                cv2.imshow("yellow_mask", yellow_img)
-                cv2.imshow("canny", canny_img)
-                cv2.imshow("line", src)
-                cv2.waitKey(1)
-            return None
-
-        if visualization:
-            cv2.imshow("yellow_mask", yellow_img)
-            cv2.imshow("canny", canny_img)
-            cv2.imshow("line", src)
-            cv2.waitKey(1)
-        return pos
-
-    def get_cube_saferoom(self):
-        img = self.get_image()
-
-        red_lower = np.array([160, 100, 20])
-        red_upper = np.array([179, 255, 255])
-
-        blue_lower = np.array([100, 60, 60])
-        blue_upper = np.array([140, 255, 255])
-
-        kernel = np.ones((5, 5), np.uint8)
-
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-
-        red_mask = cv2.inRange(hsv, red_lower, red_upper)
-        red_mask = cv2.erode(red_mask, kernel, iterations=2)
-        red_mask = cv2.morphologyEx(red_mask, cv2.MORPH_OPEN, kernel)
-        red_mask = cv2.dilate(red_mask, kernel, iterations=1)
-
-        (cnts, _) = cv2.findContours(red_mask.copy(), cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        center = None
-        if len(cnts) > 0:
-            cnt = sorted(cnts, key = cv2.contourArea, reverse = True)[0]
-            ((x, y), radius) = cv2.minEnclosingCircle(cnt)
-            M = cv2.moments(cnt)
-            center = (int(M['m10'] / M['m00']), int(M['m01'] / M['m00']))
-
-            return center
-        return None, None
-
-    def get_saferoom_position(self):
-        def draw_lines(src, lines, mode = 'all', thickness=2):
-            if mode == 'all':
-                thickness = 2
-                color=[0,255,0]
-                for line in lines:
-                    for x1, y1, x2, y2 in line:
-                        cv2.line(src, (x1, y1), (x2, y2), color, thickness)
-            if mode == 'fit':
-                thickness = 10
-                color=[0,255,0]
-                for line in lines:
-                    cv2.line(src, (lines[0], lines[1]), (lines[2], lines[3]), color, thickness)
-
-        def get_fitline(f_lines, size):
-            lines = np.squeeze(f_lines)
-            lines = lines.reshape(size,2)
-            middle=int(lines.mean(axis=0)[1])
-            min_x = int(lines.min(axis=0)[0])
-            max_x = int(lines.max(axis=0)[0])
-            H = [max_x, middle, min_x, middle]
-            H_degree = (np.arctan2(H[1] - H[3], H[0] - H[2]) * 180) / np.pi
-            return H, H_degree
-
-        img = self.get_image()
-
-        h, w = img.shape[:2]
-
-        frame_center_x = w / 2
-        frame_center_y = h / 2
-
-        green_lower = np.array([40, 40, 40])
-        green_upper = np.array([70, 255, 255])
-
-        kernel = np.ones((5, 5), np.uint8)
-
-        hsv = cv2.cvtColor(img, cv2.COLOR_BGR2HSV)
-        _, saturation, _ = cv2.split(hsv)
-
-        green_mask = cv2.inRange(hsv, green_lower, green_upper)
-        green_mask = cv2.erode(green_mask, kernel, iterations=2)
-        green_mask = cv2.morphologyEx(green_mask, cv2.MORPH_OPEN, kernel)
-        green_mask = cv2.dilate(green_mask, kernel, iterations=1)
-
-        _, binary = cv2.threshold(saturation, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        green_area_mask = cv2.bitwise_and(green_mask, binary)
-
-        edge = auto_canny(green_area_mask)
-        lines = cv2.HoughLinesP(edge, 1, np.pi / 180, 90, minLineLength = 100, maxLineGap = 100)
-
-        lines = np.squeeze(lines)
-
-        if len(lines.shape) == 0:
-            return
-        elif len(lines.shape) == 1:
-            slope_degree = (np.arctan2(lines[1] - lines[3], lines[0] - lines[2]) * 180) / np.pi
-        else:
-            slope_degree = (np.arctan2(lines[:,1] - lines[:,3], lines[:,0] - lines[:,2]) * 180) / np.pi
-
-
-        horizontal_lines = lines[np.abs(slope_degree) > 160]
-        horizontal_slope_degree = slope_degree[np.abs(slope_degree)>160]
-        horizontal_lines = horizontal_lines[:,None]
-
-        size = int(horizontal_lines.shape[0]*horizontal_lines.shape[2]/2)
-        print(horizontal_lines)
-        print(horizontal_lines.shape)
-        print(size)
-        #size = int(horizontal_lines.shape[0]*2)
-        lines = lines.reshape(size,2)
-
-        middle=int(lines.mean(axis=0)[1])
-        min_x = int(lines.min(axis=0)[0])
-        max_x = int(lines.max(axis=0)[0])
-
-        H = [max_x, middle, min_x, middle]
-        H_degree = (np.arctan2(H[1] - H[3], H[0] - H[2]) * 180) / np.pi
-
-        return H_degree
-
-    def line_tracing(self, line_visualization=False, edge_visualization=False):
-        src = self.get_image()
-        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src, line_visualization = line_visualization, edge_visualization = edge_visualization)
+    def line_tracing(self, src= None, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
+        if src is None :
+            src = self.get_image()
+        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         if line_visualization or edge_visualization :
             cv2.imshow("line", src)
             cv2.waitKey(1)
         return result
 
-    def test(self):
-        src = self.get_image(visualization=True)
-        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
-        y, cr, cb = cv2.split(ycrcb)
-        # cb = cv2.equalizeHist(cb)
-        # cr = cv2.equalizeHist(cr)
-        #_, b_mask = cv2.threshold(cb, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
-        #_, r_mask = cv2.threshold(cr, thresh=125, maxval=255, type=cv2.THRESH_TOZERO)
-        _, b_mask = cv2.threshold(cb, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
-        _, r_mask = cv2.threshold(cr, thresh=0, maxval=255, type=cv2.THRESH_OTSU)
+    def get_alphabet_info4room(self, visualization=False) -> tuple:
+        src = self.get_image()
+        if visualization:
+            canvas = src.copy()
+        alphabet_info = None
+        candidates = []
+        blur = cv2.GaussianBlur(src, (5, 5), 0)
+        hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+
+        #red_mask = self.color_preprocessor.get_red_mask(h)
+        #blue_mask = self.color_preprocessor.get_blue_mask(h)
+        #color_mask = cv2.bitwise_or(blue_mask, red_mask)
+        #mask = cv2.bitwise_and(mask, color_mask)
+        _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
+            if stats[idx][0] == 0 and stats[idx][1] == 0:
+                continue
+
+            if np.any(np.isnan(centroid)): # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
+                continue
+            _, _, width, height, area = stats[idx]
+
+            # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            if not (800 < area < 8000 and area_ratio <= 1.7):
+                continue
+
+            candidate = Target(stats=stats[idx], centroid=centroid)
+            roi = candidate.get_target_roi(src, pad=5)
+
+            # ycrcb 색공간을 이용해
+
+            candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
+            candidate_color = candidate.get_color()
+
+            thresholding = None
+            ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
+            y, cr, cb = cv2.split(ycrcb)
+            if candidate_color == "RED":
+                thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
+
+            else:
+                thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
+            _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+            ### 정확도 향상을 위해 아래 함수 수정 요망 ###
+            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+            ####################################
+
+            #if visualization:
+            #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+
+            if candidate_alphabet is None:
+                continue
+            candidate.set_name(candidate_alphabet)
+            if visualization:
+
+                setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
+            candidates.append(candidate)
+
+        if candidates:
+            candidates.sort(key=lambda candidate: candidate.get_center_pos()[1])
+            selected = candidates[0]
+            alphabet_info = (selected.get_color(), selected.get_name())
+            if visualization:
+                setLabel(canvas, selected.get_pts(), color=(0, 0, 255))
+
+        if visualization:
+            cv2.imshow("src", canvas)
+            cv2.waitKey(1)
+
+        return alphabet_info
+
+    def get_green_area_corner(self, visualization=False):
+        src = self.get_image()
+        (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src.copy(), color="GREEN",
+                                                                                line_visualization=False,
+                                                                                edge_visualization=True)
+        down_pos = None
+        up_pos = None
+        curr_activating_pos = ""
+        if edge_info["EDGE_DOWN"]:
+            down_pos = (x, y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+            if x <= 180:
+                curr_activating_pos = "RIGHT"
+            elif x > 400:
+                curr_activating_pos = "LEFT"
+            else:
+                curr_activating_pos = "MIDDLE"
+        # if edge_info["EDGE_UP"]:
+        #     up_pos = (edge_info["EDGE_UP_X"], edge_info["EDGE_UP_Y"])
+
+        if visualization:
+            if down_pos:
+                (x, y) = pos = down_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0]-100, pos[1]+30) , cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255))
+                cv2.putText(dst, curr_activating_pos, (pos[0] - 100, pos[1] + 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                            (0, 0, 255))
+            if up_pos:
+                (x, y) = pos = up_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0] - 100, pos[1] + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                            (0, 0, 255))
+            cv2.imshow("result", dst)
+            cv2.waitKey(1)
+        return (line_info, edge_info, dst)
+
+    def get_black_area_corner(self, visualization=False):
+        src = self.get_image()
+        (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src.copy(), color="BLACK",
+                                                                                line_visualization=False,
+                                                                                edge_visualization=True)
+        down_pos = None
+        up_pos = None
+        if edge_info["EDGE_DOWN"]:
+            down_pos = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+        if edge_info["EDGE_UP"]:
+            up_pos = (edge_info["EDGE_UP_X"], edge_info["EDGE_UP_Y"])
+
+        if visualization:
+            if down_pos:
+                (x, y) = pos = down_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0]-100, pos[1]+30) , cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255))
+            if up_pos:
+                (x, y) = pos = up_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0] - 100, pos[1] + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                            (0, 0, 255))
+            cv2.imshow("result", dst)
+            cv2.waitKey(1)
+        return (line_info, edge_info, dst)
+
+    def get_milk_info(self, color="BLUE", visualization=False) -> tuple:
+        src = self.get_image()
+        if visualization:
+            canvas = src.copy()
+        candidates = []
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
+        _, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
+        color_mask = None
+
+        ### 색상 이진화를 이용한 마스킹 과정 ###
+        if color == "BLUE":
+            color_mask = self.color_preprocessor.get_blue_mask(h)
+        elif color == "RED":
+            color_mask = self.color_preprocessor.get_red_mask(h)
+        else:
+            color_mask = mask
+
+        color_mask = cv2.morphologyEx(color_mask, cv2.MORPH_OPEN, k)
+        color_mask = cv2.morphologyEx(color_mask, cv2.MORPH_CLOSE, k)
+        mask = cv2.bitwise_and(mask, color_mask)
+        ###############################
+        ###############################
+
+        ### 필터링을 위한 초록색 수평선 정보 얻어오기 ###
+
+        (_, edge_info, _) = self.line_tracing(src=src, color="GREEN")
+        ######################################
+        ######################################
+
+        ### 라벨링을 이용한 객체 구별 ###############
+        _, y, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+
+        for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
+            if stats[idx][0] == 0 and stats[idx][1] == 0:
+                continue
+
+            if np.any(np.isnan(centroid)):  # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
+                continue
+
+            _, y, width, height, area = stats[idx]
+
+            ### roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 라벨만 남기도록 필터링
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            print(area_ratio)
+
+            if not (3000 < width*height < 8000 and area_ratio <= 1.7):
+                continue
+            ############################################################
+
+            ### 초록색 영역 위쪽 라인위의 라벨은 무시하도록 필터링
+            if edge_info:
+                if edge_info["EDGE_UP_Y"] > (y+height)//2 :
+                    continue
+            ########################################
+
+            ### 필터링에서 살아남은 후보 라벨만 Target 객체화 시켜 후보 리스트에 추가
+            candidate = Target(stats=stats[idx], centroid=centroid)
+            ########################################################
+
+            if visualization:
+                setLabel(canvas, candidate.get_pts(), label=f"MILK POS x:{candidate.x}, y:{candidate.y}", color=(255, 255, 255))
+            candidates.append(candidate)
+        if visualization:
+            cv2.imshow("src", canvas)
+            cv2.imshow("mask", mask)
+            cv2.waitKey(1)
+        #####################################
+        #####################################
+
+        ### 후보 라벨이 있다면 그중에서 가장 큰 크기 객체의 중심 좌표를 반환
+        if candidates:
+            return max(candidates, key=lambda candidate:candidate.get_area()).get_center_pos()
+        ### 없다면 None 리턴
+        return None
 
 
-        v1 = cv2.hconcat([cb, cr])
-        v2 = cv2.hconcat([b_mask,r_mask])
-        cv2.imshow("result", cv2.vconcat([v1, v2]))
-        cv2.waitKey(1)
+
+
 
 
 if __name__ == "__main__":
 
     imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.get_room_alphabet(visualization=True)
+        #imageProcessor.get_milk_info(color="BLUE", visualization=True)
+        imageProcessor.get_green_area_corner(visualization=True)
 

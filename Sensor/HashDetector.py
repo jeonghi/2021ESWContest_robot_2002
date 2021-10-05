@@ -51,6 +51,11 @@ class HashDetector:
         return extension_type
 
     @staticmethod
+    def check_black_rate(img:np.array) -> float:
+        assert len(img.shape) == 2, "Only Binary Image"
+        return 1 - HashDetector.check_white_rate(img)
+
+    @staticmethod
     def check_white_rate(img:np.array) -> float:
         assert len(img.shape) == 2, "Only Binary Image"
         h, w = img.shape[:2]
@@ -63,7 +68,6 @@ class HashDetector:
             return None, None
         img_hash = self.image_to_hash(img)
         hdist_dict = {}
-        
         for i in range(len(self.directions)):
             direction = self.directions[i]
             hash = self.directions_hash[i]
@@ -71,14 +75,14 @@ class HashDetector:
         
         result = min(hdist_dict.keys(), key=(lambda k:hdist_dict[k]))
 
-        if hdist_dict[result] > threshold:
+        if hdist_dict[result] > threshold :
             return None, None
         
         return result, hdist_dict[result]
 
     def detect_arrow(self, img : np.ndarray):
-        img_hash = self.image_to_hash(img)
 
+        img_hash = self.image_to_hash(img)
         distance_1 = self.hamming_distance(img_hash, self.directions_hash[0])
         distance_2 = self.hamming_distance(img_hash, self.directions_hash[1])
 
