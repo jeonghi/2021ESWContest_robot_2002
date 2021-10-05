@@ -181,7 +181,7 @@ class LineDetector:
             max_y = int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
-            result = [max_x, min_y, min_x, max_y]
+            result = [min_x, min_y, max_x, max_y ]
             return result
         elif what_line == 'edge_L' or 'all':
             min_y = int(lines.min(axis=0)[1])
@@ -228,7 +228,7 @@ class LineDetector:
             contours = self.get_lines(src, color)
 
             if len(contours) != 0:
-                contour = contours[0]
+                contour = max(contours, key=lambda x:cv2.contourArea(x))
                 leftmost = tuple(contour[contour[:,:,0].argmin()][0])
                 rightmost = tuple(contour[contour[:,:,0].argmax()][0])
                 topmost = tuple(contour[contour[:,:,1].argmin()][0])
@@ -245,7 +245,7 @@ class LineDetector:
                 edge_info["EDGE_DOWN_Y"] = edge_contour_line_DOWN[1]
 
                 if edge_visualization is True:
-                    #self.draw_lines(temp, edge_contour_line_UP, 'lines', 'fit')
+                    self.draw_lines(temp, edge_contour_line_UP, 'lines', 'fit')
                     self.draw_lines(temp, edge_contour_line_DOWN, 'lines', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
                     for cnt in contours:
