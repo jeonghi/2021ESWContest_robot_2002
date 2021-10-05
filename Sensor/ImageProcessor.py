@@ -3,7 +3,6 @@ import numpy as np
 import time
 import platform
 import os
-import pytesseract
 
 from imutils.video import WebcamVideoStream
 from imutils.video import FileVideoStream
@@ -431,16 +430,6 @@ class ImageProcessor:
             cv2.imshow("line", src)
             cv2.waitKey(1)
         return result
-    
-    def get_roomname(self, masked):
-        pytesseract.pytesseract.tesseract_cmd = "[tesseract path]"
-        name = pytesseract.image_to_string(masked, lang='eng', config="--psm 10")
-        
-        if name in ['A', 'B', 'C', 'D']:
-            return name
-        
-        return None
-        
 
     def test(self):
         src = self.get_image(visualization=True)
