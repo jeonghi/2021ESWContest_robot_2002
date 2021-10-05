@@ -234,8 +234,8 @@ class LineDetector:
                 topmost = tuple(contour[contour[:,:,1].argmin()][0])
                 bottommost = tuple(contour[contour[:,:,1].argmax()][0])
 
-                edge_contour_line_UP = [ 10, bottommost[1], 600, bottommost[1]]
-                edge_contour_line_DOWN = [ 10, topmost[1], 600, topmost[1]]
+                edge_contour_line_DOWN = [ 10, bottommost[1], 600, bottommost[1]]
+                edge_contour_line_UP = [ 10, topmost[1], 600, topmost[1]]
                 
                 edge_info["EDGE_UP"] = True     
                 edge_info["EDGE_UP_X"] = [ edge_contour_line_UP[0] , edge_contour_line_UP[2]]
@@ -245,7 +245,7 @@ class LineDetector:
                 edge_info["EDGE_DOWN_Y"] = edge_contour_line_DOWN[1]
 
                 if edge_visualization is True:
-                    self.draw_lines(temp, edge_contour_line_UP, 'lines', 'fit')
+                    #self.draw_lines(temp, edge_contour_line_UP, 'lines', 'fit')
                     self.draw_lines(temp, edge_contour_line_DOWN, 'lines', 'fit')
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
                     for cnt in contours:
