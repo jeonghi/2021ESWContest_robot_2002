@@ -9,8 +9,7 @@ import cv2
 import kbhit # press any key to exit
 
 def main():
-    #robot = Robot()
-    image_processor = ImageProcessor("Sensor/src/door_test/doortest_E.h264")
+    robot = Robot()
     #====================== debug ======================
 
     video_recorder = VideoRecorder()
@@ -20,24 +19,20 @@ def main():
     while True:
         if kb.kbhit():
             key = ord(kb.getch())
-        
+
             if key == 27: # ESC
                 break
 
-        #frame = robot._image_processor.get_image()
-        #video_recorder.record_frame(frame)
+        frame = robot._image_processor.get_image()
+        video_recorder.record_frame(frame)
 
     #===================== function ======================
 
-        #robot.tracking_cube()
-        #robot.find_yellow_corner_for_out_room()
-        print(image_processor.get_door_alphabet(visualization=True))
-
 
     #=====================================================
-
-    #video_recorder.stop()
-    #robot.set_basic_form()
+    
+    video_recorder.stop()
+    robot.set_basic_form()
 
 if __name__ == "__main__":
     main()
