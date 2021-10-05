@@ -97,7 +97,7 @@ class LineDetector:
             edges = cv2.Canny(mask, 75, 150)
             cv2.imshow('mask', mask)
             cv2.imshow('edges', edges)
-            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=50, maxLineGap=150)
+            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=30, maxLineGap=150)
             lines = np.squeeze(lines)
             print(lines)
 
@@ -181,7 +181,7 @@ class LineDetector:
             max_y = int(lines.max(axis=0)[1])
             min_x = int(lines.min(axis=0)[0])
             max_x = int(lines.max(axis=0)[0])
-            result = [min_x, min_y, max_x, max_y ]
+            result = [max_x, min_y, min_x, max_y]
             return result
         elif what_line == 'edge_L' or 'all':
             min_y = int(lines.min(axis=0)[1])

@@ -24,6 +24,7 @@ class Robot:
         self.alphabet_color = None
         self.cube_grabbed = False
         self.curr_room_color = ""
+        self.return_head - ''
         self.count = 0
         self.progress_of_roobot= [None, ]
         self.walk_info = None
@@ -34,7 +35,7 @@ class Robot:
         self._motion.basic_form()
         
     def check_motion(self):
-        self._motion.set_head(dir ='DOWN', angle = 80)
+        self._motion.set_head(dir ='DOWN', angle = 45)
 
     def get_distance_from_baseline(self, box_info, baseline=(320, 380)):
         # if bx - cx > 0
@@ -762,19 +763,28 @@ class Robot:
             self.box_into_area(line_info, edge_info)
 
         # 방탈출 #로봇 시야각 맞추기
-        elif self.mode == 'end_mission' or self.mode == 'find_edge':
+        elif self.mode == 'end_mission':
+            if self.curr_room_color == 'BLACK':
+                self._motion.set_head(dir ='DOWN', angle = 45)
+            else: # self.curr_room_color == 'BLACK':
+                if edge_info["EDGE_POS"][1] <= 100:
+                    self._motion.set_head(dir ='DOWN', angle = 55)
+                    self.return_head = '55'
+                else:
+                    self._motion.set_head(dir ='DOWN', angle = 45)
+            self.mode = 'find_edge'
+    
+        elif self.mode == 'find_edge':
+            if self.return_head == '55':
+                if edge_info["EDGE_POS"][1] <= 100:
+                    pass
+                else:
+                    self._motion.set_head(dir ='DOWN', angle = 45)
+                    self.return_head = '45'
+            else:
+                print('self.return_head is empty')
             
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
-                if self.curr_room_color == 'BLACK':
-                    self._motion.set_head(dir ='DOWN', angle = 30)
-                else: # self.curr_room_color == 'BLACK':
-                    if edge_info["EDGE_POS"][1] <= 100:
-                        self._motion.set_head(dir ='DOWN', angle = 60)
-                    elif edge_info["EDGE_POS"][1] > 100 and edge_info["EDGE_POS"][1] < 200:
-                        self._motion.set_head(dir ='DOWN', angle = 45)
-                    else:
-                        self._motion.set_head(dir ='DOWN', angle = 30)
-                
                 if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
                     self.mode = 'return_line' # --> find_V
@@ -785,15 +795,6 @@ class Robot:
                     self.find_edge()
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
-                        
             else: # yellow edge 감지 X
                 print('yellow edge 감지 X ')
                 self.mode = 'find_edge' # --> return_line
