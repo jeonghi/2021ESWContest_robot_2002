@@ -34,7 +34,7 @@ class Robot:
         self._motion.basic_form()
         
     def check_motion(self):
-        self._motion.set_head(dir ='DOWN', angle = 45)
+        self._motion.set_head(dir ='DOWN', angle = 80)
 
     def get_distance_from_baseline(self, box_info, baseline=(320, 380)):
         # if bx - cx > 0
@@ -169,7 +169,7 @@ class Robot:
         self._motion.set_head(dir="LEFTRIGHT_CENTER")  # 알파벳을 인식하기 위해 고개를 다시 정면으로 향하게 한다.
         # 만약 알파벳 정보가 없다면 영상처리 측면을 개선하거나, 약간의 움직임을 통해 프레임 refresh가 필요하다.
         if self.alphabet_color is None:
-            self._motion.set_head(dir="DOWN", angle=90)
+            self._motion.set_head(dir="DOWN", angle=80)
             time.sleep(0.6)
             alphabet = self._image_processor.get_alphabet_info4room()
             if alphabet is None:
@@ -315,8 +315,6 @@ class Robot:
 
 
     def find_edge(self): #find_corner_for_outroom
-
-                
         if self.curr_room_color=='BLACK':
             if self.direction == 'LEFT':
                 self._motion.turn(dir='RIGHT', loop=1, grab=True) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
@@ -765,8 +763,18 @@ class Robot:
 
         # 방탈출 #로봇 시야각 맞추기
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
-            self._motion.set_head(dir ='DOWN', angle = 45)
+            
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
+                if self.curr_room_color == 'BLACK':
+                    self._motion.set_head(dir ='DOWN', angle = 30)
+                else: # self.curr_room_color == 'BLACK':
+                    if edge_info["EDGE_POS"][1] <= 100:
+                        self._motion.set_head(dir ='DOWN', angle = 60)
+                    elif edge_info["EDGE_POS"][1] > 100 and edge_info["EDGE_POS"][1] < 200:
+                        self._motion.set_head(dir ='DOWN', angle = 45)
+                    else:
+                        self._motion.set_head(dir ='DOWN', angle = 30)
+                
                 if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
                     self.mode = 'return_line' # --> find_V
@@ -777,6 +785,15 @@ class Robot:
                     self.find_edge()
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
+                        
             else: # yellow edge 감지 X
                 print('yellow edge 감지 X ')
                 self.mode = 'find_edge' # --> return_line

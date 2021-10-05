@@ -13,13 +13,11 @@ if __name__ == "__main__":
     from Target import Target, setLabel
     from LineDetector import LineDetector
     from ColorChecker import ColorPreProcessor
-    from LaneLines import intersect, median, left_right_lines
 else:
     from Sensor.HashDetector import HashDetector
     from Sensor.Target import Target, setLabel
     from Sensor.LineDetector import LineDetector
     from Sensor.ColorChecker import ColorPreProcessor
-    from Sensor.LaneLines import intersect, median, left_right_lines
 
 
 class ImageProcessor:
@@ -40,7 +38,6 @@ class ImageProcessor:
             self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
 
         else:
-
             self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
             self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
             self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
@@ -422,7 +419,7 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.line_tracing(color = "YELLOW", line_visualization=False, edge_visualization=True)
+        imageProcessor.line_tracing(color = "BLACK", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", visualization=True)
