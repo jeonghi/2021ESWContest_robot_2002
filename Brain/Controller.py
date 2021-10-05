@@ -343,7 +343,7 @@ class Robot:
         # 방탈출
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None :
-                if 320 < edge_info["EDGE_POS"][0] < 360 :
+                if 300 < edge_info["EDGE_POS"][0] < 360 :
                     self.mode == 'return_line' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
@@ -354,7 +354,7 @@ class Robot:
                     self.progress_of_roobot.insert(0, self.mode)        
 
         elif self.mode == 'return_line':
-            if edge_info["EDGE_POS"][1] > 380:
+            if edge_info["EDGE_POS"][1] > 465:
                 self.mode = 'find_V' # --> walk
                 if self.progress_of_roobot[0] != self.mode:
                     self.progress_of_roobot.insert(0, self.mode)
@@ -475,7 +475,7 @@ class Robot:
         # 방탈출
         elif self.mode == 'end_mission' or self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None :
-                if 320 < edge_info["EDGE_POS"][0] < 360 :
+                if 300 < edge_info["EDGE_POS"][0] < 360 :
                     self.mode == 'return_line' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
                         print(self.mode)
@@ -492,7 +492,7 @@ class Robot:
                     self.progress_of_roobot.insert(0, self.mode)        
 
         elif self.mode == 'return_line':
-            if edge_info["EDGE_POS"][1] > 380:
+            if edge_info["EDGE_POS"][1] > 465:
                 self.mode = 'find_V' # --> walk
                 if self.progress_of_roobot[0] != self.mode:
                     print(self.mode)
@@ -536,7 +536,7 @@ class Robot:
         dq = deque(grabbed_head_moving)
         dq.rotate(flag)
         while True:
-            result = (line_info, edge_info, src) = self._image_processor.line_tracing(edge_visualization=True)
+            src = self._image_processor.get_image()
             print(result)
             if dq[0] == "begin":
                 flag = -1
