@@ -77,13 +77,13 @@ class Robot:
                 self.curr_activating_pos = "MIDDLE"
         return
 
-    def detect_room_alphabet(self):
+    def detect_room_alphabet(self, edge_info):
         self._motion.set_head(dir="LEFTRIGHT_CENTER")  # 알파벳을 인식하기 위해 고개를 다시 정면으로 향하게 한다.
         # 만약 알파벳 정보가 없다면 영상처리 측면을 개선하거나, 약간의 움직임을 통해 프레임 refresh가 필요하다.
         if self.alphabet_color is None:
             self._motion.set_head(dir="DOWN", angle=90)
             time.sleep(0.6)
-            alphabet = self._image_processor.get_alphabet_info4room()
+            alphabet = self._image_processor.get_alphabet_info4room(method="CONTOUR", edge_info=edge_info)
             if alphabet is None:
                 print("감지되는 알파벳 정보가 없습니다")
                 return
@@ -311,7 +311,7 @@ class Robot:
 
         # 1. red, blue 알파벳 구별: edge_info["EDGE_UP_Y"] 기준으로 윗 공간, self.alphabet_color 알파벳 색깔 넣어주세요
         elif self.mode == 'detect_room_alphabet':
-            self.detect_room_alphabet()
+            self.detect_room_alphabet(edge_info=edge_info)
 
 
         # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, MIDDLE, RIGHT)
