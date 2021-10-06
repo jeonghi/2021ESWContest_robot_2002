@@ -189,7 +189,7 @@ class ImageProcessor:
             cv2.waitKey(1)
         return result
 
-    def get_alphabet_info4room(self, edge_info={}, method="CONTOUR", visualization=False) -> tuple:
+    def get_alphabet_info4room(self, edge_info, method="CONTOUR", visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -218,7 +218,7 @@ class ImageProcessor:
                 # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
                 area_ratio = width / height if height < width else height / width
                 area_ratio = round(area_ratio, 2)
-                if not (800 < area < 8000 and area_ratio <= 1.7):
+                if not (800 < area < 8000 and area_ratio <= 1.4):
                     continue
 
                 candidate = Target(stats=stats[idx], centroid=centroid)
@@ -240,18 +240,17 @@ class ImageProcessor:
                 _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
                 ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
                 ####################################
 
-                #if visualization:
-                #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+                if visualization:
+                  cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
 
                 if candidate_alphabet is None:
                     continue
                 candidate.set_name(candidate_alphabet)
-                if visualization:
-
-                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
+                # if visualization:
+                #     setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
                 candidates.append(candidate)
         else:
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -263,7 +262,7 @@ class ImageProcessor:
                 # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
                 area_ratio = width / height if height < width else height / width
                 area_ratio = round(area_ratio, 2)
-                if not (800 < area < 8000 and area_ratio <= 1.7):
+                if not (800 < area < 8000 and area_ratio <= 1.4):
                     continue
 
                 candidate = Target(contour=contour)
@@ -285,31 +284,29 @@ class ImageProcessor:
                 _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
                 ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
                 ####################################
 
-                # if visualization:
-                #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+                if visualization:
+                  cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
 
                 if candidate_alphabet is None:
                     continue
                 candidate.set_name(candidate_alphabet)
-                if visualization:
-                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
+                # if visualization:
+                #     setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
                 candidates.append(candidate)
 
         if candidates:
             if edge_info:
                 if edge_info["EDGE_UP"] :
-                    print("필터 적용전", candidates)
-                    filter(lambda candidate: candidate.get_center_pos()[1] < edge_info["EDGE_UP_Y"], candidates)
-                    print("적용 후", candidates)
+                    candidates = list(filter(lambda candidate: candidate.get_center_pos()[1] < edge_info["EDGE_UP_Y"], candidates))
 
-            candidates.sort(key=lambda candidate: candidate.get_center_pos()[1], reverse=False)
-            selected = candidates[0]
+        if candidates:
+            selected = max(candidates, key=lambda candidate : candidate.get_center_pos()[1])
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
-                setLabel(canvas, selected.get_pts(), color=(0, 0, 255))
+                setLabel(canvas, selected.get_pts(), selected.get_name(), color=(0, 0, 255))
 
         if visualization:
             mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
@@ -363,7 +360,7 @@ class ImageProcessor:
             ### roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 라벨만 남기도록 필터링
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
-            print(area_ratio)
+            #print(area_ratio)
 
             if not (2000 < width*height < 8000 and area_ratio <= 1.7):
                 continue
@@ -411,12 +408,12 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN")
-        imageProcessor.get_alphabet_info4room(method="CONTOUR", edge_info=edge_info, visualization=True)
+        (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN",edge_visualization=True)
+        imageProcessor.get_alphabet_info4room(method="LABEL", edge_info=edge_info, visualization=True)
         # (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN")
         # info = imageProcessor.get_milk_info(color="RED", edge_info=edge_info, visualization=True)
         # print(info)
