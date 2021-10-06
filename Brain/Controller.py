@@ -129,7 +129,7 @@ class Robot:
         flag = True
         self.alphabet = self._image_processor.get_door_alphabet()
         print(self.alphabet)
-        if alphabet is None:
+        if self.alphabet is None:
             alphabet = self._image_processor.get_door_alphabet()
             if flag:
                 self._motion.walk("RIGHT")
@@ -138,7 +138,7 @@ class Robot:
 
             flag = not flag
         else:
-            self._motion.notice_direction(dir=alphabet)
+            self._motion.notice_direction(dir=self.alphabet)
     
     
     def update_box_pos(self, edge_info:dict, box_info:tuple):
@@ -762,32 +762,13 @@ class Robot:
         elif self.mode == 'box_into_area':
             self.box_into_area(line_info, edge_info)
 
-        # 방탈출 #로봇 시야각 맞추기
+
         elif self.mode == 'end_mission':
-            if self.curr_room_color == 'BLACK':
-                self._motion.set_head(dir ='DOWN', angle = 45)
-            else: # self.curr_room_color == 'BLACK':
-                if edge_info["EDGE_POS"][1] <= 100:
-                    self._motion.set_head(dir ='DOWN', angle = 55)
-                    self.return_head = '55'
-                else:
-                    self._motion.set_head(dir ='DOWN', angle = 45)
-            self.mode = 'find_edge'
-    
-        elif self.mode == 'find_edge':
-            if self.return_head == '55':
-                if edge_info["EDGE_POS"][1] <= 100:
-                    pass
-                else:
-                    self._motion.set_head(dir ='DOWN', angle = 45)
-                    self.return_head = '45'
-            else:
-                print('self.return_head is empty')
-            
+            self._motion.set_head(dir ='DOWN', angle = 55)
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
-                    self.mode = 'return_line' # --> find_V
+                    self.mode = 'find_edge' # --> find_V
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
                 else: # yellow edge 중앙 X
@@ -797,13 +778,47 @@ class Robot:
                         self.progress_of_roobot.insert(0, self.mode)
             else: # yellow edge 감지 X
                 print('yellow edge 감지 X ')
-                self.mode = 'find_edge' # --> return_line
+                self.mode = 'end_mission' # --> find_edge
                 self.find_edge()
                 if self.progress_of_roobot[0] != self.mode:
-                    self.progress_of_roobot.insert(0, self.mode)        
+                    self.progress_of_roobot.insert(0, self.mode)       
+        
+
+        # 방탈출 #로봇 시야각 맞추기
+        elif self.mode == 'find_edge':
+            if self.curr_room_color == 'BLACK':
+                self._motion.set_head(dir ='DOWN', angle = 45)
+            else: # self.curr_room_color == 'GREEN':
+                if edge_info["EDGE_POS"][1] <= 100:
+                    self._motion.set_head(dir ='DOWN', angle = 55)
+                    self.return_head = '55'
+                else:
+                    self._motion.set_head(dir ='DOWN', angle = 45)
+            self.mode = 'return_line'
+    
+        #elif self.mode == 'find_edge':
+            #if self.box_pos == 'LEFT':
+            #   self._motion.walk(dir = 'RIGHT', loop=2 )
+            #if self.box_pos == 'RIGHT':
+            #   self._motion.walk(dir = 'LEFT', loop=2 )
+            #else:
+                #pass
+            #self._motion.set_head(dir ='DOWN', angle = 45)
+            #self.mode = 'find_edge'
+    
+
+
 
         elif self.mode == 'return_line':
-                        
+            if self.return_head == '55': #
+                if edge_info["EDGE_POS"][1] <= 100: #
+                    pass#
+                else:#
+                    self._motion.set_head(dir ='DOWN', angle = 45)#
+                    self.return_head = '45'#
+            else:#
+                print('self.return_head is empty')#
+
             if self.curr_room_color == 'BLACK':
                 self._motion.set_head(dir='DOWN', angle=35)
                 if edge_info["EDGE_POS"] != None :
