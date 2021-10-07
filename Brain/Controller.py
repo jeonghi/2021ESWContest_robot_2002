@@ -16,15 +16,15 @@ class Robot:
         self._line_detector = LineDetector()
         self.direction = 'LEFT'
         self.alphabet = None
-        self.mode = 'walk'
+        self.mode = 'catch_box'
         #self.mode = 'start_mission'
-        self.color = 'YELLOW'
+        self.color = 'GREEN'
         #self.color = ''
-        self.box_pos = ''
+        self.box_pos = 'RIGHT'
         self.alphabet_color = None
         self.cube_grabbed = False
-        self.curr_room_color = ""
-        self.return_head - ''
+        self.curr_room_color = "GREEN"
+        self.return_head =''
         self.count = 0
         self.progress_of_roobot= [None, ]
         self.walk_info = None
@@ -35,7 +35,7 @@ class Robot:
         self._motion.basic_form()
         
     def check_motion(self):
-        self._motion.set_head(dir ='DOWN', angle = 45)
+        self._motion.set_head(dir ='DOWN', angle = 10)
 
     def get_distance_from_baseline(self, box_info, baseline=(320, 400)):
         # if bx - cx > 0
@@ -53,7 +53,7 @@ class Robot:
     def check_turn(self):
         #self._motion.move_arm(dir = 'LOW')
         #self._motion.walk(dir='FORWARD', loop=1)
-        self._motion.set_head('DOWN', 30)
+        self._motion.set_head('DOWN', 45)
 
 
     def old_line_tracing(self):
@@ -166,13 +166,13 @@ class Robot:
         else:
             print('NO EDGE DOWN')
 
-    def detect_room_alphabet(self):
+    def detect_room_alphabet(self, edge_info):
         self._motion.set_head(dir="LEFTRIGHT_CENTER")  # 알파벳을 인식하기 위해 고개를 다시 정면으로 향하게 한다.
         # 만약 알파벳 정보가 없다면 영상처리 측면을 개선하거나, 약간의 움직임을 통해 프레임 refresh가 필요하다.
         if self.alphabet_color is None:
-            self._motion.set_head(dir="DOWN", angle=80)
+            self._motion.set_head(dir="DOWN", angle=90)
             time.sleep(0.6)
-            alphabet = self._image_processor.get_alphabet_info4room()
+            alphabet = self._image_processor.get_alphabet_info4room(method="CONTOUR", edge_info=edge_info)
             if alphabet is None:
                 print("감지되는 알파벳 정보가 없습니다")
                 return
@@ -480,9 +480,10 @@ class Robot:
     def box_into_area(self, line_info, edge_info):
         self._motion.walk(dir='FORWARD', loop=2, grab=True)
         self._motion.grab(switch=False) # 앉고 잡은 박스 놓는 모션 넣기
-        self._motion.set_head(dir ='DOWN', angle=60)
-        self.mode = 'end_mission'
+        #self._motion.set_head(dir ='DOWN', angle=60)
+        #self.mode = 'end_mission'
         self.color = 'YELLOW'
+        self.count += 1
 
 
     # start > detect_alphabet> walk │ > ─ > detect_direction > walk │ > ┐ , ┌  > start_mission > end_mission > find_edge > return_line > find_V > walk > is_finish_Line > finish
@@ -593,8 +594,8 @@ class Robot:
 
         elif self.mode == 'walk' and self.walk_info =='┌':
             self._motion.set_head(dir='DOWN', angle = 10)
-            if line_info["H_Y"][1] > 90 :
-                self._motion.walk("FORWARD", 1)
+            if line_info["H_Y"][1] > 50 :
+                self._motion.walk("FORWARD", 2)
                 time.sleep(1)
                 if self.direction == 'RIGHT':
                     self.mode = 'is_finish_line' # --> end_mission --> return_line
@@ -602,6 +603,7 @@ class Robot:
                         self.progress_of_roobot.insert(0, self.mode)
 
                 elif self.direction == 'LEFT':
+                
                     self.mode = 'start_mission' # --> walk / finish
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
@@ -660,7 +662,7 @@ class Robot:
 
         # 1. red, blue 알파벳 구별: edge_info["EDGE_UP_Y"] 기준으로 윗 공간, self.alphabet_color 알파벳 색깔 넣어주세요
         elif self.mode == 'detect_room_alphabet':
-            self.detect_room_alphabet()
+            self.detect_room_alphabet(edge_info=edge_info)
 
 
         # 2. 박스 트래킹 : self.alphabet_color 기준으로 edge_info["EDGE_UP_Y"] 아래 공간, self.box_pos박스 위치 바꿔주세요 (LEFT, MIDDLE, RIGHT)
@@ -671,7 +673,7 @@ class Robot:
         elif self.mode == 'find_box':
             ### 계속해서 안전/확진지역 영역의 코너 정보를 기반으로 현재 로봇이 방에서 어디에서 활동하고 있는지를 업데이트 해줍니다.
             self._motion.set_head("DOWN", self.curr_head[0])
-            box_info = self._image_processor.get_milk_info(color=self.alphabet_color)
+            box_info = self._image_processor.get_milk_info(color=self.alphabet_color, edge_info = edge_info)
             if box_info is None:
                 if self.curr_head[0] == 35:
                     self._motion.turn(dir=self.direction, loop=1)
@@ -685,7 +687,7 @@ class Robot:
 
         elif self.mode == 'track_box':
             self._motion.set_head("DOWN", self.curr_head[0])
-            box_info = self._image_processor.get_milk_info(color=self.alphabet_color)
+            box_info = self._image_processor.get_milk_info(color=self.alphabet_color, edge_info=edge_info)
             if box_info is None:
                 self.mode = 'find_box'
             else:
@@ -761,14 +763,24 @@ class Robot:
 
         elif self.mode == 'box_into_area':
             self.box_into_area(line_info, edge_info)
+            if self.box_pos == 'LEFT':
+               self._motion.walk(dir = 'RIGHT', loop=4 )
+            if self.box_pos == 'RIGHT':
+               self._motion.walk(dir = 'LEFT', loop=4 )
+            else:
+                pass
+            self._motion.set_head(dir ='DOWN', angle = 45)
+            self.mode = 'end_mission'
+            self.colot = 'YELLOW'
 
 
         elif self.mode == 'end_mission':
-            self._motion.set_head(dir ='DOWN', angle = 55)
+            #self._motion.set_head(dir ='DOWN', angle = 55)
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 300 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
-                    self.mode = 'find_edge' # --> find_V
+                    self.mode = 'return_line' # --> find_V
+                    self._motion.walk(dir = 'LEFT', loop=4 )
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
                 else: # yellow edge 중앙 X
@@ -785,39 +797,39 @@ class Robot:
         
 
         # 방탈출 #로봇 시야각 맞추기
-        elif self.mode == 'find_edge':
-            if self.curr_room_color == 'BLACK':
-                self._motion.set_head(dir ='DOWN', angle = 45)
-            else: # self.curr_room_color == 'GREEN':
-                if edge_info["EDGE_POS"][1] <= 100:
-                    self._motion.set_head(dir ='DOWN', angle = 55)
-                    self.return_head = '55'
-                else:
-                    self._motion.set_head(dir ='DOWN', angle = 45)
-            self.mode = 'return_line'
-    
         #elif self.mode == 'find_edge':
-            #if self.box_pos == 'LEFT':
-            #   self._motion.walk(dir = 'RIGHT', loop=2 )
-            #if self.box_pos == 'RIGHT':
-            #   self._motion.walk(dir = 'LEFT', loop=2 )
-            #else:
-                #pass
-            #self._motion.set_head(dir ='DOWN', angle = 45)
-            #self.mode = 'find_edge'
+            #if self.curr_room_color == 'BLACK':
+             #   self._motion.set_head(dir ='DOWN', angle = 45)
+            #else: # self.curr_room_color == 'GREEN':
+             #   if line_info["ALL_Y"][1] <= 100:
+             #       self._motion.set_head(dir ='DOWN', angle = 55)
+             #       self.return_head = '55'
+             #   else:
+             #       self._motion.set_head(dir ='DOWN', angle = 45)
+            #self.mode = 'return_line'
+    
+        elif self.mode == 'find_edge':
+            if self.box_pos == 'LEFT':
+               self._motion.walk(dir = 'RIGHT', loop=2 )
+            if self.box_pos == 'RIGHT':
+               self._motion.walk(dir = 'LEFT', loop=2 )
+            else:
+                pass
+            self._motion.set_head(dir ='DOWN', angle = 45)
+            self.mode = 'return_line'
     
 
 
 
         elif self.mode == 'return_line':
-            if self.return_head == '55': #
-                if edge_info["EDGE_POS"][1] <= 100: #
-                    pass#
-                else:#
-                    self._motion.set_head(dir ='DOWN', angle = 45)#
-                    self.return_head = '45'#
-            else:#
-                print('self.return_head is empty')#
+            #if self.return_head == '55': #
+                #if line_info["ALL_Y"][1] <= 100: #
+                  #  pass#
+                #else:#
+                   # self._motion.set_head(dir ='DOWN', angle = 45)#
+                  #  self.return_head = '45'#
+            #else:#
+                #print('self.return_head is empty')#
 
             if self.curr_room_color == 'BLACK':
                 self._motion.set_head(dir='DOWN', angle=35)
@@ -847,6 +859,7 @@ class Robot:
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
             elif self.curr_room_color == 'GREEN':
+                self._motion.set_head(dir='DOWN', angle=35)
                 if edge_info["EDGE_POS"] != None :
                     if edge_info["EDGE_POS"][1] > 478: # yellow edge y 좌표 가까이 O
                         #self._motion.walk(dir='FORWARD', loop=2)
@@ -890,19 +903,14 @@ class Robot:
 
         # 나가기
         elif self.mode == 'is_finish_line':
-            if line_info['H'] == True:
-                self.walk(line_info, '│')
-                time.sleep(1)
-            else: #line_info['H'] == False
-                if self.count < 3:
-                     self.mode = 'walk'
-                    # self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
+            if self.count < 3:
+                if line_info['H'] == True:
+                    self.walk(line_info, '│')
+                    time.sleep(1)
                 else:
-                    self.mode = 'finish' # --> stop!
-                    self._motion.turn(dir=self.direction, loop =4)
-                    if self.progress_of_roobot[0] != self.mode:
-                            self.progress_of_roobot.insert(0, self.mode)
-            
-        # 나가기
-        elif self.mode == 'finish':
-            self.walk(line_info, '│')
+                    self.mode = 'walk'
+                # self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
+            else:
+                self.mode = 'finish' # --> stop!
+                if self.progress_of_roobot[0] != self.mode:
+                        self.progress_of_roobot.insert(0, self.mode)
