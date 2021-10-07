@@ -12,7 +12,7 @@ VIDEO_PATH = "Sensor/src/debug/room_red_A.h264"    # test robot: -1    test vide
 DEBUG = True # test robot: False    test local: True
 
 def main():
-    robot = Robot(VIDEO_PATH, DEBUG)
+    robot = Robot()
     #====================== debug ======================
 
     video_recorder = VideoRecorder()

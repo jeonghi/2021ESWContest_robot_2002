@@ -417,5 +417,3 @@ if __name__ == "__main__":
         # (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN")
         # info = imageProcessor.get_milk_info(color="RED", edge_info=edge_info, visualization=True)
         # print(info)
-
-s
