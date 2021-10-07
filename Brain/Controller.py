@@ -890,7 +890,6 @@ class Robot:
 
         # 나가기
         elif self.mode == 'is_finish_line':
-<<<<<<< HEAD
             if line_info['H'] == True:
                 self.walk(line_info, '│')
                 time.sleep(1)
@@ -907,14 +906,3 @@ class Robot:
         # 나가기
         elif self.mode == 'finish':
             self.walk(line_info, '│')
-=======
-            if self.count < 3:
-                self._motion.walk(dir='FORWARD', loop=8)
-                self.mode = 'walk'
-                # self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
-            else:
-                self.mode = 'finish' # --> stop!
-                if self.progress_of_roobot[0] != self.mode:
-                        self.progress_of_roobot.insert(0, self.mode)
-            
->>>>>>> parent of b6afb5d... escape room fix
