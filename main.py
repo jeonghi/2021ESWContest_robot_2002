@@ -32,7 +32,14 @@ def main():
         video_recorder.record_frame(frame)
 
     #===================== function ======================
+<<<<<<< HEAD
         robot._image_processor.get_room_alphabet(visualization=True)
+=======
+        robot.check_motion()
+        #robot.setting_mode()
+    
+
+>>>>>>> parent of b6afb5d... escape room fix
     #=====================================================
     
     video_recorder.stop()

@@ -161,7 +161,4 @@ cython_debug/
 # End of https://www.toptal.com/developers/gitignore/api/python,visualstudiocode
 
 # Robobasic .obj file
-*.obj
-
-# debug_video
-debug_video.avi
+.obj
