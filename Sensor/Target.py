@@ -52,6 +52,7 @@ class Target:
 
     def get_color(self):
         return self._color
+
     def get_center_pos(self):
         return self._center_pos
 
@@ -124,7 +125,7 @@ class Target:
             return None
 
 
-def setLabel(src, pts, label, color=(0,255,0)):
+def setLabel(src, pts, label=None, color=(0,255,0)):
     if type(pts) == type(np.array([])) :
         (x, y, w, h) = cv2.boundingRect(pts)
     else:
@@ -132,7 +133,8 @@ def setLabel(src, pts, label, color=(0,255,0)):
     pt1 = (x, y)
     pt2 = (x+w, y+h)
     cv2.rectangle(src, pt1, pt2, color, 2)
-    cv2.putText(src, label, (pt1[0], pt1[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color)
+    if label is not None:
+        cv2.putText(src, label, (pt1[0], pt1[1]-3), cv2.FONT_HERSHEY_SIMPLEX, 0.7, color)
 
 if __name__ == "__main__":
     from Sensor.ImageProcessor import ImageProcessor
@@ -161,7 +163,7 @@ if __name__ == "__main__":
             mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("roi thresh", mask)
             cv2.waitKey(1)
-            print(hashDetector.detect_alphabet_hash(roi))
+            #print(hashDetector.detect_alphabet_hash(roi))
 
         #cv2.imshow("src", src)
         #cv2.imshow("mask", mask)

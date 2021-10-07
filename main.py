@@ -6,36 +6,37 @@ from Sensor.ImageProcessor import ImageProcessor
 from Sensor.VideoRecorder import VideoRecorder
 
 import cv2
-#import kbhit # press any key to exit
+import kbhit # press any key to exit
+
+VIDEO_PATH = "Sensor/src/debug/room_red_A.h264"    # test robot: -1    test video: [video path]
+DEBUG = True # test robot: False    test local: True
 
 def main():
-    robot = Robot()
-    #robot.set_basic_form()
+    robot = Robot(VIDEO_PATH, DEBUG)
     #====================== debug ======================
 
-    #video_recorder = VideoRecorder()
-    #kb = kbhit.KBHit()
+    video_recorder = VideoRecorder()
+    kb = kbhit.KBHit()
 
-    #print("Press ESC key to exit")
+    print("Press ESC key to exit")
     while True:
-        #if kb.kbhit():
-            #key = ord(kb.getch())
+        if kb.kbhit():
+            key = ord(kb.getch())
 
-            #if key == 27: # ESC
-                #break
+            if key == 27: # ESC
+                break
 
-        #frame = robot._image_processor.get_image()
-        #video_recorder.record_frame(frame)
+        frame = robot._image_processor.get_image()
+        cv2.imshow("frame", frame)
+        cv2.waitKey(10)
+        video_recorder.record_frame(frame)
 
     #===================== function ======================
-        #robot.check_motion()
-        robot.setting_mode()
-    
-
+        robot._image_processor.get_room_alphabet(visualization=True)
     #=====================================================
     
-    #video_recorder.stop()
-    #robot.set_basic_form()
+    video_recorder.stop()
+    robot.set_basic_form()
 
 if __name__ == "__main__":
     main()
