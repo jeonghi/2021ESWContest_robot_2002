@@ -214,7 +214,6 @@ class Motion:
         self.TX_data_py2(10)
 
 
-=======
     def basic_form(self):
         if not self.debug:
             self.TX_data_py2(46)
@@ -224,22 +223,20 @@ class Motion:
             print(46)
             print(55)
             print(10)
->>>>>>> 1fa3f833162f7c29304c8a8e9f776cec8a3539e1
 
-    def move_arm(self, dir='HIGH'):
-        """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
-        팔을 위로 하면 머리는 아래로 숙임.
-        """
-        angle_list = [35, 90, 60]
-        level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
-        
-        if not self.debug:
-            self.TX_data_py2(76+level[dir])
-        else:
-            print(76 + dir)
-            
-        time.sleep(0.1)
-        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
+
+def move_arm(self, grab=True, level=2):
+    """level: if grab is True, {1,2,3} else grab is False, {1,2}
+    """
+    angle_list = [30, 90, 60]
+    if grab:
+        self.TX_data_py2(75 + level)
+        time.sleep(0.5)
+        self.set_head(dir='DOWN', angle=angle_list[level - 1])
+    else:
+        self.TX_data_py2(73 + level)
+        time.sleep(0.5)
+        self.set_head(dir='DOWN', angle=100)
 
 
 # **************************************************
