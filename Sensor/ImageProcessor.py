@@ -361,9 +361,9 @@ class ImageProcessor:
             ############################################################
 
             ### 초록색 영역 또는 검정색 영역 위쪽 라인위의 라벨은 무시하도록 필터링
-            if edge_info:
-                if edge_info["EDGE_UP_Y"] > (y+height)//2 :
-                    continue
+            #if edge_info:
+            #    if edge_info["EDGE_UP_Y"] > (y+height)//2 :
+             #       continue
             ########################################
 
             ### 필터링에서 살아남은 후보 라벨만 Target 객체화 시켜 후보 리스트에 추가
@@ -417,7 +417,7 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.line_tracing(color = "YELLOW", line_visualization=True, edge_visualization=False)
+        imageProcessor.line_tracing(color = "YELLOW", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", visualization=True)
