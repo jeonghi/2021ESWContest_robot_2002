@@ -177,21 +177,8 @@ class ImageProcessor:
         else:
             return "BLACK"
 
-<<<<<<< HEAD
-    def line_tracing(self, src= None, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
-        if src is None:
-            src = self.get_image()
-        result = (line_info, edge_info, src) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
-        if line_visualization or edge_visualization :
-            cv2.imshow("line", src)
-            cv2.waitKey(1)
-        return result
-
-    def get_alphabet_info4room(self, edge_info, method="CONTOUR", visualization=False) -> tuple:
-=======
 
     def get_alphabet_info4room(self, visualization=False) -> tuple:
->>>>>>> parent of b6afb5d... escape room fix
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -211,67 +198,6 @@ class ImageProcessor:
             if stats[idx][0] == 0 and stats[idx][1] == 0:
                 continue
 
-<<<<<<< HEAD
-        if method == "LABEL":
-            _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
-            for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
-                if stats[idx][0] == 0 and stats[idx][1] == 0:
-                    continue
-
-                if np.any(np.isnan(centroid)): # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
-                    continue
-                _, _, width, height, area = stats[idx]
-
-                # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
-                area_ratio = width / height if height < width else height / width
-                area_ratio = round(area_ratio, 2)
-                if not (800 < area < 8000 and area_ratio <= 1.4):
-                    continue
-
-                candidate = Target(stats=stats[idx], centroid=centroid)
-                roi = candidate.get_target_roi(src, pad=5)
-
-                # ycrcb 색공간을 이용해
-
-                candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
-                candidate_color = candidate.get_color()
-
-                thresholding = None
-                ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
-                y, cr, cb = cv2.split(ycrcb)
-                if candidate_color == "RED":
-                    thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
-
-                else:
-                    thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
-                _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-                ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
-                ####################################
-
-                if visualization:
-                  cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
-
-                if candidate_alphabet is None:
-                    continue
-                candidate.set_name(candidate_alphabet)
-                # if visualization:
-                #     setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
-                candidates.append(candidate)
-        else:
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            for contour in contours:  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
-
-                (_, _, width, height) = cv2.boundingRect(contour)
-                area = cv2.contourArea(contour)
-
-                # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
-                area_ratio = width / height if height < width else height / width
-                area_ratio = round(area_ratio, 2)
-                if not (800 < area < 8000 and area_ratio <= 1.4):
-                    continue
-=======
             if np.any(np.isnan(centroid)):  # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
                 continue
             _, _, width, height, area = stats[idx]
@@ -281,7 +207,6 @@ class ImageProcessor:
             area_ratio = round(area_ratio, 2)
             if not (1000 < area < 8000 and area_ratio <= 1.5):
                 continue
->>>>>>> parent of b6afb5d... escape room fix
 
             candidate = Target(stats=stats[idx], centroid=centroid)
             roi = candidate.get_target_roi(src, pad=15)
@@ -301,32 +226,6 @@ class ImageProcessor:
                 thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
             _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-<<<<<<< HEAD
-                ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
-                ####################################
-
-                if visualization:
-                  cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
-
-                if candidate_alphabet is None:
-                    continue
-                candidate.set_name(candidate_alphabet)
-                # if visualization:
-                #     setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
-                candidates.append(candidate)
-
-        if candidates:
-            if edge_info:
-                if edge_info["EDGE_UP"] :
-                    candidates = list(filter(lambda candidate: candidate.get_center_pos()[1] < edge_info["EDGE_UP_Y"], candidates))
-
-        if candidates:
-            selected = max(candidates, key=lambda candidate : candidate.get_center_pos()[1])
-            alphabet_info = (selected.get_color(), selected.get_name())
-            if visualization:
-                setLabel(canvas, selected.get_pts(), selected.get_name(), color=(0, 0, 255))
-=======
             ### 정확도 향상을 위해 아래 함수 수정 요망 ###
             candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.25)
             ####################################
@@ -350,7 +249,6 @@ class ImageProcessor:
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
                 setLabel(canvas, selected.get_pts(), label=f"{selected.get_name()}", color=(0, 0, 255))
->>>>>>> parent of b6afb5d... escape room fix
 
         if visualization:
             cv2.imshow("src", canvas)
@@ -510,15 +408,6 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-<<<<<<< HEAD
-        (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN",edge_visualization=True)
-        imageProcessor.get_alphabet_info4room(method="CONTOUR", edge_info=edge_info, visualization=True)
-        # (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN")
-        # info = imageProcessor.get_milk_info(color="RED", edge_info=edge_info, visualization=True)
-        # print(info)
-
-s
-=======
         imageProcessor.line_tracing(color = "YELLOW", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
@@ -526,4 +415,3 @@ s
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
         #imageProcessor.get_alphabet_info4room(visualization=True)
->>>>>>> parent of b6afb5d... escape room fix

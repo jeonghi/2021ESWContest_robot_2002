@@ -255,8 +255,8 @@ class LineDetector:
             lines, horizontal_lines,vertical_lines,edge_lines,edge_lines_L,edge_lines_R ,compact_horizontal_lines = self.get_lines(src, color)
 
             if color == 'YELLOW':
-                line_info = {"DEGREE": 0, "ALL_X": [0, 0], 'ALL_Y': [0, 0], "V": False, "V_X": [0, 0], "V_Y": [0, 0],"H_DEGREE" : 0, "H": False, "H_X": [0, 0],
-                            "H_Y": [0, 0], "compact_H": False, "compact_H_X": [0, 0], "compact_H_Y": [0, 0]}
+                line_info = {"DEGREE": 0, 'ALL_X': [0, 0], 'ALL_Y': [0, 0], "V": False, "V_X": [0, 0], "V_Y": [0, 0], "H_DEGREE": 0, "H": False,"H_X": [0, 0],
+                             "H_Y": [0, 0], "compact_H": False, "compact_H_X": [0, 0], "compact_H_Y": [0, 0]}
                 edge_info = {"EDGE_POS": None, "EDGE_L": False, "L_X": [0, 0], "L_Y": [0, 0], "EDGE_R": False,
                             "R_X": [0, 0], "R_Y": [0, 0]}
 
@@ -353,6 +353,8 @@ class LineDetector:
                     x_center = int((edge_line_L[2] + edge_line_R[2]) / 2)
                     y_center = edge_fit_line_DOWN[1]  # [max_x, max_y, min_x, max_y]
                     edge_info["EDGE_POS"] = [x_center, y_center]
+                    line_info["ALL_X"] = [edge_fit_line_DOWN[0], edge_fit_line_DOWN[2]]  # [min_x, min_y, max_x, max_y]
+                    line_info["ALL_Y"] = [edge_fit_line_DOWN[1], edge_fit_line_DOWN[3]]
                 else:
                     edge_info["EDGE_POS"] = None
 
@@ -383,7 +385,7 @@ class LineDetector:
                     a = compact_horizontal_line[1] - compact_horizontal_line[3]
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
-                    #print('length:  ', c)
+                    # print('length:  ', c)
                     if c >= 300:
                         line_info["H"] = True
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
