@@ -14,7 +14,7 @@ class Motion:
     head_angle1 = 'UPDOWN_CENTER'
     head_angle2 = 'LEFTRIGHT_CENTER'
 
-    def __init__(self):
+    def __init__(self, DEBUG):
         self.serial_use = 1
         self.serial_port = None
         self.Read_RX = 0
@@ -22,22 +22,27 @@ class Motion:
         self.threading_Time = 0.01
         self.lock = Lock()
         self.distance = 0
+        self.debug = DEBUG
         BPS = 4800  # 4800,9600,14400, 19200,28800, 57600, 115200
 
         # ---------local Serial Port : ttyS0 --------
         # ---------USB Serial Port : ttyAMA0 --------
-        self.serial_port = serial.Serial('/dev/ttyS0', BPS, timeout=0.01)
-        self.serial_port.flush()  # serial cls
-        self.serial_t = Thread(target=self.Receiving, args=(self.serial_port,))
-        self.serial_t.daemon = True
-        self.serial_t.start()
-        time.sleep(0.1)
+        if not self.debug:
+            self.serial_port = serial.Serial('/dev/ttyS0', BPS, timeout=0.01)
+            self.serial_port.flush()  # serial cls
+            self.serial_t = Thread(target=self.Receiving, args=(self.serial_port,))
+            self.serial_t.daemon = True
+            self.serial_t.start()
+            time.sleep(0.1)
+
+
 
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
         self.lock.acquire()
 
         self.serial_port.write(serial.to_bytes([one_byte]))  # python3
         time.sleep(0.02)
+
 
     def RX_data(self):
         if self.serial_port.inWaiting() > 0:
@@ -47,8 +52,7 @@ class Motion:
         else:
             return 0
 
-    def getRx(self):
-        return self.lock
+
 
     def Receiving(self, ser):
         self.receiving_exit = 1
@@ -72,101 +76,144 @@ class Motion:
                 elif RX != 200:
                      self.distance = RX
 
+
     def notice_direction(self, dir):
         """dir={'E', 'W', 'S', 'N'}
         """
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
-        self.TX_data_py2(dir_list[dir])
+        
+        if not self.debug:
+            self.TX_data_py2(dir_list[dir])
+        else:
+            print(dir)
+
+
 
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
-        area_list = {'GREEN':66,'BLACK':67}
-        self.TX_data_py2(area_list[area])
+        area_list = {'GREEN':67,'BLACK':68}
+        
+        if not self.debug:
+            self.TX_data_py2(area_list[area])
+        else:
+            print(area)
+
+
 
     def set_head(self, dir, angle=0):
         """parameter 설명
         dir: {DOWN, LEFT, RIGHT, UPDOWN_CENTER, LEFTRIGHT_CENTER}
-        angle: {DOWN:{10,20,30,45,60,75,90,100},
+        angle: {DOWN:{10,20,30,35,45,50,55,60,70,75,80,85,90,100},
         LEFT:{30,45,60,90},
         RIGHT:{30,45,60,90}
         }
         """
         if dir == 'DOWN':
             self.head_angle1 = angle
-        elif dir == 'LEFT' and dir == 'RIGHT':
+        elif dir == 'LEFT' or dir == 'RIGHT':
             self.head_angle2 = angle
         elif dir == 'UPDOWN_CENTER':
             self.head_angle1 = dir
         elif dir == 'LEFTRIGHT_CENTER':
             self.head_angle2 = dir
 
-        center_list = {'UPDOWN_CENTER':44, 'LEFTRIGHT_CENTER':54}
+        center_list = {'UPDOWN_CENTER':46, 'LEFTRIGHT_CENTER':55}
         dir_list = {
             'DOWN':{
-            10:37, 20:38, 30:39, 45:40, 60:41, 75:42, 90:43, 100:44
+            10:37, 20:80, 30:38, 35:39, 45:40, 50:84, 55:81, 60:41, 70:82, 75:42, 80:43, 85:83, 90:44, 100:45
             },
             'LEFT':{
-                30:46, 45:47, 60:48, 90:49
+                30:47, 45:48, 60:49, 90:50
             },
             'RIGHT':{
-                30:50, 45:51, 60:52, 90:53
+                30:51, 45:52, 60:53, 90:54
             }
         }
-        if dir in center_list:
-            self.TX_data_py2(center_list[dir])
+        
+        if not self.debug:
+            if dir in center_list:
+                self.TX_data_py2(center_list[dir])
+            else:
+                self.TX_data_py2(dir_list[dir][angle])
         else:
-            self.TX_data_py2(dir_list[dir][angle])
+            if dir in center_list:
+                print(dir)
+            else:
+                print(dir, angle)
 
 
     def walk(self, dir, loop=1, grab=False):
-        dir_list = {'FORWARD':55, 'BACKWARD':56, 'LEFT':57, 'RIGHT':58}
+        dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
-            self.TX_data_py2(dir_list[dir])
+            if not self.debug:
+                self.TX_data_py2(dir_list[dir])
+            else:
+                print(dir)
 
 
-    def turn(self, dir, loop=1, grab=False):
-        dir_list = {'SLIDING_LEFT':59, 'SLIDING_RIGHT':60, 'LEFT':61, 'RIGHT':62}
-        if grab: dir_list[dir] += 11  # if grab is true, change walk motion with grab
+    def turn(self, dir, loop=1, sleep=0.5, grab=False,sliding=False):
+        """parameter 설명
+        dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
+        """
+        dir_list = {'SLIDING_LEFT':60, 'SLIDING_RIGHT':61, 'LEFT':62, 'RIGHT':63}
+        if grab:
+            dir_list[dir] += 11# if grab is true, change walk motion with grab
+            if sliding:
+                dir_list[dir]+=9
         for _ in range(loop):
-            self.TX_data_py2(dir_list[dir])
+            if not self.debug:
+                self.TX_data_py2(dir_list[dir])
+                time.sleep(sleep)
+            else:
+                print(dir)
 
 
     def get_IR(self) -> int:
         """get IR value and return self.distance
         """
-        self.TX_data_py2(5)
-        self.TX_data_py2(5)
+        if not self.debug:
+            self.TX_data_py2(5)
+            self.TX_data_py2(5)
+        else:
+            print("get IR")
+            
         return self.distance
 
-    def open_door_1(self):
-        self.turn('LEFT', loop=7)
-        self.TX_data_py2(63)
-        self.walk('RIGHT', loop=20)
 
-    def open_door_2(self, loop=1):
+    def open_door(self, loop=1):
         for _ in range(loop):
-            self.TX_data_py2(66)
+            if not self.debug:
+                self.TX_data_py2(66)
+            else:
+                print("TX 66")
+
+
 
     def grab(self, switch=True):
         """if switch=True then grab ON, else then grab OFF
         """
-        if switch:
-            self.TX_data_py2(64)
+        tx = 65 if switch else 66
+        
+        if not self.debug:
+            self.TX_data_py2(tx)
         else:
-            self.TX_data_py2(65)
+            print(tx)
+
 
     def get_head(self):
         """Return vertical, horizontal head angle
         """
         return (self.head_angle1, self.head_angle2)
 
+
     def basic_form(self):
         self.TX_data_py2(45)
         self.TX_data_py2(54)
         self.TX_data_py2(10)
 
+<<<<<<< HEAD
     def move_arm(self, grab=True, level=2):
         """level: if grab is True, {1,2,3} else grab is False, {1,2}
         """
@@ -180,21 +227,37 @@ class Motion:
             time.sleep(0.5)
             self.set_head(dir='DOWN', angle=100)
 
+=======
+    def basic_form(self):
+        if not self.debug:
+            self.TX_data_py2(46)
+            self.TX_data_py2(55)
+            self.TX_data_py2(10)
+        else:
+            print(46)
+            print(55)
+            print(10)
+>>>>>>> 1fa3f833162f7c29304c8a8e9f776cec8a3539e1
+
+    def move_arm(self, dir='HIGH'):
+        """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
+        팔을 위로 하면 머리는 아래로 숙임.
+        """
+        angle_list = [35, 90, 60]
+        level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
+        
+        if not self.debug:
+            self.TX_data_py2(76+level[dir])
+        else:
+            print(76 + dir)
+            
+        time.sleep(0.1)
+        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
 
 
-
-# **************************************************
 # **************************************************
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.TX_data_py2(16) # power on/off
-#    motion.TX_data_py2(65)
-
-
-
-
-
-
-
-
+    motion.TX_data_py2(16)
+    
