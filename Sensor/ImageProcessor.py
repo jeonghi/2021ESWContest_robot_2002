@@ -3,7 +3,6 @@ import numpy as np
 import time
 import platform
 import os
-
 from imutils.video import WebcamVideoStream
 from imutils.video import FileVideoStream
 from imutils.video import FPS
@@ -39,7 +38,6 @@ class ImageProcessor:
             self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
 
         else:
-
             self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
             self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
             self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
@@ -84,7 +82,7 @@ class ImageProcessor:
                 target = Target(contour=cnt)
                 no_canny_targets.append(target)
                 if visualization:
-                           setLabel(canvas, cnt, "no_canny")
+                    setLabel(canvas, cnt, "no_canny")
 
         for cnt in cnts2:
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
@@ -118,7 +116,6 @@ class ImageProcessor:
             cv2.waitKey(1)
         answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask)
         return answer
-
     def get_slope_degree(self, visualization: bool = False):
         src = self.get_image()
         return self.line_detector.get_slope_degree(src)
@@ -180,6 +177,7 @@ class ImageProcessor:
         else:
             return "BLACK"
 
+<<<<<<< HEAD
     def line_tracing(self, src= None, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
         if src is None:
             src = self.get_image()
@@ -190,6 +188,10 @@ class ImageProcessor:
         return result
 
     def get_alphabet_info4room(self, edge_info, method="CONTOUR", visualization=False) -> tuple:
+=======
+
+    def get_alphabet_info4room(self, visualization=False) -> tuple:
+>>>>>>> parent of b6afb5d... escape room fix
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -198,13 +200,18 @@ class ImageProcessor:
         blur = cv2.GaussianBlur(src, (5, 5), 0)
         hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
-        #_, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
+
         red_mask = self.color_preprocessor.get_red_mask(h)
         blue_mask = self.color_preprocessor.get_blue_mask(h)
         color_mask = cv2.bitwise_or(blue_mask, red_mask)
         mask = cv2.bitwise_and(mask, color_mask)
+        _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
+            if stats[idx][0] == 0 and stats[idx][1] == 0:
+                continue
 
+<<<<<<< HEAD
         if method == "LABEL":
             _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
             for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
@@ -264,25 +271,37 @@ class ImageProcessor:
                 area_ratio = round(area_ratio, 2)
                 if not (800 < area < 8000 and area_ratio <= 1.4):
                     continue
+=======
+            if np.any(np.isnan(centroid)):  # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
+                continue
+            _, _, width, height, area = stats[idx]
 
-                candidate = Target(contour=contour)
-                roi = candidate.get_target_roi(src, pad=5)
+            # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            if not (1000 < area < 8000 and area_ratio <= 1.5):
+                continue
+>>>>>>> parent of b6afb5d... escape room fix
 
-                # ycrcb 색공간을 이용해
+            candidate = Target(stats=stats[idx], centroid=centroid)
+            roi = candidate.get_target_roi(src, pad=15)
 
-                candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
-                candidate_color = candidate.get_color()
+            # ycrcb 색공간을 이용해
 
-                thresholding = None
-                ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
-                y, cr, cb = cv2.split(ycrcb)
-                if candidate_color == "RED":
-                    thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
+            candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
+            candidate_color = candidate.get_color()
 
-                else:
-                    thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
-                _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+            thresholding = None
+            ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
+            y, cr, cb = cv2.split(ycrcb)
+            if candidate_color == "RED":
+                thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
 
+            else:
+                thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
+            _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+
+<<<<<<< HEAD
                 ### 정확도 향상을 위해 아래 함수 수정 요망 ###
                 candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
                 ####################################
@@ -307,22 +326,104 @@ class ImageProcessor:
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
                 setLabel(canvas, selected.get_pts(), selected.get_name(), color=(0, 0, 255))
+=======
+            ### 정확도 향상을 위해 아래 함수 수정 요망 ###
+            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.25)
+            ####################################
+
+            # if visualization:
+            #     cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+
+            if candidate_alphabet is None:
+                continue
+            candidate.set_name(candidate_alphabet)
+            if visualization:
+                setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
+            candidates.append(candidate)
+
+        if candidates:
+            ##y값 기준으로 정령###################
+            candidates.sort(key=lambda candidate: candidate.get_center_pos()[1])
+            #candidates.sort(key=lambda candidate: candidate.get_area())
+            #################################
+            selected = candidates[0]
+            alphabet_info = (selected.get_color(), selected.get_name())
+            if visualization:
+                setLabel(canvas, selected.get_pts(), label=f"{selected.get_name()}", color=(0, 0, 255))
+>>>>>>> parent of b6afb5d... escape room fix
 
         if visualization:
-            mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
-            debug = cv2.hconcat([mask, canvas])
-            cv2.imshow("debug", debug)
+            cv2.imshow("src", canvas)
             cv2.waitKey(1)
 
         return alphabet_info
 
+    def get_green_area_corner(self, visualization=False):
+        src = self.get_image()
+        (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src.copy(), color="GREEN",
+                                                                                line_visualization=False,
+                                                                                edge_visualization=True)
+        down_pos = None
+        up_pos = None
+        curr_activating_pos = ""
+        if edge_info["EDGE_DOWN"]:
+            down_pos = (x, y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+            if x <= 180:
+                curr_activating_pos = "RIGHT"
+            elif x > 400:
+                curr_activating_pos = "LEFT"
+            else:
+                curr_activating_pos = "MIDDLE"
+        # if edge_info["EDGE_UP"]:
+        #     up_pos = (edge_info["EDGE_UP_X"], edge_info["EDGE_UP_Y"])
 
-    def get_milk_info(self, color:str, edge_info:dict, visualization=False) -> tuple:
+        if visualization:
+            if down_pos:
+                (x, y) = pos = down_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0]-100, pos[1]+30) , cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255))
+                cv2.putText(dst, curr_activating_pos, (pos[0] - 100, pos[1] + 70), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                            (0, 0, 255))
+            if up_pos:
+                (x, y) = pos = up_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0] - 100, pos[1] + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                            (0, 0, 255))
+            cv2.imshow("result", dst)
+            cv2.waitKey(1)
+        return (line_info, edge_info, dst)
+
+    def get_black_area_corner(self, visualization=False):
+        src = self.get_image()
+        (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src.copy(), color="BLACK",
+                                                                                line_visualization=False,
+                                                                                edge_visualization=True)
+        down_pos = None
+        up_pos = None
+        if edge_info["EDGE_DOWN"]:
+            down_pos = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
+        if edge_info["EDGE_UP"]:
+            up_pos = (edge_info["EDGE_UP_X"], edge_info["EDGE_UP_Y"])
+
+        if visualization:
+            if down_pos:
+                (x, y) = pos = down_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0]-100, pos[1]+30) , cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 0, 255))
+            if up_pos:
+                (x, y) = pos = up_pos
+                cv2.circle(dst, pos, 10, (0, 0, 255), -1)
+                cv2.putText(dst, f"x: {x}, y: {y}", (pos[0] - 100, pos[1] + 30), cv2.FONT_HERSHEY_SIMPLEX, 0.7,
+                            (0, 0, 255))
+            cv2.imshow("result", dst)
+            cv2.waitKey(1)
+        return (line_info, edge_info, dst)
+
+    def get_milk_info(self, color="RED", visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
         candidates = []
-        selected = None
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
@@ -330,7 +431,7 @@ class ImageProcessor:
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None
-
+        cv2.imshow("s", mask)
         ### 색상 이진화를 이용한 마스킹 과정 ###
         if color == "BLUE":
             color_mask = self.color_preprocessor.get_blue_mask(h)
@@ -345,8 +446,14 @@ class ImageProcessor:
         ###############################
         ###############################
 
+        ### 필터링을 위한 초록색 수평선 정보 얻어오기 ###
+
+        (_, edge_info, _) = self.line_tracing(src=src, color="GREEN")
+        ######################################
+        ######################################
+
         ### 라벨링을 이용한 객체 구별 ###############
-        _, y, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
+        _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
 
         for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
             if stats[idx][0] == 0 and stats[idx][1] == 0:
@@ -362,11 +469,11 @@ class ImageProcessor:
             area_ratio = round(area_ratio, 2)
             #print(area_ratio)
 
-            if not (2000 < width*height < 8000 and area_ratio <= 1.7):
+            if not (1000 < width*height and area_ratio <=2.2):
                 continue
             ############################################################
 
-            ### 초록색 영역 또는 검정색 영역 위쪽 라인위의 라벨은 무시하도록 필터링
+            ### 초록색 영역 위쪽 라인위의 라벨은 무시하도록 필터링
             if edge_info:
                 if edge_info["EDGE_UP_Y"] > (y+height)//2 :
                     continue
@@ -379,15 +486,6 @@ class ImageProcessor:
             if visualization:
                 setLabel(canvas, candidate.get_pts(), label=f"MILK POS x:{candidate.x}, y:{candidate.y}", color=(255, 255, 255))
             candidates.append(candidate)
-
-
-        ### 후보 라벨이 있다면 그중에서 가장 큰 크기 객체의 중심 좌표를 반환
-        if candidates:
-            selected = max(candidates, key=lambda candidate:candidate.get_area())
-            if visualization:
-                setLabel(canvas, selected.get_pts(), label=f"MILK POS x:{selected.x}, y:{selected.y}",
-                         color=(0, 0, 255))
-        ### 시각화 ############################
         if visualization:
             cv2.imshow("src", canvas)
             cv2.imshow("mask", mask)
@@ -395,9 +493,9 @@ class ImageProcessor:
         #####################################
         #####################################
 
-        ### 선택된 타깃의 중심 좌표 반환 ###########
-        if selected:
-            return selected.get_center_pos()
+        ### 후보 라벨이 있다면 그중에서 가장 큰 크기 객체의 중심 좌표를 반환
+        if candidates:
+            return max(candidates, key=lambda candidate:candidate.get_area()).get_center_pos()
         ### 없다면 None 리턴
         return None
 
@@ -412,6 +510,7 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
+<<<<<<< HEAD
         (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN",edge_visualization=True)
         imageProcessor.get_alphabet_info4room(method="CONTOUR", edge_info=edge_info, visualization=True)
         # (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN")
@@ -419,3 +518,12 @@ if __name__ == "__main__":
         # print(info)
 
 s
+=======
+        imageProcessor.line_tracing(color = "YELLOW", line_visualization=False, edge_visualization=True)
+        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        #print(alphabet)
+        #imageProcessor.get_milk_info(color="RED", visualization=True)
+        #print(imageProcessor.get_green_area_corner(visualization=True))
+        #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
+        #imageProcessor.get_alphabet_info4room(visualization=True)
+>>>>>>> parent of b6afb5d... escape room fix

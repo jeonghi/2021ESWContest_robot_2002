@@ -63,10 +63,17 @@ class LineDetector:
 
     def mask_color(self, src, color='YELLOW'):
         if color == 'YELLOW':
+<<<<<<< HEAD
             # hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
             # h, l, s = cv2.split(hls)
             # ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
             # src = cv2.bitwise_and(src, src, mask=mask)
+=======
+            #hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+            #h, l, s = cv2.split(hls)
+            #ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+            #src = cv2.bitwise_and(src, src, mask=mask)
+>>>>>>> parent of b6afb5d... escape room fix
             match_lower = np.array([10, 40, 110])  # yellow_lower
             match_upper = np.array([50, 255, 255])  # yellow_upper
 
@@ -99,7 +106,7 @@ class LineDetector:
             cv2.imshow('edges', edges)
             lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=30, maxLineGap=150)
             lines = np.squeeze(lines)
-            #print(lines)
+            print(lines)
 
             if len(lines.shape) == 0:
                 return [], [], [], [], [], [], []
@@ -257,9 +264,14 @@ class LineDetector:
                 src, color)
 
             if color == 'YELLOW':
+<<<<<<< HEAD
                 line_info = {"DEGREE": 0, 'ALL_X': [0, 0], 'ALL_Y': [0, 0], "V": False, "V_X": [0, 0], "V_Y": [0, 0], "H_DEGREE": 0, "H": False,
                              "H_X": [0, 0],
                              "H_Y": [0, 0], "compact_H": False, "compact_H_X": [0, 0], "compact_H_Y": [0, 0]}
+=======
+                line_info = {"DEGREE": 0, "V": False, "V_X": [0, 0], "V_Y": [0, 0],"H_DEGREE" : 0, "H": False, "H_X": [0, 0],
+                            "H_Y": [0, 0], "compact_H": False, "compact_H_X": [0, 0], "compact_H_Y": [0, 0]}
+>>>>>>> parent of b6afb5d... escape room fix
                 edge_info = {"EDGE_POS": None, "EDGE_L": False, "L_X": [0, 0], "L_Y": [0, 0], "EDGE_R": False,
                              "R_X": [0, 0], "R_Y": [0, 0]}
 
@@ -392,7 +404,11 @@ class LineDetector:
                     a = compact_horizontal_line[1] - compact_horizontal_line[3]
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
+<<<<<<< HEAD
                     # print('length:  ', c)
+=======
+                    print('length:  ', c)
+>>>>>>> parent of b6afb5d... escape room fix
                     if c >= 300:
                         line_info["H"] = True
                     # H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
