@@ -14,8 +14,8 @@ class HashDetector:
         for direction in self.file_lst:
             self.directions_hash.append(self.image_to_hash(cv2.imread(file_path + direction)))
             self.directions.append(direction.rsplit('.')[0])
-        print(file_path + direction)
-        print(self.directions)
+        #print(file_path + direction)
+        #print(self.directions)
          
     @staticmethod
     def image_to_hash(img : np.ndarray) -> list:
@@ -64,7 +64,7 @@ class HashDetector:
 
     def detect_alphabet_hash(self, img : np.ndarray, threshold=0.3) -> str:
         if self.check_white_rate(img) < 0.2 or self.check_white_rate(img) > 0.8:
-            print(self.check_white_rate(img))
+            #print(self.check_white_rate(img))
             return None, None
         img_hash = self.image_to_hash(img)
         hdist_dict = {}

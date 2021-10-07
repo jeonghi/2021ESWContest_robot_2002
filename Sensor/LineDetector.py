@@ -99,7 +99,7 @@ class LineDetector:
             cv2.imshow('edges', edges)
             lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=30, maxLineGap=150)
             lines = np.squeeze(lines)
-            print(lines)
+            #print(lines)
 
             if len(lines.shape) == 0:
                 return [], [], [], [], [], [], []
@@ -390,7 +390,7 @@ class LineDetector:
                     a = compact_horizontal_line[1] - compact_horizontal_line[3]
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
-                    print('length:  ', c)
+                    # print('length:  ', c)
                     if c >= 300:
                         line_info["H"] = True
                     # H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi

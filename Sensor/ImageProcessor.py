@@ -49,7 +49,7 @@ class ImageProcessor:
         self.COLORS = self.color_preprocessor.COLORS
 
         shape = (self.height, self.width, _) = self.get_image().shape
-        print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
+        #print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
         time.sleep(2)
 
     def get_image(self, visualization=False):
@@ -408,12 +408,12 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="src/debug/room_blue_A.h264")
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN",edge_visualization=True)
-        imageProcessor.get_alphabet_info4room(method="LABEL", edge_info=edge_info, visualization=True)
+        imageProcessor.get_alphabet_info4room(method="CONTOUR", edge_info=edge_info, visualization=True)
         # (_, edge_info, _) = imageProcessor.line_tracing(color="GREEN")
         # info = imageProcessor.get_milk_info(color="RED", edge_info=edge_info, visualization=True)
         # print(info)
