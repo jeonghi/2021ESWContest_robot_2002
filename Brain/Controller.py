@@ -12,25 +12,39 @@ class Robot:
     def __init__(self, video_path =""):
         self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
-        #self._image_processor = ImageProcessor(video_path="Sensor/src/line_test/case2.h264")
         self._line_detector = LineDetector()
-        self.direction = 'LEFT'
+        self.direction = None
         self.alphabet = None
-        self.mode = 'catch_box'
-        #self.mode = 'walk'
-        #self.mode = 'start_mission'
-        self.color = 'GREEN'
-        #self.color = ''
-        self.box_pos = 'RIGHT'
         self.alphabet_color = None
         self.cube_grabbed = False
-        self.curr_room_color = "GREEN"
-        self.return_head =''
+        self.return_head = None # return 할 때 고개 각도 바꿀 지 고민 중 10/08
         self.count = 0
         self.progress_of_roobot= [None, ]
         self.walk_info = None
         self.curr_head = deque([60,45,35])
         self.curr_activating_pos = "" # 방에서 활동중인 위치
+
+        
+        self.mode = 'start'
+        self.direction = None
+        self.color = None
+        self.box_pos = None
+        self.curr_room_color = None
+
+        # 박스 앞에 놓고 테스트 하고 싶을 때
+        #self.direction = 'LEFT'
+        #self.mode = 'catch_box'
+        #self.color = 'GREEN'
+        #self.box_pos = 'RIGHT'
+        #self.curr_room_color = "GREEN"
+
+        # ㄱ 자 오기 전부터 walk부터 테스트하고 싶을 때 실행시키기전에 먼저 10도 내려주기
+        #self.direction = 'LEFT'
+        #self.mode = 'walk'
+        #self.color = 'YELLOW'
+        #self.box_pos = None
+        #self.curr_room_color = None
+
 
     def set_basic_form(self):
         self._motion.basic_form()
@@ -265,7 +279,10 @@ class Robot:
         if self.direction == None :
             self.mode = 'detect_direction: fail'
         else:
-            self.mode = 'detect_direction: success'
+            #self._motion.walk('FORWARD', 2)
+            #self._motion.walk(self.direction, 4)
+            #self._motion.turn(self.direction, 8)
+            #self._motion.set_head('DOWN', 10)
             print(self.direction)
 
     def walk(self, line_info, walk_info):
@@ -525,10 +542,15 @@ class Robot:
             if self.direction == None:
                 self.detect_direction()
             else:
-                self._motion.walk("FORWARD", 1)
-                self._motion.walk(self.direction, 2)
-                self._motion.turn(self.direction, 7)
+                self._motion.walk('FORWARD', 2)
+                self._motion.walk(self.direction, 4)
+                self._motion.turn(self.direction, 8)
+                self._motion.set_head('DOWN', 10)
+                #self._motion.walk("FORWARD", 1)
+                #self._motion.walk(self.direction, 2)
+                #self._motion.turn(self.direction, 7)
                 self.mode = 'walk' 
+                self.walk_info = '│'
 
 
         # 걷기 # 보정 추가로 넣기
