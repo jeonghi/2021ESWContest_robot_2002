@@ -61,7 +61,7 @@ class Motion:
                 # Rx, 수신
                 result = ser.read(1)
                 RX = ord(result)
-                print ("RX=" + str(RX))
+                #print ("RX=" + str(RX))
 
                 # -----  remocon 16 Code  Exit ------
                 if RX == 16:
@@ -78,6 +78,7 @@ class Motion:
         """
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
         self.TX_data_py2(dir_list[dir])
+        time.sleep(0.5)
 
 
     def notice_area(self,area):
@@ -85,6 +86,7 @@ class Motion:
         """
         area_list = {'GREEN':67,'BLACK':68}
         self.TX_data_py2(area_list[area])
+        time.sleep(0.5)
 
 
     def set_head(self, dir, angle=0):
@@ -124,11 +126,12 @@ class Motion:
         time.sleep(0.5)
 
 
-    def walk(self, dir, loop=1, grab=False):
+    def walk(self, dir, loop=1, sleep=0.3, grab=False):
         dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
+            time.sleep(sleep)
 
 
     def turn(self, dir, loop=1, sleep=1, grab=False,sliding=False):
@@ -163,6 +166,7 @@ class Motion:
         """
         tx = 65 if switch else 66
         self.TX_data_py2(tx)
+        time.sleep(0.3)
 
 
     def get_head(self):
@@ -175,6 +179,7 @@ class Motion:
         self.TX_data_py2(46)
         self.TX_data_py2(55)
         self.TX_data_py2(10)
+        time.sleep(0.3)
 
 
     def move_arm(self, dir='HIGH'):
@@ -186,6 +191,7 @@ class Motion:
         self.TX_data_py2(76+level[dir])
         time.sleep(0.1)
         self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
+        time.sleep(0.7)
 
 
 # **************************************************
