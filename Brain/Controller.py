@@ -217,8 +217,14 @@ class Robot:
         time.sleep(0.5)
         self._motion.set_head(dir="DOWN", angle=45) # 아래로 45도 고개를 내린다
         time.sleep(0.5)
-        self.color = self._image_processor.get_area_color() # 안전지역인지, 확진지역인지 색상을 구별한다. BLACK 또는 GREEN
-        self.curr_room_color = self._image_processor.get_area_color()
+        #self.color = self._image_processor.get_area_color() # 안전지역인지, 확진지역인지 색상을 구별한다. BLACK 또는 GREEN
+        #self.curr_room_color = self._image_processor.get_area_color()
+        self.color = 'GREEN'
+        line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
+        if edge_info['EDGE_DOWN'] == True:
+            self.color ='GREEN'
+        else:
+            self.color ='BLACK'
         self._motion.notice_area(area=self.color) # 지역에 대한 정보를 말한다
         time.sleep(0.5)
         self.mode = 'detect_room_alphabet' # 알파벳 인식 모드로 변경한다.
@@ -523,7 +529,7 @@ class Robot:
     def setting_mode(self):
         if self.color == 'YELLOW':
             line_info, edge_info = self.line_tracing(line_visualization=True, edge_visualization=False)
-        if self.color == 'GREEN':
+        elif self.color == 'GREEN':
             line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
         else:
             line_info, edge_info = self.line_tracing()
