@@ -120,6 +120,8 @@ class Motion:
             self.TX_data_py2(center_list[dir])
         else:
             self.TX_data_py2(dir_list[dir][angle])
+            
+        time.sleep(0.5)
 
 
     def walk(self, dir, loop=1, grab=False):
@@ -129,7 +131,7 @@ class Motion:
             self.TX_data_py2(dir_list[dir])
 
 
-    def turn(self, dir, loop=1, sleep=0.5, grab=False,sliding=False):
+    def turn(self, dir, loop=1, sleep=1, grab=False,sliding=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """

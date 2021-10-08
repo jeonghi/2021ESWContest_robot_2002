@@ -76,7 +76,7 @@ class LineDetector:
             ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask=mask)
             match_lower = np.array([20, 20, 20])  # green_lower
-            match_upper = np.array([80, 255, 255])  # green_upper
+            match_upper = np.array([80, 220, 220])  # green_upper
 
         if color == 'BLACK':
             match_lower = np.array([0, 0, 0])  # black_lower
@@ -323,7 +323,7 @@ class LineDetector:
                 if len(edge_lines) != 0:
                     size = int(edge_lines.shape[0] * edge_lines.shape[2] / 2)
                     edge_fit_line_DOWN = self.get_fitline(src, edge_lines, size, 'edge_DOWN')
-                    line_info["ALL_X"] = [edge_fit_line_DOWN[0], edge_fit_line_DOWN[2]]  # [min_x, min_y, max_x, max_y]
+                    line_info["ALL_X"] = [edge_fit_line_DOWN[2], edge_fit_line_DOWN[0]]  # [min_x, min_y, max_x, max_y]
                     line_info["ALL_Y"] = [edge_fit_line_DOWN[1], edge_fit_line_DOWN[3]]
                     if edge_visualization is True:
                         self.draw_lines(temp, edge_fit_line_DOWN, 'edge', 'fit')
@@ -384,7 +384,7 @@ class LineDetector:
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
                     #print('length:  ', c)
-                    if c >= 300:
+                    if c >= 350:
                         line_info["H"] = True
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
@@ -414,12 +414,12 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture("./Sensor/src/debug/black_area.h264")
+    video = cv2.VideoCapture(-1)
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
         if not ret:
-            video = cv2.VideoCapture("./Sensor/src/debug/black_area.h264")
+            video = cv2.VideoCapture(-1)
             continue
         src = cv2.resize(src, dsize=(640, 480))
 
@@ -430,7 +430,7 @@ if __name__ == "__main__":
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
 
-        line_info, edge_info, result = line_detector.get_all_lines(src, color='BLACK', line_visualization=False,
+        line_info, edge_info, result = line_detector.get_all_lines(src, color='GREEN', line_visualization=False,
                                                                    edge_visualization=True)
         print(line_info)
         print(edge_info)

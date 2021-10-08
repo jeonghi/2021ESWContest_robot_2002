@@ -189,7 +189,7 @@ class ImageProcessor:
         blur = cv2.GaussianBlur(src, (5, 5), 0)
         hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
         #_, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         red_mask = self.color_preprocessor.get_red_mask(h)
         blue_mask = self.color_preprocessor.get_blue_mask(h)
@@ -231,7 +231,7 @@ class ImageProcessor:
                 _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
                 ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
                 ####################################
 
                 #if visualization:
@@ -276,7 +276,7 @@ class ImageProcessor:
                 _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
                 ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.2)
+                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
                 ####################################
 
                 # if visualization:
@@ -320,7 +320,7 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
-        _, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None
@@ -356,14 +356,14 @@ class ImageProcessor:
             area_ratio = round(area_ratio, 2)
             print(area_ratio)
 
-            if not (2000 < width*height < 8000 and area_ratio <= 1.7):
+            if not (2000 < width*height  and area_ratio <= 1.7):
                 continue
             ############################################################
 
             ### 초록색 영역 또는 검정색 영역 위쪽 라인위의 라벨은 무시하도록 필터링
             #if edge_info:
             #    if edge_info["EDGE_UP_Y"] > (y+height)//2 :
-             #       continue
+            #       continue
             ########################################
 
             ### 필터링에서 살아남은 후보 라벨만 Target 객체화 시켜 후보 리스트에 추가
@@ -397,7 +397,7 @@ class ImageProcessor:
 
 
 
-    def line_tracing(self, src= None, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
+    def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
         
         src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
@@ -417,10 +417,10 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.line_tracing(color = "YELLOW", line_visualization=False, edge_visualization=True)
+        _, info, _ = imageProcessor.line_tracing(color = "GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
-        #imageProcessor.get_milk_info(color="RED", visualization=True)
+        #imageProcessor.get_milk_info(color="RED", edge_info="info", visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        #imageProcessor.get_alphabet_info4room(visualization=True)
+        #imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
