@@ -6,7 +6,7 @@ from Sensor.ImageProcessor import ImageProcessor
 from Sensor.VideoRecorder import VideoRecorder
 
 import cv2
-#import kbhit # press any key to exit
+import kbhit # press any key to exit
 
 VIDEO_PATH = -1
 
