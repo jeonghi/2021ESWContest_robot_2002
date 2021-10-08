@@ -129,7 +129,7 @@ class ImageProcessor:
         print(direction)
         return direction
 
-    def get_area_color(self, threshold: float = 0.35, visualization: bool = False):
+    def get_area_color(self, threshold: float = 0.15, visualization: bool = False):
         src = self.get_image()
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
@@ -413,11 +413,11 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.get_arrow_direction()
-        #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
+        #imageProcessor.get_arrow_direction()
+        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        #imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)

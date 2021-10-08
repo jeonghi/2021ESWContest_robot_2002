@@ -25,9 +25,15 @@ class Robot:
         self.curr_activating_pos = "" # 방에서 활동중인 위치
 
         
-        self.mode = 'walk'
-        #self.direction = 'LEFT'
+        self.mode = "start_mission"
+        self.direction = "LEFT"
         self.color = "YELLOW"
+        self.box_pos = None
+        self.curr_room_color = ""
+        
+        #self.mode = 'walk'
+        #self.direction = 'LEFT'
+        #self.color = "YELLOW"
         #self.box_pos = None
         #self.curr_room_color = ""
 
