@@ -8,24 +8,26 @@ from Sensor.VideoRecorder import VideoRecorder
 import cv2
 #import kbhit # press any key to exit
 
+VIDEO_PATH = -1
+
 def main():
-    robot = Robot()
+    robot = Robot(video_path=VIDEO_PATH, DEBUG=False)
     #robot.set_basic_form()
     #====================== debug ======================
 
-    #video_recorder = VideoRecorder()
-    #kb = kbhit.KBHit()
+    video_recorder = VideoRecorder()
+    kb = kbhit.KBHit()
 
-    #print("Press ESC key to exit")
+    print("Press ESC key to exit")
     while True:
-        #if kb.kbhit():
-            #key = ord(kb.getch())
+        if kb.kbhit():
+            key = ord(kb.getch())
 
-            #if key == 27: # ESC
-                #break
+            if key == 27: # ESC
+                break
 
-        #frame = robot._image_processor.get_image()
-        #video_recorder.record_frame(frame)
+        frame = robot._image_processor.get_image()
+        video_recorder.record_frame(frame)
 
     #===================== function ======================
         #robot.check_motion()
@@ -34,7 +36,7 @@ def main():
 
     #=====================================================
     
-    #video_recorder.stop()
+    video_recorder.stop()
     #robot.set_basic_form()
 
 if __name__ == "__main__":
