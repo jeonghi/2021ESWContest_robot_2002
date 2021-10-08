@@ -796,8 +796,60 @@ class Robot:
             self.colot = 'YELLOW'
 
 
+        #elif self.mode == 'end_mission':
+            #self._motion.set_head(dir ='DOWN', angle = 45)
+            #if edge_info["EDGE_POS"] != None : # yellow edge 감지
+                #if 300 < edge_info["EDGE_POS"][0] < 380 : # yellow edge x 좌표 중앙 O
+                    #print('yellow edge 감지 중앙 O')
+                    #self.mode = 'return_line' # --> find_V
+                    #if self.progress_of_roobot[0] != self.mode:
+                        #self.progress_of_roobot.insert(0, self.mode)
+                #else: # yellow edge 중앙 X
+                    #print('yellow edge 감지 중앙 X')
+                    #self.find_edge()
+                    #if self.progress_of_roobot[0] != self.mode:
+                        #self.progress_of_roobot.insert(0, self.mode)
+           # else: # yellow edge 감지 X
+               # print('yellow edge 감지 X ')
+               # self.mode = 'end_mission' # --> find_edge
+              #  self.find_edge()
+              #  if self.progress_of_roobot[0] != self.mode:
+                   # self.progress_of_roobot.insert(0, self.mode)       
+        
+
+
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
         elif self.mode == 'end_mission':
-            self._motion.set_head(dir ='DOWN', angle = 45)
+            if self.box_pos == 'RIGHT':
+                if line_info["ALL_X"][1] != 0 and line_info["ALL_X"][1] > 240:
+                    if line_info["ALL_Y"][1] < 320 : # yellow 감지
+                        self._motion.set_head(dir ='DOWN', angle = 60)
+                        self.mode = 'find_edge'
+                    else:
+                        self._motion.set_head(dir ='DOWN', angle = 45)
+                        self.mode = 'find_edge'
+                else:
+                    if self.curr_room_color == 'BLACK':
+                        self._motion.turn(dir = 'LEFT', loop = 1, grab = True)
+                    else:
+                        self._motion.turn(dir = 'LEFT', loop = 1)
+            else:
+                if line_info["ALL_X"][1] != 0 and line_info["ALL_X"][1] > 240:
+                    if line_info["ALL_Y"][1] < 320 : # yellow 감지
+                        self._motion.set_head(dir ='DOWN', angle = 60)
+                        self.mode = 'find_edge'
+                    else:
+                        self._motion.set_head(dir ='DOWN', angle = 45)
+                        self.mode = 'find_edge'
+                else:
+                    if self.curr_room_color == 'BLACK':
+                        self._motion.turn(dir = 'RIGHT', loop = 1, grab = True)
+                    else:
+                        self._motion.turn(dir = 'RIGHT', loop = 1)
+    
+        elif self.mode == 'find_edge':
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 300 < edge_info["EDGE_POS"][0] < 380 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
@@ -814,119 +866,12 @@ class Robot:
                 self.mode = 'end_mission' # --> find_edge
                 self.find_edge()
                 if self.progress_of_roobot[0] != self.mode:
-                    self.progress_of_roobot.insert(0, self.mode)       
-        
-
-
-#------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------
-        #elif self.mode == 'end_mission':
-            #self._motion.set_head(dir ='DOWN', angle = 55)
-            #if edge_info["EDGE_POS"] != None : # yellow edge 감지
-                #if 300 < edge_info["EDGE_POS"][0] < 380 : # yellow edge x 좌표 중앙 O
-                    #print('yellow edge 감지 중앙 O')
-                    #self.mode = 'return_line' # --> find_V
-                    #if self.progress_of_roobot[0] != self.mode:
-                  #      self.progress_of_roobot.insert(0, self.mode)
-                #else: # yellow edge 중앙 X
-                    #print('yellow edge 감지 중앙 X')
-                    #self.find_edge()
-                    #if self.progress_of_roobot[0] != self.mode:
-                        #self.progress_of_roobot.insert(0, self.mode)
-            #else: # yellow edge 감지 X
-               # print('yellow edge 감지 X ')
-                #self.mode = 'end_mission' # --> find_edge
-                #self.find_edge()
-                #if self.progress_of_roobot[0] != self.mode:
-                    #self.progress_of_roobot.insert(0, self.mode)       
-        
-
-        # 방탈출 #로봇 시야각 맞추기
-        #elif self.mode == 'find_edge':
-            #if self.curr_room_color == 'BLACK':
-                #self._motion.set_head(dir ='DOWN', angle = 45)
-            #else: # self.curr_room_color == 'GREEN':
-                #if line_info["ALL_Y"][1] <= 100:
-                    #self._motion.set_head(dir ='DOWN', angle = 55)
-                    #self.return_head = '55'
-                #else:
-                    #self._motion.set_head(dir ='DOWN', angle = 45)
-            #self.mode = 'return_line'
-    
-        #elif self.mode == 'find_edge':
-            #if self.box_pos == 'LEFT':
-              # self._motion.walk(dir = 'RIGHT', loop=2 )
-           # if self.box_pos == 'RIGHT':
-            #   self._motion.walk(dir = 'LEFT', loop=2 )
-         #   else:
-           #     pass
-         #   self._motion.set_head(dir ='DOWN', angle = 45)
-          #  self.mode = 'return_line'
-
-      #  elif self.mode == 'return_line':
-            #if self.return_head == '55': #
-                #if line_info["ALL_Y"][1] <= 100: #
-                  #  pass#
-                #else:#
-                   # self._motion.set_head(dir ='DOWN', angle = 45)#
-                  #  self.return_head = '45'#
-            #else:#
-                #print('self.return_head is empty')#
-
-          #  if self.curr_room_color == 'BLACK':
-             #   self._motion.set_head(dir='DOWN', angle=35)
-             #   if edge_info["EDGE_POS"] != None :
-              #      print(self.curr_room_color, edge_info["EDGE_POS"][1])
-               #     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
-                 #       self._motion.walk(dir='FORWARD', loop=2)
-                #        self._motion.grab(switch = False)
-                 #       self._motion.turn(dir=self.direction, loop = 3)
-                   #     self.mode = 'find_V' # --> 걸을 직선 찾고 walk
-                  #      if self.progress_of_roobot[0] != self.mode:
-                   #         self.progress_of_roobot.insert(0, self.mode)
-                 #   else: # yellow edge y 좌표 가까이 X
-                #        self.mode = 'return_line' # --> find_V
-                 #       self._motion.walk(dir='FORWARD', loop=1, grab=True)
-                #        time.sleep(1)           
-                #        if self.progress_of_roobot[0] != self.mode:
-                #            self.progress_of_roobot.insert(0, self.mode)
-              #  else: # yellow edge 감지 X
-                 #   self._motion.walk(dir='FORWARD', loop=1, grab=True)
-                 #   time.sleep(1)
-                 #   if self.progress_of_roobot[0] != self.mode:
-                #        self.progress_of_roobot.insert(0, self.mode)
-
-          #  elif self.curr_room_color == 'GREEN':
-             #   self._motion.set_head(dir='DOWN', angle=35)
-              #  if edge_info["EDGE_POS"] != None :
-                #    if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
-                #        self._motion.walk(dir='FORWARD', loop=2)
-                 #       self._motion.grab(switch = False)
-                 #       self._motion.turn(dir=self.direction, loop = 3)
-                 #       self.mode = 'find_V' # --> 걸을 직선 찾고 walk
-                 #       if self.progress_of_roobot[0] != self.mode:
-                  #          self.progress_of_roobot.insert(0, self.mode)
-              #      else: # yellow edge y 좌표 가까이 X
-                #        self.mode = 'return_line' # --> find_V
-                        # self.return_line()
-               #         self._motion.walk(dir='FORWARD', loop=1)
-                #        if self.progress_of_roobot[0] != self.mode:
-              #              self.progress_of_roobot.insert(0, self.mode)
-              #  else: # yellow edge 감지 X 
-                #    self.mode = 'find_edge' # --> return_line
-                #    self.find_edge()
-                  #  if self.progress_of_roobot[0] != self.mode:
-                  #      self.progress_of_roobot.insert(0, self.mode)
-#------------------------------------------------------------------------------------------------------    
-#------------------------------------------------------------------------------------------------------
-#------------------------------------------------------------------------------------------------------
-
-
+                    self.progress_of_roobot.insert(0, self.mode)    
 
         elif self.mode == 'return_line':
             if self.curr_room_color == 'BLACK':
-                self._motion.set_head(dir='DOWN', angle=35)
+                if line_info["ALL_Y"][1] > 200 :
+                    self._motion.set_head(dir='DOWN', angle=35)
                 if edge_info["EDGE_POS"] != None :
                     print(self.curr_room_color, edge_info["EDGE_POS"][1])
                     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
@@ -934,7 +879,6 @@ class Robot:
                         self._motion.grab(switch = False)
                         self._motion.turn(dir=self.direction, loop = 3)
                         self.mode = 'find_V' # --> 걸을 직선 찾고 walk
-
                         if self.progress_of_roobot[0] != self.mode:
                             self.progress_of_roobot.insert(0, self.mode)
                     else: # yellow edge y 좌표 가까이 X
@@ -943,21 +887,21 @@ class Robot:
                         time.sleep(1)           
                         if self.progress_of_roobot[0] != self.mode:
                             self.progress_of_roobot.insert(0, self.mode)
-                else: # yellow edge 감지 X
+                else: # yellow edge 감지될 때까지 걷기
                     self._motion.walk(dir='FORWARD', loop=1, grab=True)
                     time.sleep(1)
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
 
             elif self.curr_room_color == 'GREEN':
-                self._motion.set_head(dir='DOWN', angle=35)
+                if line_info["ALL_Y"][1] > 200 :
+                    self._motion.set_head(dir='DOWN', angle=35)
                 if edge_info["EDGE_POS"] != None :
                     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
                         self._motion.walk(dir='FORWARD', loop=2)
                         self._motion.grab(switch = False)
                         self._motion.turn(dir=self.direction, loop = 3)
                         self.mode = 'find_V' # --> 걸을 직선 찾고 walk
-
                         if self.progress_of_roobot[0] != self.mode:
                             self.progress_of_roobot.insert(0, self.mode)
                     else: # yellow edge y 좌표 가까이 X
@@ -971,6 +915,83 @@ class Robot:
                     self.find_edge()
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
+#------------------------------------------------------------------------------------------------------    
+#------------------------------------------------------------------------------------------------------
+#------------------------------------------------------------------------------------------------------
+
+
+
+       # elif self.mode == 'return_line':
+            #if self.return_head == '55': #
+                #if line_info["ALL_Y"][1] <= 100: #
+                  #  pass#
+                #else:#
+                   # self._motion.set_head(dir ='DOWN', angle = 45)#
+                  #  self.return_head = '45'#
+            #else:#
+                #print('self.return_head is empty')#
+
+           # if self.curr_room_color == 'BLACK':
+              #  self._motion.set_head(dir='DOWN', angle=35)
+              #  if edge_info["EDGE_POS"] != None :
+               #     print(self.curr_room_color, edge_info["EDGE_POS"][1])
+               #     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
+               #         self._motion.walk(dir='FORWARD', loop=2)
+                #        self._motion.grab(switch = False)
+                #        self._motion.turn(dir=self.direction, loop = 3)
+
+                #        self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+
+                        # 10/08 수정 전
+                        #self.walk_info = None
+                        #self.mode = 'walk' ##
+                        #self.walk_info = '│'
+                        #self._motion.turn(dir=self.direction, loop = 3)
+                        
+                 #       if self.progress_of_roobot[0] != self.mode:
+                 #           self.progress_of_roobot.insert(0, self.mode)
+                 #   else: # yellow edge y 좌표 가까이 X
+                 #       self.mode = 'return_line' # --> find_V
+                 #       self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                 #       time.sleep(1)           
+                  #      if self.progress_of_roobot[0] != self.mode:
+                #            self.progress_of_roobot.insert(0, self.mode)
+              #  else: # yellow edge 감지 X
+                  #  self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                  #  time.sleep(1)
+                 #   if self.progress_of_roobot[0] != self.mode:
+                  #      self.progress_of_roobot.insert(0, self.mode)
+
+          #  elif self.curr_room_color == 'GREEN':
+             #   self._motion.set_head(dir='DOWN', angle=35)
+             #   if edge_info["EDGE_POS"] != None :
+                 #   if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
+                  #      self._motion.walk(dir='FORWARD', loop=2)
+                  #      self._motion.grab(switch = False)
+                  #      self._motion.turn(dir=self.direction, loop = 3)
+
+                  #      self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+
+                        #self._motion.walk(dir='FORWARD', loop=2)
+                        #self._motion.turn(self.direction, 2) ##
+                        #self.walk_info = None
+                        #self.mode = 'walk' ##
+                        #self.walk_info = '│'
+                        #self._motion.turn(dir=self.direction, loop = 3)
+                        #self._motion.walk(dir='FORWARD', loop=1)
+                     #   if self.progress_of_roobot[0] != self.mode:
+                    #        self.progress_of_roobot.insert(0, self.mode)
+                 #   else: # yellow edge y 좌표 가까이 X
+                 #       self.mode = 'return_line' # --> find_V
+                        # self.return_line()
+                 #       self._motion.walk(dir='FORWARD', loop=1)
+                 #       if self.progress_of_roobot[0] != self.mode:
+                  #          self.progress_of_roobot.insert(0, self.mode)
+             #   else: # yellow edge 감지 X 
+                 #   self.mode = 'find_edge' # --> return_line
+                 #   self.find_edge()
+                 #   if self.progress_of_roobot[0] != self.mode:
+                   #     self.progress_of_roobot.insert(0, self.mode)
                     
         elif self.mode == 'find_V':
             if line_info["V"] == True :
