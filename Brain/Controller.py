@@ -340,14 +340,8 @@ class Robot:
 
     def find_edge(self): #find_corner_for_outroom
         if self.curr_room_color=='BLACK':
-            if self.direction == 'LEFT':
-                self._motion.turn(dir='RIGHT', loop=1, grab=True) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                time.sleep(1)
-            elif self.direction == 'RIGHT':
-                self._motion.turn(dir='LEFT', loop=1, grab=True) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                time.sleep(1)
-            else:
-                print('no direction')
+            self._motion.turn(dir=self.direction, loop=1, grab=True) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
+            time.sleep(1)
 
         elif self.curr_room_color == 'GREEN':
             if self.direction == 'LEFT':
@@ -386,16 +380,10 @@ class Robot:
                 time.sleep(1)
                 self.mode = 'check_area'
         elif self.color == 'BLACK':
-            if self.direction == 'RIGHT':
-                self._motion.turn(dir='LEFT', loop=9, grab=True)
-                time.sleep(1)
-                self.mode = 'end_mission'
-                self.color = 'YELLOW'
-            if self.direction == 'LEFT':
-                self._motion.turn(dir='RIGHT', loop=9, grab=True)
-                time.sleep(1)
-                self.mode = 'end_mission'
-                self.color = 'YELLOW'
+            self._motion.turn(dir=self.direction, loop=5, grab=True)
+            time.sleep(1)
+            self.mode = 'end_mission'
+            self.color = 'YELLOW'
             
             
     def check_area(self, line_info, edge_info):
@@ -781,16 +769,10 @@ class Robot:
                                 time.sleep(1)
                                 self.mode = 'check_area'
                         elif self.color == 'BLACK':
-                            if self.direction == 'RIGHT':
-                                self._motion.turn(dir='LEFT', loop=9, grab=True)
-                                time.sleep(1)
-                                self.mode = 'end_mission'
-                                self.color = 'YELLOW'
-                            if self.direction == 'LEFT':
-                                self._motion.turn(dir='RIGHT', loop=9, grab=True)
-                                time.sleep(1)
-                                self.mode = 'end_mission'
-                                self.color = 'YELLOW'
+                            self._motion.turn(dir=self.direction, loop=5, grab=True)
+                            time.sleep(1)
+                            self.mode = 'end_mission'
+                            self.color = 'YELLOW'
                             
                     else:
                         self.curr_head.rotate(-1)
