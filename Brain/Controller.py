@@ -909,7 +909,7 @@ class Robot:
                 if edge_info["EDGE_POS"] != None :
                     print(self.curr_room_color, edge_info["EDGE_POS"][1])
                     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
-                        self._motion.walk(dir='FORWARD', loop=2)
+                        self._motion.walk(dir='FORWARD', loop=1, grab=True)
                         self._motion.grab(switch = False)
                         self._motion.turn(dir=self.direction, loop = 2)
                         time.sleep(1)
@@ -931,7 +931,7 @@ class Robot:
             elif self.curr_room_color == 'GREEN':
                 if edge_info["EDGE_POS"] != None :
                     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
-                        self._motion.walk(dir='FORWARD', loop=2)
+                        self._motion.walk(dir='FORWARD', loop=1)
                         self._motion.turn(dir=self.direction, loop = 2)
                         time.sleep(1)
                         self.mode = 'find_V' # --> 걸을 직선 찾고 walk

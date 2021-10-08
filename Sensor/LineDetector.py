@@ -65,10 +65,10 @@ class LineDetector:
         if color == 'YELLOW':
             hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
             h, l, s = cv2.split(hls)
-            ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+            ret, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask=mask)
             match_lower = np.array([10, 40, 110])  # yellow_lower
-            match_upper = np.array([45, 220, 220])  # yellow_upper
+            match_upper = np.array([45, 225, 220])  # yellow_upper
 
         if color == 'GREEN':
             hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
