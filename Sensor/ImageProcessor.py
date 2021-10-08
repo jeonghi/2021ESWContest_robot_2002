@@ -125,7 +125,7 @@ class ImageProcessor:
 
     def get_arrow_direction(self):
         src = self.get_image()
-        direction, _ = self.hash_detector4arrow.detect_arrow(src)
+        direction = self.hash_detector4arrow.detect_arrow(src)
         return direction
 
     def get_area_color(self, threshold: float = 0.35, visualization: bool = False):
