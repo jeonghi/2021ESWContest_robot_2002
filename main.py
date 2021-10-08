@@ -28,8 +28,8 @@ def main():
         #video_recorder.record_frame(frame)
 
     #===================== function ======================
-        #robot.check_motion()
-        robot.setting_mode()
+        robot.check_motion()
+        #robot.setting_mode()
     
 
     #=====================================================

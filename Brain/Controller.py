@@ -36,7 +36,7 @@ class Robot:
         self._motion.basic_form()
         
     def check_motion(self):
-        self._motion.set_head(dir ='DOWN', angle = 10)
+        self._motion.walk(dir = 'LEFT', loop=4 )
 
     def get_distance_from_baseline(self, box_info, baseline=(320, 400)):
         # if bx - cx > 0
@@ -836,26 +836,29 @@ class Robot:
                 if edge_info["EDGE_POS"] != None :
                     print(self.curr_room_color, edge_info["EDGE_POS"][1])
                     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
-                        #self._motion.walk(dir='FORWARD', loop=2)
-                        #self.mode = 'find_V' # --> 걸을 직선 찾고 walk
-                        self._motion.turn(self.direction, 2, grab=True) ##
-                        self.walk_info = None
-                        self._motion.grab(switch = False)
-                        self.mode = 'walk' ##
-                        self.walk_info = '│'
-                        self._motion.turn(dir=self.direction, loop = 3)
                         self._motion.walk(dir='FORWARD', loop=2)
+                        self._motion.grab(switch = False)
+                        self._motion.turn(dir=self.direction, loop = 3)
+
+                        self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+
+                        # 10/08 수정 전
+                        #self.walk_info = None
+                        #self.mode = 'walk' ##
+                        #self.walk_info = '│'
+                        #self._motion.turn(dir=self.direction, loop = 3)
+                        
                         if self.progress_of_roobot[0] != self.mode:
                             self.progress_of_roobot.insert(0, self.mode)
                     else: # yellow edge y 좌표 가까이 X
                         self.mode = 'return_line' # --> find_V
-                        # self.return_line()
                         self._motion.walk(dir='FORWARD', loop=1, grab=True)
-                                                
+                        time.sleep(1)           
                         if self.progress_of_roobot[0] != self.mode:
                             self.progress_of_roobot.insert(0, self.mode)
                 else: # yellow edge 감지 X
                     self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                    time.sleep(1)
                     if self.progress_of_roobot[0] != self.mode:
                         self.progress_of_roobot.insert(0, self.mode)
 
@@ -863,14 +866,19 @@ class Robot:
                 self._motion.set_head(dir='DOWN', angle=35)
                 if edge_info["EDGE_POS"] != None :
                     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
-                        #self._motion.walk(dir='FORWARD', loop=2)
-                        #self.mode = 'find_V' # --> 걸을 직선 찾고 walk
-                        self._motion.turn(self.direction, 2) ##
-                        self.walk_info = None
-                        self.mode = 'walk' ##
-                        self.walk_info = '│'
-                        self._motion.turn(dir=self.direction, loop = 3)
                         self._motion.walk(dir='FORWARD', loop=2)
+                        self._motion.grab(switch = False)
+                        self._motion.turn(dir=self.direction, loop = 3)
+
+                        self.mode = 'find_V' # --> 걸을 직선 찾고 walk
+
+                        #self._motion.walk(dir='FORWARD', loop=2)
+                        #self._motion.turn(self.direction, 2) ##
+                        #self.walk_info = None
+                        #self.mode = 'walk' ##
+                        #self.walk_info = '│'
+                        #self._motion.turn(dir=self.direction, loop = 3)
+                        #self._motion.walk(dir='FORWARD', loop=1)
                         if self.progress_of_roobot[0] != self.mode:
                             self.progress_of_roobot.insert(0, self.mode)
                     else: # yellow edge y 좌표 가까이 X
@@ -898,7 +906,6 @@ class Robot:
                         self._motion.walk(dir='RIGHT', loop=1)
             else:
                 self.mode = 'find_V'
-                # self.find_V()
                 self._motion.turn(self.direction, 1)
 
 
