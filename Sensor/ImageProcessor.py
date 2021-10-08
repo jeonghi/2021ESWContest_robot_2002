@@ -128,58 +128,46 @@ class ImageProcessor:
         direction, _ = self.hash_detector4arrow.detect_arrow(src)
         return direction
 
-    def get_area_color(self, threshold: float = 0.5, visualization: bool = False):
+    def get_area_color(self, threshold: float = 0.35, visualization: bool = False):
         src = self.get_image()
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         h = h.astype(l.dtype)
 
+        area_color = None
         # red mask
-        red_mask = self.color_preprocessor.get_red_mask(h)
+        red_mask = self.color_preprocessor.get_red_mask(hue=h)
 
         # blue mask
-        blue_mask = self.color_preprocessor.get_blue_mask(h)
+        blue_mask = self.color_preprocessor.get_blue_mask(hue=h)
+
+        # green mask
+        green_mask = self.color_preprocessor.get_green_mask(hue=h)
+
+        # saturation thresholding
+        _, s_mask = cv2.threshold(s, 100, 255, cv2.THRESH_BINARY)
 
         # mask denoise
         mask = cv2.bitwise_or(red_mask, blue_mask)
-        mask = cv2.GaussianBlur(mask, (5, 5), 0)
-        kernel = cv2.getStructuringElement(cv2.MORPH_RECT, (5, 5))
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, kernel)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, kernel)
         mask = cv2.bitwise_not(mask)
+        mask = cv2.bitwise_and(green_mask, mask)
 
-        # background : white, target: green, red, blue, black
-        # ostu thresholding inverse : background -> black, target -> white
-        _, roi_mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_OPEN, kernel)
-        roi_mask = cv2.morphologyEx(roi_mask, cv2.MORPH_CLOSE, kernel)
 
-        # subtract blue and red mask to ostu thresholded mask
-        # masking
-        roi_mask = cv2.bitwise_and(mask, roi_mask)
-        h = cv2.bitwise_and(h, h, mask=roi_mask)
+        mask = cv2.bitwise_and(green_mask, s_mask)
+        sz = mask.shape[:2][0] * mask.shape[:2][1]
+        rate = np.count_nonzero(mask) / sz
+        rate = round(rate, 2)
+        print(rate)
 
-        # get mean value about non_zero value
-        h_mean = self.color_preprocessor.get_mean_value_for_non_zero(h)
-
-        # green
-        green_upper = 85
-        green_lower = 35
-        green = np.where(h > green_lower, h, 0)
-        green = np.where(green < green_upper, green, 0)
-
-        pixel_rate = np.count_nonzero(green) / np.count_nonzero(h)
+        area_color = "GREEN" if rate > threshold else "BLACK"
 
         if visualization:
-            dst = cv2.bitwise_and(src, src, mask=roi_mask)
-            cv2.imshow("dst", dst)
+            cv2.imshow("green", mask)
             cv2.waitKey(1)
 
-        if green_lower <= h_mean <= green_upper and pixel_rate >= threshold:
-            return "GREEN"
-        else:
-            return "BLACK"
-    
+        return area_color
+
+
     def get_alphabet_info4room(self, edge_info={}, method="CONTOUR", visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
@@ -405,11 +393,11 @@ class ImageProcessor:
 
 
     def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
-        
+
         src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         print(line_info)
-        #print(edge_info)
+        print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
             cv2.waitKey(1)
@@ -420,12 +408,12 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor()
+    imageProcessor = ImageProcessor(video_path="./src/debug/room_blue_A.h264")
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        _, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=True, edge_visualization=0)
-        
+        imageProcessor.get_area_color(visualization=True)
+        #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
