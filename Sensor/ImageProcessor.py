@@ -126,6 +126,7 @@ class ImageProcessor:
     def get_arrow_direction(self):
         src = self.get_image()
         direction = self.hash_detector4arrow.detect_arrow(src)
+        print(direction)
         return direction
 
     def get_area_color(self, threshold: float = 0.35, visualization: bool = False):
@@ -412,7 +413,7 @@ if __name__ == "__main__":
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
-        imageProcessor.get_area_color(visualization=True)
+        imageProcessor.get_arrow_direction()
         #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)

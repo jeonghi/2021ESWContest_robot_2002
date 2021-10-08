@@ -543,6 +543,7 @@ class Robot:
 
         # 화살표 방향 인식
         elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
+            self._motion.set_head(dir='DOWN', angle=90)
             if self.mode == 'detect_direction: fail':
                 self._motion.walk("BACKWARD", 1)
                 time.sleep(1)
@@ -589,7 +590,7 @@ class Robot:
                 if line_info["H_X"][0] <= 100 and line_info["H_X"][1] >= 550 :
                     self.walk_info = 'T'
                     print(line_info["H_Y"][1])
-                    if line_info["H_Y"][1] > 220:
+                    if line_info["H_Y"][1] > 190:
                         self.mode = 'detect_direction'
                         if self.progress_of_roobot[0] != self.walk_info:
                             self.progress_of_roobot.insert(0, self.walk_info)
