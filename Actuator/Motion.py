@@ -170,7 +170,7 @@ class Motion:
     def open_door(self, loop=1):
         if not self.debug:
             for _ in range(loop):
-                self.TX_data_py2(66)
+                self.TX_data_py2(68)
 
 
     def grab(self, switch=True):
