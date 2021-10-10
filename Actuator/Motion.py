@@ -14,7 +14,7 @@ class Motion:
     head_angle1 = 'UPDOWN_CENTER'
     head_angle2 = 'LEFTRIGHT_CENTER'
 
-    def __init__(self, DEBUG=False):
+    def __init__(self):
         self.serial_use = 1
         self.serial_port = None
         self.Read_RX = 0
@@ -22,18 +22,16 @@ class Motion:
         self.threading_Time = 0.01
         self.lock = Lock()
         self.distance = 0
-        self.debug = DEBUG
         BPS = 4800  # 4800,9600,14400, 19200,28800, 57600, 115200
 
         # ---------local Serial Port : ttyS0 --------
         # ---------USB Serial Port : ttyAMA0 --------
-        if not self.debug:
-            self.serial_port = serial.Serial('/dev/ttyS0', BPS, timeout=0.01)
-            self.serial_port.flush()  # serial cls
-            self.serial_t = Thread(target=self.Receiving, args=(self.serial_port,))
-            self.serial_t.daemon = True
-            self.serial_t.start()
-            time.sleep(0.1)
+        self.serial_port = serial.Serial('/dev/ttyS0', BPS, timeout=0.01)
+        self.serial_port.flush()  # serial cls
+        self.serial_t = Thread(target=self.Receiving, args=(self.serial_port,))
+        self.serial_t.daemon = True
+        self.serial_t.start()
+        time.sleep(0.1)
 
 
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
@@ -63,7 +61,7 @@ class Motion:
                 # Rx, 수신
                 result = ser.read(1)
                 RX = ord(result)
-                #print ("RX=" + str(RX))
+                print ("RX=" + str(RX))
 
                 # -----  remocon 16 Code  Exit ------
                 if RX == 16:
@@ -79,18 +77,14 @@ class Motion:
         """dir={'E', 'W', 'S', 'N'}
         """
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
-        if not self.debug:
-            self.TX_data_py2(dir_list[dir])
-            time.sleep(0.5)
+        self.TX_data_py2(dir_list[dir])
 
 
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
         area_list = {'GREEN':67,'BLACK':68}
-        if not self.debug:
-            self.TX_data_py2(area_list[area])
-            time.sleep(0.5)
+        self.TX_data_py2(area_list[area])
 
 
     def set_head(self, dir, angle=0):
@@ -122,26 +116,25 @@ class Motion:
                 30:51, 45:52, 60:53, 90:54
             }
         }
-        if not self.debug:
-            if dir in center_list:
-                self.TX_data_py2(center_list[dir])
-            else:
-                self.TX_data_py2(dir_list[dir][angle])
-
-            time.sleep(0.5)
+        if dir in center_list:
+            self.TX_data_py2(center_list[dir])
+        else:
+            self.TX_data_py2(dir_list[dir][angle])
 
 
-    def walk(self, dir, loop=1, sleep=0.3, grab=False):
+    def walk(self, dir, loop=1, grab=False, IR=False):
         dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
-        
-        if not self.debug:
-            for _ in range(loop):
-                self.TX_data_py2(dir_list[dir])
-                time.sleep(sleep)
+        for _ in range(loop):
+            self.TX_data_py2(dir_list[dir])
+
+        if IR:
+            if self.get_IR() > 65:
+                return True
+            return False
 
 
-    def turn(self, dir, loop=1, sleep=1, grab=False,sliding=False):
+    def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, IR=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """
@@ -150,36 +143,39 @@ class Motion:
             dir_list[dir] += 11# if grab is true, change walk motion with grab
             if sliding:
                 dir_list[dir]+=9
-                
-        if not self.debug:
-            for _ in range(loop):
-                self.TX_data_py2(dir_list[dir])
-                time.sleep(sleep)
+        for _ in range(loop):
+            self.TX_data_py2(dir_list[dir])
+            time.sleep(sleep)
+        
+        if IR:
+            if self.get_IR() > 65:
+                return True
+            return False
 
 
     def get_IR(self) -> int:
         """get IR value and return self.distance
         """
-        
-        if not self.debug:
-            self.TX_data_py2(5)
-            self.TX_data_py2(5)
+        self.TX_data_py2(5)
+        self.TX_data_py2(5)
         return self.distance
 
 
     def open_door(self, loop=1):
-        if not self.debug:
-            for _ in range(loop):
-                self.TX_data_py2(68)
+        for _ in range(loop):
+            self.TX_data_py2(68)
 
 
-    def grab(self, switch=True):
+    def grab(self, switch=True, IR=False):
         """if switch=True then grab ON, else then grab OFF
         """
         tx = 65 if switch else 66
-        if not self.debug:
-            self.TX_data_py2(tx)
-            time.sleep(0.3)
+        self.TX_data_py2(tx)
+
+        if IR:
+            if self.get_IR() > 65:
+                return True
+            return False
 
 
     def get_head(self):
@@ -189,11 +185,9 @@ class Motion:
 
 
     def basic_form(self):
-        if not self.debug:
-            self.TX_data_py2(46)
-            self.TX_data_py2(55)
-            self.TX_data_py2(10)
-            time.sleep(0.3)
+        self.TX_data_py2(46)
+        self.TX_data_py2(55)
+        self.TX_data_py2(10)
 
 
     def move_arm(self, dir='HIGH'):
@@ -202,11 +196,9 @@ class Motion:
         """
         angle_list = [35, 90, 60]
         level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
-        if not self.debug:
-            self.TX_data_py2(76+level[dir])
-            time.sleep(0.1)
-            self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
-            time.sleep(0.7)
+        self.TX_data_py2(76+level[dir])
+        time.sleep(0.1)
+        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
 
 
 # **************************************************
