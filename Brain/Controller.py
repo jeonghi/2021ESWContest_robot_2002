@@ -10,7 +10,7 @@ from collections import deque
 class Robot:
 
     def __init__(self, video_path ="", DEBUG=False):
-        self._motion = Motion(DEBUG)
+        self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
         self._line_detector = LineDetector()
         self.direction = None
