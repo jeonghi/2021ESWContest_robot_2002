@@ -14,12 +14,13 @@ class Motion:
     head_angle1 = 'UPDOWN_CENTER'
     head_angle2 = 'LEFTRIGHT_CENTER'
 
-    def __init__(self):
+    def __init__(self, sleep_time=0):
         self.serial_use = 1
         self.serial_port = None
         self.Read_RX = 0
         self.receiving_exit = 1
         self.threading_Time = 0.01
+        self.sleep_time = sleep_time
         self.lock = Lock()
         self.distance = 0
         BPS = 4800  # 4800,9600,14400, 19200,28800, 57600, 115200
@@ -32,6 +33,13 @@ class Motion:
         self.serial_t.daemon = True
         self.serial_t.start()
         time.sleep(0.1)
+
+    # DELAY DECORATOR
+    def sleep(self, func):
+        def decorated():
+            func()
+            time.sleep(self.sleep_time)
+        return decorated
 
 
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
@@ -87,6 +95,15 @@ class Motion:
         self.TX_data_py2(area_list[area])
 
 
+    def notice_alpha(self, ls):
+        alpha_list = {'A':85, 'B':86, 'C':87, 'D':88}
+        for i in ls:
+            if i in alpha_list:
+                self.TX_data_py2(alpha_list[i])
+                time.sleep(0.2)
+
+
+    @sleep
     def set_head(self, dir, angle=0):
         """parameter 설명
         dir: {DOWN, LEFT, RIGHT, UPDOWN_CENTER, LEFTRIGHT_CENTER}
@@ -163,7 +180,7 @@ class Motion:
 
     def open_door(self, loop=1):
         for _ in range(loop):
-            self.TX_data_py2(68)
+            self.TX_data_py2(89)
 
 
     def grab(self, switch=True, IR=False):
@@ -199,6 +216,7 @@ class Motion:
         self.TX_data_py2(76+level[dir])
         time.sleep(0.1)
         self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
+    
 
 
 # **************************************************
