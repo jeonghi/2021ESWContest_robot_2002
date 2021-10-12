@@ -32,7 +32,7 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color = ""
         
-        self.mode = "walk"
+        self.mode = "walk" # 리모콘으로 각도 10도 먼저 내리고 run
         self.direction = "LEFT"
         self.color = "YELLOW"
         self.box_pos = ""
@@ -320,30 +320,49 @@ class Robot:
     def walk(self, line_info, walk_info):
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}
         self._motion.set_head(dir = 'DOWN', angle = 10)
+        if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+            # 팔뻗기
+            print('팔뻗기')
         #time.sleep(1)
         if walk_info == '│':
             if line_info["DEGREE"] > 85 and line_info["DEGREE"] < 95:
                 if 290 < line_info["V_X"][0] <350:
                     print('walk')
-                    print('│', line_info)
-                    self._motion.walk(dir='FORWARD', loop=1)
+                    print('│')
+                    if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+                        self._motion.walk(dir='FORWARD', loop=1) # 팔뻗기
+                    else:
+                        self._motion.walk(dir='FORWARD', loop=1)
                     #time.sleep(1)
                 else:
                     if line_info["V_X"][0] < 290:
                         print('← ←', line_info["V_X"][0])
-                        self._motion.walk(dir='LEFT', loop=1)
+                        if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+                            self._motion.walk(dir='LEFT', loop=1) # 팔뻗기
+                        else:
+                            self._motion.walk(dir='LEFT', loop=1)
                         #time.sleep(1)
                     elif line_info["V_X"][0] > 350:
                         print('→ →', line_info["V_X"][0])
-                        self._motion.walk(dir='RIGHT', loop=1)
+                        if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+                            self._motion.walk(dir='RIGHT', loop=1) # 팔뻗기
+                        else:
+                            self._motion.walk(dir='RIGHT', loop=1)
                         #time.sleep(1)
             elif line_info["DEGREE"] <= 85:
-                print('MODIFY angle --LEFT', line_info)
-                self._motion.turn(dir='LEFT', loop=1)
+                print('MODIFY angle --LEFT')
+                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+                    self._motion.turn(dir='LEFT', loop=1) # 팔뻗기
+                else:
+                    self._motion.turn(dir='LEFT', loop=1)
                 #time.sleep(1)
             elif line_info["DEGREE"] >= 95:
-                print('MODIFY angle --RIGHT', line_info)
-                self._motion.turn(dir='RIGHT', loop=1)
+                print('MODIFY angle --RIGHT')
+                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+                    self._motion.turn(dir='RIGHT', loop=1) # 팔뻗기
+                else:
+                    self._motion.turn(dir='RIGHT', loop=1)
+                
                 #time.sleep(1)
             else:
                 print('else')
@@ -351,12 +370,18 @@ class Robot:
 
         elif walk_info == None: # 'modify_angle'
             if line_info["DEGREE"] <= 85:
-                print('MODIFY angle --LEFT', line_info)
-                self._motion.turn(dir='LEFT', loop=1)
+                print('MODIFY angle --LEFT')
+                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+                    self._motion.turn(dir='LEFT', loop=1) # 팔뻗기
+                else:
+                    self._motion.turn(dir='LEFT', loop=1)
                 #time.sleep(1)
             elif line_info["DEGREE"] >= 95:
-                print('MODIFY angle --RIGHT', line_info)
-                self._motion.turn(dir='RIGHT', loop=1)
+                print('MODIFY angle --RIGHT')
+                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
+                    self._motion.turn(dir='RIGHT', loop=1) # 팔뻗기
+                else:
+                    self._motion.turn(dir='RIGHT', loop=1)
                 #time.sleep(1)
             else:
                 print('else')
@@ -559,7 +584,8 @@ class Robot:
             if self.alphabet is None:
                 self.detect_alphabet()
             else:
-                self._motion
+                self._motion.set_head(dir='DOWN', angle=10)
+                time.sleep(2)
                 self.mode = 'walk'
                 #self._motion.move_arm(dir="HIGH")
 
@@ -575,19 +601,13 @@ class Robot:
             if self.direction == None:
                 self.detect_direction()
             else:
-                self._motion.walk('FORWARD', 2)
+                #self._motion.walk('FORWARD', 2) #너무 뒤에서 멈추면 추가
                 self._motion.walk(self.direction, 4)
                 self._motion.turn(self.direction, 8)
-                self._motion.set_head('DOWN', 10)
-                time.sleep(1)
-                #self._motion.walk("FORWARD", 1)
-                #self._motion.walk(self.direction, 2)
-                #self._motion.turn(self.direction, 7)
-                self.mode = 'walk' 
-                self.walk_info = '│'
                 self._motion.set_head(dir='DOWN', angle = 10)
                 time.sleep(1)
-
+                self.mode = 'walk' 
+                self.walk_info = '│'
 
 
         # 걷기 # 보정 추가로 넣기
@@ -606,7 +626,7 @@ class Robot:
 
             else:
                 print(line_info["H_X"])
-                if line_info["H_X"][0] <= 100 and line_info["H_X"][1] >= 550 :
+                if line_info["H_X"][0] <= 200 and line_info["H_X"][1] >= 400 :
                     self.walk_info = 'T'
                     print(line_info["H_Y"][1])
                     if line_info["H_Y"][1] > 190:
@@ -617,10 +637,10 @@ class Robot:
                         time.sleep(1)
                         
                 else:
-                    if line_info["H_X"][0] <= 200 and line_info["H_X"][1] <= 400:
+                    if line_info["H_X"][0] < 200 and line_info["H_X"][1] < 400:
                         self.walk_info = '┐'
 
-                    elif line_info["H_X"][1] >= 400 and line_info["H_X"][0] >= 200 :
+                    elif line_info["H_X"][1] > 400 and line_info["H_X"][0] > 200 :
                         self.walk_info = '┌'
 
                     else:
@@ -870,6 +890,7 @@ class Robot:
                         time.sleep(1)
     
         elif self.mode == 'find_edge':
+            print(edge_info["EDGE_POS"])
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
                 if 300 < edge_info["EDGE_POS"][0] < 380 : # yellow edge x 좌표 중앙 O
                     print('yellow edge 감지 중앙 O')
@@ -1044,7 +1065,11 @@ class Robot:
             self.walk_info = '│'
 
         if self.progress_of_robot[0] != self.mode and self.mode != 'walk':
+            if self.progress_of_robot[0] == None :
+                self.progress_of_robot[0]=self.mode
+            else:
                 self.progress_of_robot.insert(0, self.mode)
+            print(self.progress_of_robot)
             
         if self.mode_history != self.mode :
             self.mode_history = self.mode
