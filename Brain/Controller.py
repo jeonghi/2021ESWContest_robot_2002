@@ -882,7 +882,7 @@ class Robot:
                         self.return_head = '45'
                 else:
                     if self.curr_room_color == 'BLACK':
-                        self._motion.turn(dir = 'LEFT', loop = 1, grab = True)
+                        self._motion.turn(dir = self.direction, loop = 1, grab = True)
                         time.sleep(1)
                     else:
                         self._motion.turn(dir = 'LEFT', loop = 1)
@@ -902,7 +902,7 @@ class Robot:
                   
                 else:
                     if self.curr_room_color == 'BLACK':
-                        self._motion.turn(dir = 'RIGHT', loop = 1, grab = True)
+                        self._motion.turn(dir = self.direction, loop = 1, grab = True)
                         time.sleep(1)
                     else:
                         self._motion.turn(dir = 'RIGHT', loop = 1)
