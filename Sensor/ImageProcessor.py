@@ -226,7 +226,7 @@ class ImageProcessor:
                     continue
 
                 candidate = Target(stats=stats[idx], centroid=centroid)
-                roi = candidate.get_target_roi(src, pad=5)
+                roi = candidate.get_target_roi(src, pad=15)
 
                 # ycrcb 색공간을 이용해
 
@@ -271,7 +271,7 @@ class ImageProcessor:
                     continue
 
                 candidate = Target(contour=contour)
-                roi = candidate.get_target_roi(src, pad=5)
+                roi = candidate.get_target_roi(src, pad=15)
 
                 # ycrcb 색공간을 이용해
 
@@ -368,7 +368,7 @@ class ImageProcessor:
             ### roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 라벨만 남기도록 필터링
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
-            print(area_ratio)
+            #print(area_ratio)
 
             if not (1000 < width*height and area_ratio <= 1.7):
                 continue
@@ -391,9 +391,9 @@ class ImageProcessor:
         if candidates:
             if edge_info:
                 if edge_info["EDGE_UP"] :
-                    print("필터 적용전", candidates)
+                    #print("필터 적용전", candidates)
                     candidates = list(filter(lambda candidate: candidate.y + candidate.height > edge_info["EDGE_UP_Y"], candidates))
-                    print("적용 후", candidates)
+                    #print("적용 후", candidates)
 
         ### 후보 라벨이 있다면 그중에서 가장 큰 크기 객체의 중심 좌표를 반환
         if candidates:
@@ -421,8 +421,8 @@ class ImageProcessor:
 
         src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
-        print(line_info)
-        print(edge_info)
+        #print(line_info)
+        #print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
             cv2.waitKey(1)
@@ -433,20 +433,16 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    import cv2
-    import numpy as np
-    import math
-    video = cv2.VideoCapture("Sensor/src/arrow_test/arrow_left.h264")
-    image_processor = ImageProcessor("Sensor/src/arrow_test/arrow_right.h264")
+    imageProcessor = ImageProcessor(video_path="")
+    #imageProcessor = ImageProcessor(video_path="")
+    imageProcessor.fps.start()
     while True:
-        ret, src = video.read()
-        if not ret:
-            break
-        
-        print(image_processor.get_arrow_direction())
-        
-        key = cv2.waitKey(1)
-        if key == 27:
-            break
-    video.release()
-    cv2.destroyAllWindows()
+        #imageProcessor.get_arrow_direction()
+        _, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=False, edge_visualization=True)
+        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        #print(alphabet)
+        #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
+        #print(imageProcessor.get_green_area_corner(visualization=True))
+        #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
+        #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        #print(result)
