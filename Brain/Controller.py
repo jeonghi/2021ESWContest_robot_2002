@@ -18,7 +18,7 @@ class Robot:
         self.alphabet_color = None
         self.cube_grabbed = False
         self.return_head = None # return 할 때 고개 각도 바꿀 지 고민 중 10/08
-        self.count = 2
+        self.count = 0
         self.progress_of_roobot= [None, ]
         
         self.walk_info = None
@@ -26,17 +26,17 @@ class Robot:
         self.curr_activating_pos = "" # 방에서 활동중인 위치
 
         
-        self.mode = "start"
-        self.direction = None
-        self.color = "YELLOW"
-        self.box_pos = ""
-        self.curr_room_color = ""
-        
-        #self.mode = "walk"
-        #self.direction = "LEFT"
+        #self.mode = "start"
+        #self.direction = None
         #self.color = "YELLOW"
         #self.box_pos = ""
         #self.curr_room_color = ""
+        
+        self.mode = "walk"
+        self.direction = "LEFT"
+        self.color = "YELLOW"
+        self.box_pos = ""
+        self.curr_room_color = ""
         
         #self.mode = 'walk'
         #self.direction = 'LEFT'
@@ -58,6 +58,8 @@ class Robot:
         #self.box_pos = None
         #self._motion.set_head("DOWN", 10)
         #self.curr_room_color = None
+        
+        
         self.mode_history = self.mode
 
 
