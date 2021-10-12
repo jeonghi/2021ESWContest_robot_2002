@@ -26,6 +26,13 @@ class Robot:
         self.curr_activating_pos = "" # 방에서 활동중인 위치
 
         
+        
+        #self.mode = "detect_direction"
+        #self.direction = None
+        #self.color = "YELLOW"
+        #self.box_pos = ""
+        #self.curr_room_color =""
+        
         self.mode = "start"
         self.direction = None
         self.color = "YELLOW"
@@ -303,37 +310,37 @@ class Robot:
                 if 290 < line_info["V_X"][0] <350:
                     print('walk')
                     print('│')
-                    if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-                        self._motion.walk(dir='FORWARD', loop=1) # 팔뻗기
+                    if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+                        self._motion.walk(dir='FORWARD', loop=1, grab=True) # 팔뻗기
                     else:
                         self._motion.walk(dir='FORWARD', loop=1)
                     #time.sleep(1)
                 else:
                     if line_info["V_X"][0] < 290:
                         print('← ←', line_info["V_X"][0])
-                        if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-                            self._motion.walk(dir='LEFT', loop=1) # 팔뻗기
+                        if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+                            self._motion.walk(dir='LEFT', loop=1, grab=True) # 팔뻗기
                         else:
                             self._motion.walk(dir='LEFT', loop=1)
                         #time.sleep(1)
                     elif line_info["V_X"][0] > 350:
                         print('→ →', line_info["V_X"][0])
-                        if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-                            self._motion.walk(dir='RIGHT', loop=1) # 팔뻗기
+                        if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+                            self._motion.walk(dir='RIGHT', loop=1, grab=True) # 팔뻗기
                         else:
                             self._motion.walk(dir='RIGHT', loop=1)
                         #time.sleep(1)
             elif line_info["DEGREE"] <= 85:
                 print('MODIFY angle --LEFT')
-                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-                    self._motion.turn(dir='LEFT', loop=1) # 팔뻗기
+                if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+                    self._motion.turn(dir='LEFT', loop=1, grab=True) # 팔뻗기
                 else:
                     self._motion.turn(dir='LEFT', loop=1)
                 #time.sleep(1)
             elif line_info["DEGREE"] >= 95:
                 print('MODIFY angle --RIGHT')
-                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-                    self._motion.turn(dir='RIGHT', loop=1) # 팔뻗기
+                if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+                    self._motion.turn(dir='RIGHT', loop=1, grab=True) # 팔뻗기
                 else:
                     self._motion.turn(dir='RIGHT', loop=1)
                 
@@ -345,15 +352,15 @@ class Robot:
         elif walk_info == None: # 'modify_angle'
             if line_info["DEGREE"] <= 85:
                 print('MODIFY angle --LEFT')
-                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-                    self._motion.turn(dir='LEFT', loop=1) # 팔뻗기
+                if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+                    self._motion.turn(dir='LEFT', loop=1, grab=True) # 팔뻗기
                 else:
                     self._motion.turn(dir='LEFT', loop=1)
                 #time.sleep(1)
             elif line_info["DEGREE"] >= 95:
                 print('MODIFY angle --RIGHT')
-                if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-                    self._motion.turn(dir='RIGHT', loop=1) # 팔뻗기
+                if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+                    self._motion.turn(dir='RIGHT', loop=1, grab=True) # 팔뻗기
                 else:
                     self._motion.turn(dir='RIGHT', loop=1)
                 #time.sleep(1)
@@ -367,23 +374,23 @@ class Robot:
     def find_edge(self): #find_corner_for_outroom
         if self.curr_room_color=='BLACK':
             self._motion.turn(dir=self.direction, loop=1, grab=True) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-            time.sleep(1.5)
+            time.sleep(1)
 
         elif self.curr_room_color == 'GREEN':
             if self.direction == 'LEFT':
                 if self.box_pos == 'RIGHT':
                     self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                    time.sleep(1.5)
+                    time.sleep(1)
                 if self.box_pos == 'LEFT':
                     self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                    time.sleep(1.5)
+                    time.sleep(1)
             elif self.direction == 'RIGHT':
                 if self.box_pos == 'LEFT':
                     self._motion.turn(dir='RIGHT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                    time.sleep(1.5)
+                    time.sleep(1)
                 if self.box_pos == 'RIGHT':
                     self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
-                    time.sleep(1.5)
+                    time.sleep(1)
             else:
                 print('no direction')
                 
@@ -549,7 +556,7 @@ class Robot:
         # 걷기 # 보정 추가로 넣기
         elif self.mode == 'walk' and self.walk_info != '┐' and self.walk_info != '┌' :
             self._motion.set_head(dir='DOWN', angle = 10)
-            time.sleep(1)
+            time.sleep(0.5)
             if line_info["V"]==True and line_info["H"]==False:
                 print('go')
                 self.walk_info = '│'
@@ -569,8 +576,8 @@ class Robot:
                         self.mode = 'detect_direction'
                         self.set_basic_form()
                     else:
-                        self._motion.walk("FORWARD", 1)
-                        time.sleep(1)
+                        self._motion.walk("FORWARD", 1, grab=True)
+                        time.sleep(0.5)
                         
                 else:
                     if line_info["H_X"][0] < 200 and line_info["H_X"][1] < 400:
@@ -788,13 +795,13 @@ class Robot:
                 if line_info["ALL_Y"][1] > 240 :
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
-                    time.sleep(1.5)
+                    time.sleep(1)
                         
             elif self.return_head == '45':
                 if line_info["ALL_Y"][1] > 240 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
-                    time.sleep(1.5)
+                    time.sleep(1)
             
             if self.curr_room_color == 'BLACK':
                 if edge_info["EDGE_POS"] != None :
