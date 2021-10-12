@@ -19,7 +19,7 @@ class Robot:
         self.cube_grabbed = False
         self.return_head = None # return 할 때 고개 각도 바꿀 지 고민 중 10/08
         self.count = 0
-        self.progress_of_roobot= [None, ]
+        self.progress_of_robot= [None, ]
         
         self.walk_info = None
         self.curr_head = deque([75,60,35])
@@ -1042,6 +1042,9 @@ class Robot:
             #self.walk(line_info, '│')
             self.mode = 'walk'
             self.walk_info = '│'
+
+        if self.progress_of_robot[0] != self.mode and self.mode != 'walk':
+                self.progress_of_robot.insert(0, self.mode)
             
         if self.mode_history != self.mode :
             self.mode_history = self.mode
