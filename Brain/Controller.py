@@ -20,16 +20,23 @@ class Robot:
         self.return_head = None # return 할 때 고개 각도 바꿀 지 고민 중 10/08
         self.count = 2
         self.progress_of_roobot= [None, ]
+        
         self.walk_info = None
         self.curr_head = deque([75,60,35])
         self.curr_activating_pos = "" # 방에서 활동중인 위치
 
         
-        self.mode = "start_mission"
-        self.direction = "LEFT"
+        self.mode = "start"
+        self.direction = None
         self.color = "YELLOW"
-        self.box_pos = None
+        self.box_pos = ""
         self.curr_room_color = ""
+        
+        #self.mode = "walk"
+        #self.direction = "LEFT"
+        #self.color = "YELLOW"
+        #self.box_pos = ""
+        #self.curr_room_color = ""
         
         #self.mode = 'walk'
         #self.direction = 'LEFT'
@@ -51,6 +58,7 @@ class Robot:
         #self.box_pos = None
         #self._motion.set_head("DOWN", 10)
         #self.curr_room_color = None
+        self.mode_history = self.mode
 
 
     def set_basic_form(self):
@@ -184,14 +192,17 @@ class Robot:
                         self.box_pos = "LEFT"
 
 
-            elif box_x < cor_x -40:
+            elif box_x < cor_x -dx:
                 self.box_pos = "LEFT"
 
             else:
                 self.box_pos = "RIGHT"
+                
             print(f"BOX POS -> {self.curr_activating_pos}:, {cor_x},{cor_y}")
+        elif self.direction == "RIGHT":
+            self.box_pos = "LEFT"
         else:
-            print('NO EDGE DOWN')
+            self.box_pos = "RIGHT"
 
     def detect_room_alphabet(self, edge_info):
         self._motion.set_head(dir="LEFTRIGHT_CENTER")  # 알파벳을 인식하기 위해 고개를 다시 정면으로 향하게 한다.
@@ -226,6 +237,7 @@ class Robot:
         else:
             self.color ='BLACK'
         self._motion.notice_area(area=self.color) # 지역에 대한 정보를 말한다
+        self.curr_room_color = self.color
         time.sleep(0.5)
         self.mode = 'detect_room_alphabet' # 알파벳 인식 모드로 변경한다.
         return
@@ -551,7 +563,9 @@ class Robot:
             if self.alphabet is None:
                 self.detect_alphabet()
             else:
+                self._motion
                 self.mode = 'walk'
+                #self._motion.move_arm(dir="HIGH")
 
         # 화살표 방향 인식
         elif self.mode == 'detect_direction' or self.mode == 'detect_direction: fail':
@@ -604,6 +618,8 @@ class Robot:
                     print(line_info["H_Y"][1])
                     if line_info["H_Y"][1] > 190:
                         self.mode = 'detect_direction'
+                        
+                        self.set_basic_form()
                         if self.progress_of_roobot[0] != self.walk_info:
                             self.progress_of_roobot.insert(0, self.walk_info)
                     else:
@@ -811,10 +827,10 @@ class Robot:
         elif self.mode == 'box_into_area':
             self.box_into_area(line_info, edge_info)
             if self.box_pos == 'LEFT':
-               self._motion.walk(dir = 'RIGHT', loop=4 )
+               self._motion.turn(dir = 'RIGHT', loop=9 )
                
             if self.box_pos == 'RIGHT':
-               self._motion.walk(dir = 'LEFT', loop=4 )
+               self._motion.turn(dir = 'LEFT', loop=9 )
             else:
                 pass
                 
@@ -1086,3 +1102,7 @@ class Robot:
             #self.walk(line_info, '│')
             self.mode = 'walk'
             self.walk_info = '│'
+            
+        if self.mode_history != self.mode :
+            self.mode_history = self.mode
+            cv2.destroyAllWindows()
