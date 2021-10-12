@@ -98,8 +98,9 @@ class Motion:
     def notice_alpha(self, ls):
         alpha_list = {'A':85, 'B':86, 'C':87, 'D':88}
         for i in ls:
-            self.TX_data_py2(alpha_list[i])
-            time.sleep(0.2)
+            if i in alpha_list:
+                self.TX_data_py2(alpha_list[i])
+                time.sleep(0.2)
 
 
     @sleep
