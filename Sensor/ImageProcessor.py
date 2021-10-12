@@ -119,15 +119,39 @@ class ImageProcessor:
         answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask)
         return answer
 
+    def get_arrow_direction(self, visualization: bool = True):
+        src = self.get_image()
+        src = cv2.resize(src, dsize=(640, 480))
+        dst = src.copy()
+        gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
+        ret, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_OTSU+cv2.THRESH_BINARY)
+        cv2.imshow("binary", binary)
+        contours, hierarchy = cv2.findContours(binary, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+        contour = min(contours, key=lambda x:cv2.contourArea(x))
+        leftmost = tuple(contour[contour[:,:,0].argmin()][0])
+        rightmost = tuple(contour[contour[:,:,0].argmax()][0])
+        topmost = tuple(contour[contour[:,:,1].argmin()][0])
+        bottommost = tuple(contour[contour[:,:,1].argmax()][0])
+        print(leftmost, rightmost, topmost, bottommost)
+        result = [leftmost[0], topmost[1], rightmost[0]-leftmost[0], bottommost[1]-topmost[1]]
+        if result[2] < 10 or result[3] < 10:
+            roi_mask = src
+        else:
+            print(result)
+            roi_mask = src[result[1] : result[1] + result[3], result[0] : result[0] + result[2]]
+        
+        if visualization:
+            cv2.imshow("roi_mask", roi_mask)
+            cv2.waitKey(10)
+            
+        direction = self.hash_detector4arrow.detect_arrow(roi_mask)
+        print(direction)
+        
+        return direction
+    
     def get_slope_degree(self, visualization: bool = False):
         src = self.get_image()
         return self.line_detector.get_slope_degree(src)
-
-    def get_arrow_direction(self):
-        src = self.get_image()
-        direction = self.hash_detector4arrow.detect_arrow(src)
-        print(direction)
-        return direction
 
     def get_area_color(self, threshold: float = 0.15, visualization: bool = False):
         src = self.get_image()
