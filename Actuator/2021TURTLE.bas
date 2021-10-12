@@ -2612,6 +2612,23 @@ Number_Play: '  BUTTON_NO = 숫자대입
     RETURN
     '******************************************
 
+A지역:
+    PRINT "OPEN M_ABCD.mrs !"
+    PRINT "SOUND 0 !"
+    RETURN
+B지역:
+    PRINT "OPEN M_ABCD.mrs !"
+    PRINT "SOUND 1 !"
+    RETURN
+C지역:
+    PRINT "OPEN M_ABCD.mrs !"
+    PRINT "SOUND 2 !"
+    RETURN
+D지역:
+    PRINT "OPEN M_ABCD.mrs !"
+    PRINT "SOUND 3 !"
+    RETURN
+
 전방하향100도:
     SPEED 3
     SERVO 16, 100
@@ -3897,4 +3914,24 @@ KEY83:
 KEY84:
     ETX 4800, 84
     GOSUB 전방하향50도
+    GOTO RX_EXIT
+
+KEY85:
+    ETX 4800, 85
+    GOSUB A지역
+    GOTO RX_EXIT
+
+KEY86:
+    ETX 4800, 86
+    GOSUB B지역
+    GOTO RX_EXIT
+
+KEY87:
+    ETX 4800, 87
+    GOSUB C지역
+    GOTO RX_EXIT
+
+KEY88:
+    ETX 4800, 88
+    GOSUB D지역
     GOTO RX_EXIT
