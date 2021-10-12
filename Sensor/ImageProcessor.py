@@ -119,28 +119,37 @@ class ImageProcessor:
         answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask)
         return answer
 
-    def get_arrow_direction(self, visualization: bool = True):
+    def get_arrow_direction(self, visualization: bool = False):
         src = self.get_image()
-        src = cv2.resize(src, dsize=(640, 480))
         dst = src.copy()
+
+        kernel = np.ones((5, 5), np.uint8)
+
         gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
-        ret, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_OTSU+cv2.THRESH_BINARY)
-        cv2.imshow("binary", binary)
-        contours, hierarchy = cv2.findContours(binary, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
-        contour = min(contours, key=lambda x:cv2.contourArea(x))
+        _, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY_INV)
+        binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
+        edge = auto_canny(binary)
+
+        contours, _ = cv2.findContours(edge, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+        contour = max(contours, key=lambda x:cv2.contourArea(x))
+
         leftmost = tuple(contour[contour[:,:,0].argmin()][0])
         rightmost = tuple(contour[contour[:,:,0].argmax()][0])
         topmost = tuple(contour[contour[:,:,1].argmin()][0])
         bottommost = tuple(contour[contour[:,:,1].argmax()][0])
-        print(leftmost, rightmost, topmost, bottommost)
+        
         result = [leftmost[0], topmost[1], rightmost[0]-leftmost[0], bottommost[1]-topmost[1]]
         if result[2] < 10 or result[3] < 10:
             roi_mask = src
         else:
-            print(result)
+            #print(result)
             roi_mask = src[result[1] : result[1] + result[3], result[0] : result[0] + result[2]]
-        
+
+        cv2.drawContours(dst, [contour], -1, (255, 0, 0), 2)
         if visualization:
+            cv2.imshow("src", src)
+            #cv2.imshow("binary", edge)
+            #cv2.imshow("dst", dst)
             cv2.imshow("roi_mask", roi_mask)
             cv2.waitKey(10)
             
