@@ -18,7 +18,7 @@ class Robot:
         self.alphabet_color = None
         self.cube_grabbed = False
         self.return_head = None # return 할 때 고개 각도 바꿀 지 고민 중 10/08
-        self.count = 0
+        self.count = 2
         self.progress_of_robot= [None, ]
         self.is_grab=False
         
@@ -46,13 +46,13 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color = ""
     
-        self.mode = "find_box"
+        self.mode = "walk"
         self.direction = "LEFT"
-        self.color = "GREEN"
+        self.color = "YELLOW"
         self.box_pos = None
-        self.curr_room_color = "GREEN"
-        self.alphabet_color = "BLUE"
-        self.alphabet = "C"
+        self.curr_room_color = None
+        self.alphabet_color = None
+        self.alphabet = None
         
         
         #self.mode = 'start_mission'
@@ -749,40 +749,62 @@ class Robot:
             self.colot = 'YELLOW'
 
         elif self.mode == 'end_mission':
+            print(line_info["ALL_Y"][1])
             self._motion.set_head(dir ='DOWN', angle = 60)
             time.sleep(1)
-            if self.box_pos == 'RIGHT':
-                if line_info["ALL_X"][1] != 0 and line_info["ALL_X"][1] > 240:
-                    if line_info["ALL_Y"][1] < 320 : # yellow 감지
-                        self._motion.set_head(dir ='DOWN', angle = 60)
-                        time.sleep(1.5)
-                        self.return_head = '60'
-                        self.mode = 'find_edge'
+            if self.curr_room_color == 'GREEN':
+                if self.box_pos == 'RIGHT':
+                    if line_info["ALL_X"][1] > 340:
+                        if line_info["ALL_Y"][1] < 100 : # yellow 감지
+                            self._motion.set_head(dir ='DOWN', angle = 60)
+                            time.sleep(1.5)
+                            self.return_head = '60'
+                            self.mode = 'find_edge'
+                        else:
+                            self._motion.set_head(dir ='DOWN', angle = 45)
+                            time.sleep(1.5)
+                            self.mode = 'find_edge'
+                            self.return_head = '45'
                     else:
-                        self._motion.set_head(dir ='DOWN', angle = 45)
-                        time.sleep(1.5)
-                        self.mode = 'find_edge'
-                        self.return_head = '45'
+                        if self.curr_room_color == 'BLACK':
+                            self._motion.turn(dir = self.direction, loop = 1, grab = True)
+                            time.sleep(1)
+                        else:
+                            self._motion.turn(dir = 'LEFT', loop = 1)
+                            time.sleep(1)
                 else:
-                    if self.curr_room_color == 'BLACK':
-                        self._motion.turn(dir = self.direction, loop = 1, grab = True)
-                        time.sleep(1)
+                    if line_info["ALL_X"][0] < 300:
+                        if line_info["ALL_Y"][1] < 100 : # yellow 감지
+                            self._motion.set_head(dir ='DOWN', angle = 60)
+                            time.sleep(1.5)
+                            self.return_head = '60'
+                            self.mode = 'find_edge'
+                        else:
+                            self._motion.set_head(dir ='DOWN', angle = 45)
+                            time.sleep(1.5)
+                            self.mode = 'find_edge'
+                            self.return_head = '45'
+                      
                     else:
-                        self._motion.turn(dir = 'LEFT', loop = 1)
-                        time.sleep(1)
+                        if self.curr_room_color == 'BLACK':
+                            self._motion.turn(dir = self.direction, loop = 1, grab = True)
+                            time.sleep(1)
+                        else:
+                            self._motion.turn(dir = 'RIGHT', loop = 1)
+                            time.sleep(1)
             else:
-                if line_info["ALL_X"][1] != 0 and line_info["ALL_X"][1] > 240:
-                    if line_info["ALL_Y"][1] < 320 : # yellow 감지
-                        self._motion.set_head(dir ='DOWN', angle = 60)
-                        time.sleep(1.5)
-                        self.return_head = '60'
-                        self.mode = 'find_edge'
-                    else:
-                        self._motion.set_head(dir ='DOWN', angle = 45)
-                        time.sleep(1.5)
-                        self.mode = 'find_edge'
-                        self.return_head = '45'
-                  
+                if (self.direction == 'RIGHT' and 0 < line_info["ALL_X"][0] < 300) or (self.direction == 'LEFT' and line_info["ALL_X"][1] > 340):
+                        if line_info["ALL_Y"][1] < 100 : # yellow 감지
+                            self._motion.set_head(dir ='DOWN', angle = 60)
+                            time.sleep(1.5)
+                            self.return_head = '60'
+                            self.mode = 'find_edge'
+                        else:
+                            self._motion.set_head(dir ='DOWN', angle = 45)
+                            time.sleep(1.5)
+                            self.mode = 'find_edge'
+                            self.return_head = '45'
+                      
                 else:
                     if self.curr_room_color == 'BLACK':
                         self._motion.turn(dir = self.direction, loop = 1, grab = True)
@@ -790,12 +812,14 @@ class Robot:
                     else:
                         self._motion.turn(dir = 'RIGHT', loop = 1)
                         time.sleep(1)
+                        
+                        
+                    
     
         elif self.mode == 'find_edge':
             print(edge_info["EDGE_POS"])
             if edge_info["EDGE_POS"] != None : # yellow edge 감지
-                if 300 < edge_info["EDGE_POS"][0] < 380 : # yellow edge x 좌표 중앙 O
-                    print('yellow edge 감지 중앙 O')
+                if 280 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
                     self.mode = 'return_line' # --> find_V
                 else: # yellow edge 중앙 X
                     print('yellow edge 감지 중앙 X')
@@ -808,13 +832,13 @@ class Robot:
 
         elif self.mode == 'return_line':
             if self.return_head == '60':
-                if line_info["ALL_Y"][1] > 240 :
+                if line_info["ALL_Y"][1] > 100 :
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
                     time.sleep(1)
                         
             elif self.return_head == '45':
-                if line_info["ALL_Y"][1] > 240 :
+                if line_info["ALL_Y"][1] > 100 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
                     time.sleep(1)
@@ -888,7 +912,7 @@ class Robot:
                     # self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
                 else:
                     self.mode = 'finish' # --> stop!
-                    self._motion.turn(dir=self.direction, loop =5)
+                    self._motion.turn(dir=self.direction, loop =10)
                     time.sleep(1)
 
         # 나가기
