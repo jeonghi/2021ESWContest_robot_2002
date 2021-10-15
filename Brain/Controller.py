@@ -289,7 +289,6 @@ class Robot:
         print(line_info)
         print(edge_info)
         return line_info, edge_info
-        
 
     def detect_direction(self):
         self.direction = self._image_processor.get_arrow_direction()
@@ -301,8 +300,8 @@ class Robot:
     def walk(self, line_info, walk_info):
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}
         self._motion.set_head(dir = 'DOWN', angle = 10)
-        if self.progress_of_robot[0] == 'detect_alphabet' or 'finish':
-            # 팔뻗기
+        if self.progress_of_robot[0] in ['detect_alphabet','finish']:
+            self._motion.grab()
             print('팔뻗기')
         #time.sleep(1)
         if walk_info == '│':
@@ -311,8 +310,7 @@ class Robot:
                     print('walk')
                     print('│')
                     if self.progress_of_robot[0] in ['detect_alphabet','finish']:
-                        self._motion.open_door(loop=2)
-                        #self._motion.walk(dir='FORWARD', loop=1, grab=True) # 팔뻗기
+                        self._motion.walk(dir='FORWARD', loop=1, grab=True) # 팔뻗기
                     else:
                         self._motion.walk(dir='FORWARD', loop=1)
                     #time.sleep(1)
@@ -577,8 +575,7 @@ class Robot:
                         self.mode = 'detect_direction'
                         self.set_basic_form()
                     else:
-                        self._motion.open_door(loop=2)
-                        #self._motion.walk("FORWARD", 1, grab=True)
+                        self._motion.walk("FORWARD", 1, grab=True)
                         time.sleep(0.5)
                         
                 else:

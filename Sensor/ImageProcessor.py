@@ -157,10 +157,7 @@ class ImageProcessor:
         print(direction)
         
         return direction
-    
-    def get_slope_degree(self, visualization: bool = False):
-        src = self.get_image()
-        return self.line_detector.get_slope_degree(src)
+
 
     def get_area_color(self, threshold: float = 0.15, visualization: bool = False):
         src = self.get_image()
