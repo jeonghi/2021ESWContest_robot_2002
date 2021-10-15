@@ -33,17 +33,17 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
         
-        self.mode = "start"
-        self.direction = None
-        self.color = "YELLOW"
-        self.box_pos = ""
-        self.curr_room_color = ""
-        
-        #self.mode = "walk" # 리모콘으로 각도 10도 먼저 내리고 run
-        #self.direction = "LEFT"
+        #self.mode = "start"
+        #self.direction = None
         #self.color = "YELLOW"
         #self.box_pos = ""
         #self.curr_room_color = ""
+        
+        self.mode = "walk" # 리모콘으로 각도 10도 먼저 내리고 run
+        self.direction = "LEFT"
+        self.color = "YELLOW"
+        self.box_pos = ""
+        self.curr_room_color = ""
         
         #self.mode = 'walk'
         #self.direction = 'LEFT'
@@ -311,7 +311,8 @@ class Robot:
                     print('walk')
                     print('│')
                     if self.progress_of_robot[0] in ['detect_alphabet','finish']:
-                        self._motion.walk(dir='FORWARD', loop=1, grab=True) # 팔뻗기
+                        self._motion.open_door(loop=2)
+                        #self._motion.walk(dir='FORWARD', loop=1, grab=True) # 팔뻗기
                     else:
                         self._motion.walk(dir='FORWARD', loop=1)
                     #time.sleep(1)
@@ -576,7 +577,8 @@ class Robot:
                         self.mode = 'detect_direction'
                         self.set_basic_form()
                     else:
-                        self._motion.walk("FORWARD", 1, grab=True)
+                        self._motion.open_door(loop=2)
+                        #self._motion.walk("FORWARD", 1, grab=True)
                         time.sleep(0.5)
                         
                 else:
