@@ -20,6 +20,7 @@ class Robot:
         self.return_head = None # return 할 때 고개 각도 바꿀 지 고민 중 10/08
         self.count = 0
         self.progress_of_robot= [None, ]
+        self.is_grab=False
         
         self.walk_info = None
         self.curr_head = deque([75,60,35])
@@ -39,17 +40,26 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color = ""
         
-        self.mode = "walk" # 리모콘으로 각도 10도 먼저 내리고 run
-        self.direction = "LEFT"
-        self.color = "YELLOW"
-        self.box_pos = ""
-        self.curr_room_color = ""
-        
-        #self.mode = 'walk'
+        #self.mode = "walk" # 리모콘으로 각도 10도 먼저 내리고 run
         #self.direction = 'LEFT'
         #self.color = "YELLOW"
-        #self.box_pos = None
+        #self.box_pos = ""
         #self.curr_room_color = ""
+    
+        self.mode = "find_box"
+        self.direction = "LEFT"
+        self.color = "GREEN"
+        self.box_pos = None
+        self.curr_room_color = "GREEN"
+        self.alphabet_color = "BLUE"
+        self.alphabet = "C"
+        
+        
+        #self.mode = 'start_mission'
+        #self.direction = 'LEFT'
+        #self.color = "GREEN"
+        #self.box_pos = None
+        #self.curr_room_color = "GREEN"
 
         # 박스 앞에 놓고 테스트 하고 싶을 때
         #self.direction = 'RIGHT'
@@ -175,7 +185,7 @@ class Robot:
             center_x = 320
             (cor_x, cor_y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
             (box_x, box_y) = box_info
-            dx = 50
+            dx = 100
             if cor_x - dx <= box_x <= cor_x + dx :
                 if box_y <= cor_y:
                     self.box_pos = "MIDDLE"
@@ -295,13 +305,18 @@ class Robot:
         if self.direction == None :
             self.mode = 'detect_direction: fail'
         else:
+            self._motion.set_head(dir = 'DOWN', angle = 10)
+            time.sleep(1.5)
             print(self.direction)
 
     def walk(self, line_info, walk_info):
         # line_info = {"DEGREE" : 0, "V" : False, "V_X" : [0 ,0], "V_Y" : [0 ,0], "H" : False, "H_X" : [0 ,0], "H_Y" : [0 ,0]}
         self._motion.set_head(dir = 'DOWN', angle = 10)
-        if self.progress_of_robot[0] in ['detect_alphabet','finish']:
-            self._motion.grab()
+        if self.is_grab == False and self.progress_of_robot[0] in ['detect_alphabet','finish']:
+            #self._motion.grab()
+            self.is_grab = True
+            self._motion.move_arm(dir='HIGH')
+            self._motion.set_head(dir = 'DOWN', angle = 10)
             print('팔뻗기')
         #time.sleep(1)
         if walk_info == '│':
@@ -539,15 +554,16 @@ class Robot:
                 time.sleep(1)
             else:
                 pass
-
+            print(self.direction)
             if self.direction == None:
                 self.detect_direction()
             else:
-                #self._motion.walk('FORWARD', 2) #너무 뒤에서 멈추면 추가
+                #if line_info['DEGREE'] != 0:
+                    #self.walk(line_info, '│')
+                #else:
+                self._motion.walk('FORWARD', 4) #너무 뒤에서 멈추면 추가
                 self._motion.walk(self.direction, 4)
                 self._motion.turn(self.direction, 8)
-                self._motion.set_head(dir='DOWN', angle = 10)
-                time.sleep(1)
                 self.mode = 'walk' 
                 self.walk_info = '│'
 
@@ -568,21 +584,22 @@ class Robot:
 
             else:
                 print(line_info["H_X"])
-                if line_info["H_X"][0] <= 200 and line_info["H_X"][1] >= 400 :
+                if line_info["H_X"][0] <= 170 and line_info["H_X"][1] >= 430 :
                     self.walk_info = 'T'
                     print(line_info["H_Y"][1])
-                    if line_info["H_Y"][1] > 190:
-                        self.mode = 'detect_direction'
-                        self.set_basic_form()
-                    else:
-                        self._motion.walk("FORWARD", 1, grab=True)
-                        time.sleep(0.5)
+                    #if line_info["H_Y"][1] > 190:
+                    self.mode = 'detect_direction'
+                    self.set_basic_form()
+                    self.is_grab=False
+                    #else:
+                        #self._motion.walk("FORWARD", 1, grab=True)
+                        #time.sleep(0.5)
                         
                 else:
-                    if line_info["H_X"][0] < 200 and line_info["H_X"][1] < 400:
+                    if line_info["H_X"][0] < 170 and line_info["H_X"][1] < 430:
                         self.walk_info = '┐'
 
-                    elif line_info["H_X"][1] > 400 and line_info["H_X"][0] > 200 :
+                    elif line_info["H_X"][0] > 170 and line_info["H_X"][1] > 430 :
                         self.walk_info = '┌'
 
                     else:
@@ -591,8 +608,8 @@ class Robot:
         elif self.mode == 'walk' and self.walk_info =='┌':
             self._motion.set_head(dir='DOWN', angle = 10)
             #time.sleep(1)
-            if line_info["H_Y"][1] > 50 :
-                self._motion.walk("FORWARD", 2)
+            if line_info["H_Y"][1] > 90 :
+                self._motion.walk("FORWARD", 1)
                 #time.sleep(1)
                 if self.direction == 'RIGHT':
                     self.mode = 'is_finish_line' # --> end_mission --> return_line

@@ -73,6 +73,8 @@ class ImageProcessor:
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
         _, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        #_, mask = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
+        cv2.imshow("mask", mask)
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -444,9 +446,9 @@ if __name__ == "__main__":
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        _, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=False, edge_visualization=True)
-        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        #print(alphabet)
+        #_, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=False, edge_visualization=True)
+        alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        print(alphabet)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
