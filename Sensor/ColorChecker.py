@@ -97,14 +97,21 @@ class ColorPreProcessor():
 
     @staticmethod
     def get_mean_value_for_non_zero(src: np.array) -> int:
+        print(src)
         src_mean = np.true_divide(src.sum(), (src != 0).sum())
+        print(src_mean)
         return int(np.mean(src_mean))
 
     @staticmethod
     def check_red_or_blue(src: np.array) -> str:
-        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
-        y, cr, cb = cv2.split(ycrcb)
-        answer = "RED" if np.mean(cr) > np.mean(cb) else "BLUE"
+
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
+        h = cv2.bitwise_and(s, h)
+        red_mask = ColorPreProcessor.get_red_mask(h)
+        blue_mask = ColorPreProcessor.get_blue_mask(h)
+        answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
         return answer
 
     @staticmethod

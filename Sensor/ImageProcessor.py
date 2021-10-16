@@ -235,16 +235,10 @@ class ImageProcessor:
 
                 candidate = Target(stats=stats[idx], centroid=centroid)
                 roi = candidate.get_target_roi(src, pad=15)
-
-                # ycrcb 색공간을 이용해
-
                 candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
-                candidate_color = candidate.get_color()
-
-                thresholding = None
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
-                if candidate_color == "RED":
+                if candidate.get_color() == "RED":
                     thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
 
                 else:
@@ -280,16 +274,10 @@ class ImageProcessor:
 
                 candidate = Target(contour=contour)
                 roi = candidate.get_target_roi(src, pad=15)
-
-                # ycrcb 색공간을 이용해
-
                 candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
-                candidate_color = candidate.get_color()
-
-                thresholding = None
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
-                if candidate_color == "RED":
+                if candidate.get_color() == "RED":
                     thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
 
                 else:
@@ -306,23 +294,23 @@ class ImageProcessor:
                 if candidate_alphabet is None:
                     continue
                 candidate.set_name(candidate_alphabet)
-                if visualization:
-                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
+                #if visualization:
+                    #setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
                 candidates.append(candidate)
 
         if candidates:
             if edge_info:
                 if edge_info["EDGE_UP"] :
-                    print("필터 적용전", candidates)
+                    #print("필터 적용전", candidates)
                     candidates = list(filter(lambda candidate: candidate.y + candidate.height < edge_info["EDGE_UP_Y"], candidates))
-                    print("적용 후", candidates)
+                    #print("적용 후", candidates)
 
 
         if candidates:
             selected = max(candidates, key=lambda candidate: candidate.get_center_pos()[1])
             alphabet_info = (selected.get_color(), selected.get_name())
             if visualization:
-                setLabel(canvas, selected.get_pts(), color=(0, 0, 255))
+                setLabel(canvas, selected.get_pts(), label=f"{selected.get_name()}:{selected.get_color()}", color=(0, 0, 255))
 
         if visualization:
             mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
@@ -441,16 +429,16 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        #_, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=False, edge_visualization=True)
-        alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        print(alphabet)
+        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=False)
+        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #print(result)
