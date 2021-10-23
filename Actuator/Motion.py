@@ -183,9 +183,12 @@ class Motion:
         return self.distance
 
 
+    # 문 여는 함수
     def open_door(self, loop=1):
+        if self.get_IR() > 65:
+            self.turn(dir='LEFT', loop=4)
         for _ in range(loop):
-            self.TX_data_py2(89)
+            self.TX_data_py2(90)
 
 
     def grab(self, switch=True, IR=False):
