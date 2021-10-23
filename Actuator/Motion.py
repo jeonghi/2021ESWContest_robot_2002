@@ -100,7 +100,7 @@ class Motion:
         for i in ls:
             if i in alpha_list:
                 self.TX_data_py2(alpha_list[i])
-                time.sleep(0.2)
+                time.sleep(2)
 
 
     def set_head(self, dir, angle=0):
@@ -231,4 +231,4 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.TX_data_py2(16)
+    motion.notice_alpha(['B', 'A', 'D', 'C'])
