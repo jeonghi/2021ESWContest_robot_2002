@@ -69,7 +69,7 @@ class Motion:
                 # Rx, 수신
                 result = ser.read(1)
                 RX = ord(result)
-                print ("RX=" + str(RX))
+                #print ("RX=" + str(RX))
 
                 # -----  remocon 16 Code  Exit ------
                 if RX == 16:
@@ -136,6 +136,7 @@ class Motion:
             self.TX_data_py2(center_list[dir])
         else:
             self.TX_data_py2(dir_list[dir][angle])
+        time.sleep(0.3)
 
 
     def is_grabbed(self) -> bool :
