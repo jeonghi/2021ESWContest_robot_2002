@@ -210,8 +210,8 @@ class ImageProcessor:
         blur = cv2.GaussianBlur(src, (5, 5), 0)
         hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
-        #_, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        #_, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         red_mask = self.color_preprocessor.get_red_mask(h)
         blue_mask = self.color_preprocessor.get_blue_mask(h)
         color_mask = cv2.bitwise_or(blue_mask, red_mask)
@@ -269,11 +269,11 @@ class ImageProcessor:
                 # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
                 area_ratio = width / height if height < width else height / width
                 area_ratio = round(area_ratio, 2)
-                if not (800 < area < 8000 and area_ratio <= 1.4):
+                if not (800 <area < 8000 and area_ratio <= 1.4):
                     continue
 
                 candidate = Target(contour=contour)
-                roi = candidate.get_target_roi(src, pad=15)
+                roi = candidate.get_target_roi(src, pad=5)
                 candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
@@ -285,7 +285,7 @@ class ImageProcessor:
                 _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
                 ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
+                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.6)
                 ####################################
 
                 # if visualization:
@@ -294,8 +294,8 @@ class ImageProcessor:
                 if candidate_alphabet is None:
                     continue
                 candidate.set_name(candidate_alphabet)
-                #if visualization:
-                    #setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
+                if visualization:
+                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
                 candidates.append(candidate)
 
         if candidates:
@@ -429,7 +429,7 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area1.h264")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:

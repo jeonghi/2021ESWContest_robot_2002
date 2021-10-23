@@ -138,6 +138,12 @@ class Motion:
             self.TX_data_py2(dir_list[dir][angle])
             
         time.sleep(1)
+
+    def is_grabbed(self) -> bool :
+        if self.get_IR() > 65:
+            return True
+        return False
+
     def walk(self, dir, loop=1, grab=False, IR=False):
         dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
