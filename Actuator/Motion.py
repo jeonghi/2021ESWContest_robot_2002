@@ -186,7 +186,7 @@ class Motion:
     # 문 여는 함수
     def open_door(self, loop=1):
         if self.get_IR() > 65:
-            self.turn(dir='LEFT', loop=4)
+            self.turn(dir='SLIDING_LEFT', loop=5)
         for _ in range(loop):
             self.TX_data_py2(90)
 
@@ -231,4 +231,5 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.notice_alpha(['B', 'A', 'D', 'C'])
+    #motion.notice_alpha(['B', 'A', 'D', 'C'])
+    motion.open_door()
