@@ -12,7 +12,7 @@ VIDEO_PATH = -1
 
 def main():
     robot = Robot(video_path=VIDEO_PATH, DEBUG=False)
-    #robot.set_basic_form()
+    robot.set_basic_form()
     #====================== debug ======================
 
     #video_recorder = VideoRecorder()

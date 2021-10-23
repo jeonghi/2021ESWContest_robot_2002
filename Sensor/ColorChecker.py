@@ -108,9 +108,11 @@ class ColorPreProcessor():
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
-        h = cv2.bitwise_and(s, h)
+        h = cv2.bitwise_and(h, h, mask=mask)
         red_mask = ColorPreProcessor.get_red_mask(h)
+        cv2.imshow("red", red_mask)
         blue_mask = ColorPreProcessor.get_blue_mask(h)
+        cv2.imshow("blue", blue_mask)
         answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
         return answer
 

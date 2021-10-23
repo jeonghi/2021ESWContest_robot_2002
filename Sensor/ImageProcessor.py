@@ -269,11 +269,11 @@ class ImageProcessor:
                 # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
                 area_ratio = width / height if height < width else height / width
                 area_ratio = round(area_ratio, 2)
-                if not (800 <area < 8000 and area_ratio <= 1.4):
+                if not (800 <area and area_ratio <= 1.4):
                     continue
 
                 candidate = Target(contour=contour)
-                roi = candidate.get_target_roi(src, pad=5)
+                roi = candidate.get_target_roi(src, pad=10)
                 candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
@@ -285,7 +285,7 @@ class ImageProcessor:
                 _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
                 ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.6)
+                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.8)
                 ####################################
 
                 # if visualization:
@@ -429,16 +429,16 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
-    #imageProcessor = ImageProcessor(video_path="")
+    #imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=False)
+        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
         result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
-        #print(result)
+        print(result)
