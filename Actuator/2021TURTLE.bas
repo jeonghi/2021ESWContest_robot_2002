@@ -1536,6 +1536,88 @@ GOSUB_RX_EXIT2:
     '************************************************
     '*********************************************
 
+'좀더 강하게 옆으로 가는 함수(문열때 사용)  
+오른쪽옆으로걷기:
+
+    MOTORMODE G6A,3,3,3,3,2
+    MOTORMODE G6D,3,3,3,3,2
+    GOSUB All_motor_Reset
+    DELAY  10
+
+    SPEED 7
+    MOVE G6D, 90,  90, 120, 105, 110, 100
+    MOVE G6A,100,  76, 145,  93, 107, 100
+    'MOVE G6C,100,  40
+    'MOVE G6B,100,  40
+    WAIT
+
+    SPEED 13
+    MOVE G6D, 102,  76, 145, 93, 100, 100
+    MOVE G6A,83,  78, 140,  96, 115, 100
+    WAIT
+
+    SPEED 13
+    MOVE G6D,98,  76, 145,  93, 100, 100
+    MOVE G6A,98,  76, 145,  93, 100, 100
+    WAIT
+
+    SPEED 12
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 145,  93, 100, 100
+    WAIT
+
+
+    SPEED 5
+
+    RETURN
+
+
+왼쪽옆으로걷기:
+
+    MOTORMODE G6A,3,3,3,3,2
+    MOTORMODE G6D,3,3,3,3,2
+    GOSUB All_motor_Reset
+    DELAY  10
+
+    SPEED 7
+    MOVE G6A, 90,  90, 120, 105, 110, 100
+    MOVE G6D,100,  76, 145,  93, 107, 100
+    'MOVE G6C,100,  40
+    'MOVE G6B,100,  40
+    WAIT
+
+    SPEED 13
+    MOVE G6A, 102,  76, 145, 93, 100, 100
+    MOVE G6D,83,  78, 140,  96, 115, 100
+    WAIT
+
+    SPEED 13
+    MOVE G6A,98,  76, 145,  93, 100, 100
+    MOVE G6D,98,  76, 145,  93, 100, 100
+    WAIT
+
+    SPEED 12
+    MOVE G6D,100,  76, 145,  93, 100, 100
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    WAIT
+
+
+    SPEED 5
+
+    RETURN
+    
+문열기동작:
+	SPEED 5
+
+    MOVE G6C,130,  90, 10 , , , ,
+    MOVE G6B,190, 100 ,  , , , ,	
+    WAIT
+
+    DELAY 200
+
+    RETURN
+
+
 왼쪽턴3:
     MOTORMODE G6A,3,3,3,3,2
     MOTORMODE G6D,3,3,3,3,2
@@ -3592,7 +3674,7 @@ KEY8:
     '***************
 KEY9:
     ETX 4800, 9
-    GOSUB 문열고집고전진
+    GOSUB 양팔벌리기
     GOTO RX_EXIT
     '***************
 KEY10: '0
