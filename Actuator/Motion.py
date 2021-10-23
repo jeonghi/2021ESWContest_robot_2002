@@ -136,8 +136,7 @@ class Motion:
             self.TX_data_py2(center_list[dir])
         else:
             self.TX_data_py2(dir_list[dir][angle])
-            
-        time.sleep(1)
+
 
     def is_grabbed(self) -> bool :
         if self.get_IR() > 65:
