@@ -24,13 +24,14 @@ class Robot:
         self.alphabet_color: str = None
         self.curr_room_color: str = None
         self.cube_grabbed: bool = False
-        self.count: int = 2
+        self.count: int = 0
         self.progress_of_robot: list = [None]
         self.is_grab: bool = False
         self.walk_info: str = None
         self.curr_head4box: deque = deque([75, 60, 35])
         self.curr_head4room_alphabet: deque = deque([85, 80])
         self.curr_head4door_alphabet: deque = deque([80, 75])
+        self.black_room: list = []
 
         self.return_head: str = ""  # return 할 때 고개 각도 바꿀 지 고민 중 10/08
         self.mode_history: str = self.mode
@@ -166,12 +167,12 @@ class Robot:
 
     def turn_to_green_area_after_box_tracking(self) -> None:
         if self.box_pos == 'RIGHT':
-            self._motion.turn(dir='LEFT', loop=5, grab=True)
+            self._motion.turn(dir='LEFT', loop=7, grab=True)
             self._motion.move_arm(dir='LOW')
             # time.sleep(1)
             self.mode = 'check_area'
         elif self.box_pos == 'LEFT':
-            self._motion.turn(dir='RIGHT', loop=5, grab=True)
+            self._motion.turn(dir='RIGHT', loop=7, grab=True)
             self._motion.move_arm(dir='LOW')
             # time.sleep(1)
             self.mode = 'check_area'
@@ -181,7 +182,7 @@ class Robot:
             self.mode = 'check_area'
 
     def turn_to_black_area_after_box_tracking(self) -> None:
-        self._motion.turn(dir=self.direction, loop=5, grab=True)
+        self._motion.turn(dir=self.direction, loop=7, grab=True)
         # time.sleep(1)
         self.mode = 'end_mission'
         self.color = 'YELLOW'
@@ -202,7 +203,7 @@ class Robot:
                 if 290 < line_info["V_X"][0] <350:
                     print('walk')
                     print('│')
-                    self._motion.walk(dir='FORWARD', loop=1, grab=self.is_grab) # 팔뻗기
+                    self._motion.walk(dir='FORWARD', loop=3, grab=self.is_grab) # 팔뻗기
                     #time.sleep(1)
                 else:
                     if line_info["V_X"][0] < 290:
@@ -493,9 +494,11 @@ class Robot:
             if self.detect_room_alphabet(edge_info=edge_info):
                 print(f"현재 지역은 {self.curr_room_color}, 방 이름은 {self.alphabet}, 목표 색상은 {self.alphabet_color}")
                 self.mode = "find_box"
+                
                 # 감염지역일때는 빠른 탐색을 위해 45도 정도 미리 몸을 틀어준다.
                 if self.curr_room_color == 'BLACK':
-                    self._motion.turn(dir=self.direction, loop=4)
+                    self._motion.turn(dir=self.direction, loop=5)
+                    self.black_room.append(self.alphabet)
                     time.sleep(1)
             else:
                 self.curr_head4room_alphabet.rotate(-1)
@@ -515,7 +518,10 @@ class Robot:
                     self.update_box_pos(edge_info=edge_info, box_info=box_info)
             else:
                 if self.curr_head4box[0] == 35:
-                    self._motion.turn(dir=self.direction, loop=2)
+                    if self.curr_room_color == "GREEN":
+                        self._motion.turn(dir=self.direction, loop=4)
+                    else:
+                        self._motion.turn(dir=self.direction, loop=2)
                 self.curr_head4box.rotate(-1)
 
         elif self.mode in ['track_box']:
@@ -584,7 +590,7 @@ class Robot:
         elif self.mode in ['end_mission']:
 
             self._motion.set_head(dir ='DOWN', angle = 60)
-            time.sleep(1)
+            time.sleep(0.5)
 
             if self.curr_room_color == 'GREEN':
                 if self.box_pos == 'RIGHT':
@@ -595,35 +601,35 @@ class Robot:
                         else:
                             self._motion.set_head(dir ='DOWN', angle = 45)
                             self.return_head = '45'
-                        time.sleep(1.5)
+                        time.sleep(0.5)
                         self.mode = 'find_edge'
                     else:
                         if self.curr_room_color == 'BLACK':
                             self._motion.turn(dir=self.direction, loop=1, grab=True)
-                            time.sleep(1)
+                            time.sleep(0.5)
                         else:
                             self._motion.turn(dir='LEFT', loop=1)
-                            time.sleep(1)
+                            time.sleep(0.5)
                 else:
                     if line_info["ALL_X"][0] < 300:
                         if line_info["ALL_Y"][1] < 100 : # yellow 감지
                             self._motion.set_head(dir ='DOWN', angle = 60)
-                            time.sleep(1.5)
+                            time.sleep(0.5)
                             self.return_head = '60'
                             self.mode = 'find_edge'
                         else:
                             self._motion.set_head(dir ='DOWN', angle = 45)
-                            time.sleep(1.5)
+                            time.sleep(0.5)
                             self.mode = 'find_edge'
                             self.return_head = '45'
                       
                     else:
                         if self.curr_room_color == 'BLACK':
                             self._motion.turn(dir=self.direction, loop = 1, grab = True)
-                            time.sleep(1)
+                            time.sleep(0.5)
                         else:
                             self._motion.turn(dir='RIGHT', loop = 1)
-                            time.sleep(1)
+                            time.sleep(0.5)
             else:
                 if (self.direction == 'RIGHT' and 0 < line_info["ALL_X"][0] < 300) or (self.direction == 'LEFT' and line_info["ALL_X"][1] > 340):
                         if line_info["ALL_Y"][1] < 100 : # yellow 감지
@@ -635,7 +641,7 @@ class Robot:
                             self.return_head = '45'
 
                         self.mode = 'find_edge'
-                        time.sleep(1.5)
+                        time.sleep(0.5)
                       
                 else:
                     if self.curr_room_color == 'BLACK':
@@ -663,13 +669,13 @@ class Robot:
                 if line_info["ALL_Y"][1] > 100 :
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
-                    time.sleep(1)
+                    time.sleep(0.5)
                         
             elif self.return_head == '45':
                 if line_info["ALL_Y"][1] > 100 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
-                    time.sleep(1)
+                    time.sleep(0.5)
             
             if self.curr_room_color == 'BLACK':
                 if edge_info["EDGE_POS"]:
@@ -677,30 +683,30 @@ class Robot:
                         self._motion.walk(dir='FORWARD', loop=1, grab=True)
                         self._motion.grab(switch = False)
                         self._motion.turn(dir=self.direction, loop = 2)
-                        time.sleep(1)
+                        time.sleep(0.5)
                         self.mode = 'find_corner' # --> 걸을 직선 찾고 walk
 
                     else: # yellow edge y 좌표 가까이 X
                         self.mode = 'return_line' # --> find_V
                         self._motion.walk(dir='FORWARD', loop=1, grab=True)
-                        time.sleep(1)
+                        time.sleep(0.5)
                 else: # yellow edge 감지될 때까지 걷기
                     self._motion.walk(dir='FORWARD', loop=1, grab=True)
-                    time.sleep(1)
+                    time.sleep(0.5)
 
             elif self.curr_room_color == 'GREEN':
                 if edge_info["EDGE_POS"]:
                     if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
                         self._motion.walk(dir='FORWARD', loop=1)
                         self._motion.turn(dir=self.direction, loop = 2)
-                        time.sleep(1)
+                        time.sleep(0.5)
                         self.mode = 'find_corner' # --> 걸을 직선 찾고 walk
 
                     else: # yellow edge y 좌표 가까이 X
                         self.mode = 'return_line' # --> find_V
                         # self.return_line()
                         self._motion.walk(dir='FORWARD', loop=1)
-                        time.sleep(1)
+                        time.sleep(0.5)
 
                 else: # yellow edge 감지 X 
                     self.mode = 'find_edge' # --> return_line
@@ -744,6 +750,9 @@ class Robot:
         elif self.mode == 'finish':
             self.mode = 'walk'
             self.walk_info = '│'
+            if self.black_room :
+                self._motion.notice_direction(self.black_room)
+                self.black_room.clear()
 
         # if self.progress_of_robot[-1] != self.mode and self.mode != 'walk':
         #     if self.progress_of_robot[-1]:
