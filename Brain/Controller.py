@@ -138,10 +138,8 @@ class Robot:
             return True
         return False
 
-    def recognize_area_color(self) -> None:
-        self._motion.set_head(dir=self.direction, angle=45)
-        self._motion.set_head(dir="DOWN", angle=45)
-        time.sleep(0.5)
+    def recognize_area_color(self) -> bool:
+
         self.color = 'GREEN'
         line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
         if edge_info['EDGE_DOWN']:
@@ -149,10 +147,15 @@ class Robot:
         else:
             self.curr_room_color = 'BLACK'
 
-        self._motion.notice_area(area=self.curr_room_color)
-        self.color = self.curr_room_color
-        self.mode = 'detect_room_alphabet'
-        time.sleep(0.5)
+        if self.curr_room_color:
+            self._motion.notice_area(area=self.curr_room_color)
+            self.color = self.curr_room_color
+            return True
+
+        return False
+
+
+
 
     def line_tracing(self, line_visualization=False, edge_visualization=False):
         line_info, edge_info, result = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization)
@@ -430,8 +433,13 @@ class Robot:
             time.sleep(0.5)
 
         elif self.mode in ['start_mission']:
-            self.recognize_area_color()
-            self._motion.set_head("LEFTRIGHT_CENTER")
+            self._motion.set_head(dir=self.direction, angle=45)
+            self._motion.set_head(dir="DOWN", angle=45)
+            time.sleep(0.5)
+            if self.recognize_area_color():
+                self.mode = 'detect_room_alphabet'
+            self._motion.set_head(dir="LEFTRIGHT_CENTER")
+            time.sleep(0.2)
 
         elif self.mode in ['detect_room_alphabet']:
             self._motion.set_head("DOWN", angle=self.curr_head4room_alphabet[0])
@@ -531,7 +539,7 @@ class Robot:
         elif self.mode in ['end_mission']:
 
             self._motion.set_head(dir ='DOWN', angle = 60)
-            time.sleep(0.5)
+            time.sleep(0.2)
 
             if self.curr_room_color == 'GREEN':
                 if self.box_pos == 'RIGHT':
