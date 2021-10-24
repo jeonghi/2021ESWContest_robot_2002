@@ -87,6 +87,8 @@ class Robot:
 
     def set_basic_form(self):
         self._motion.basic_form()
+        self.is_grab = False
+        self.cube_grabbed = False
 
     def get_distance_from_baseline(self, box_info, baseline=(320, 370)):
         """
@@ -281,7 +283,6 @@ class Robot:
         if self.box_pos == 'RIGHT':
             if line_info["ALL_X"][1] > 440:
                 if line_info["ALL_X"][0] < 180:
-                    print('find!!!!!!!!!!!!')
                     self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     self.mode = 'move_into_area'
                 else:
@@ -291,7 +292,6 @@ class Robot:
         elif self.box_pos == 'LEFT':
             if line_info["ALL_X"][0] < 150:
                 if line_info["ALL_X"][1] > 440:
-                    print('find!!!!!!!!!!!!')
                     self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     self.mode = 'move_into_area'
                 else:
@@ -303,7 +303,7 @@ class Robot:
                 self._motion.walk(dir='RIGHT', loop=1, grab=True)
             elif edge_info["EDGE_DOWN_X"] > 340:
                 self._motion.walk(dir='LEFT', loop=1, grab=True)
-            else:  # elif 300 < edge_info["EDGE_DOWN_X"] < 360 :
+            else:
                 self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                 self.mode = 'move_into_area'
         time.sleep(0.5)
@@ -325,6 +325,12 @@ class Robot:
         self.count += 1
 
     def run(self):
+
+        if self.mode_history != self.mode:
+            if self.mode != 'walk':
+                self.progress_of_robot.append(self.mode_history)
+            self.mode_history = self.mode
+            cv2.destroyAllWindows()
 
         if self.DEBUG:
             if self.color == 'YELLOW':
@@ -392,26 +398,19 @@ class Robot:
 
             else:
                 if line_info["H"]:
-                    print(line_info["H_X"])
-                    if line_info["H_X"][0] <= 170 and line_info["H_X"][1] >= 430:
-                        self.walk_info = 'T'
-                        # if line_info["H_Y"][1] > 190:
-                        self.mode = 'detect_direction'
-                        self.set_basic_form()
-                        self.is_grab = False
-                        # else:
-                        # self._motion.walk("FORWARD", 1, grab=True)
-                        # time.sleep(0.5)
-
-                    else:
-                        if line_info["H_X"][0] < 170 and line_info["H_X"][1] < 430:
+                    if line_info["H_X"][0] <= 170:
+                        if line_info["H_X"][1] >= 430:
+                            self.walk_info = 'T'
+                            self.set_basic_form()
+                            self.mode = 'detect_direction'
+                        else:
                             self.walk_info = '┐'
-
-                        elif line_info["H_X"][0] > 170 and line_info["H_X"][1] > 430:
+                    else:
+                        if line_info["H_X"][1] > 430:
                             self.walk_info = '┌'
-
                         else:
                             print('out of range')
+
                 else:
                     if line_info["V"]:
                         self.walk_info = '│'  # go
@@ -419,9 +418,7 @@ class Robot:
                     else:
                         self.walk_info = None  # modify_angle
                         self.walk(line_info, False)
-
-
-            time.sleep(0.5)
+            time.sleep(0.3)
 
         elif self.mode in ['start_mission']:
             self._motion.set_head(dir=self.direction, angle=45)
@@ -660,7 +657,7 @@ class Robot:
                      #self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
                 else:
                     self.mode = 'finish' # --> stop!
-                    self._motion.turn(dir=self.direction, loop =10)
+                    self._motion.turn(dir=self.direction, loop=10)
             time.sleep(1)
 
         # 나가기
@@ -671,8 +668,3 @@ class Robot:
                 self._motion.notice_direction(self.black_room)
                 self.black_room.clear()
             
-        if self.mode_history != self.mode:
-            if self.mode != 'walk':
-                self.progress_of_robot.append(self.mode_history)
-            self.mode_history = self.mode
-            cv2.destroyAllWindows()
