@@ -269,7 +269,7 @@ class ImageProcessor:
                 # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
                 area_ratio = width / height if height < width else height / width
                 area_ratio = round(area_ratio, 2)
-                if not (800 <area and area_ratio <= 1.4):
+                if not (800 < area and area_ratio <= 1.4):
                     continue
 
                 candidate = Target(contour=contour)
