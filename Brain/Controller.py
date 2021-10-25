@@ -361,7 +361,7 @@ class Robot:
             self._motion.set_head(dir='DOWN', angle=90)
             if self.detect_direction():
                 self._motion.walk("BACKWARD", 1)
-                time.sleep(1)
+                time.sleep(0.5)
             else:
                 self._motion.set_head(dir='DOWN', angle=10)
                 time.sleep(0.3)
@@ -381,18 +381,21 @@ class Robot:
             time.sleep(0.3)
 
             if self.walk_info in ['┐', '┌']:
-                if line_info["H_Y"][1] > 90:
-                    self._motion.walk("FORWARD", 1)
-                    if self.walk_info == '┌':
-                        if self.direction == 'RIGHT':
-                            self.mode = 'is_finish_line'
+                if line_info["H"]:
+                    if line_info["H_Y"][1] > 90:
+                        self._motion.walk("FORWARD", 1)
+                        if self.walk_info == '┌':
+                            if self.direction == 'RIGHT':
+                                self.mode = 'is_finish_line'
+                            else:
+                                self.mode = 'start_mission'
                         else:
-                            self.mode = 'start_mission'
+                            if self.direction == 'RIGHT':
+                                self.mode = 'start_mission'
+                            else:
+                                self.mode = 'is_finish_line'
                     else:
-                        if self.direction == 'RIGHT':
-                            self.mode = 'start_mission'
-                        else:
-                            self.mode = 'is_finish_line'
+                        self.walk(line_info, True)
                 else:
                     self.walk(line_info, True)
 
@@ -607,29 +610,29 @@ class Robot:
             if self.curr_room_color == 'BLACK':
                 self._motion.walk(dir='FORWARD', loop=1, grab=True)
                 if edge_info["EDGE_POS"]:
-                    if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
-                        self._motion.grab(switch = False)
-                        self._motion.turn(dir=self.direction, loop = 2)
-                        self.mode = 'find_corner' # --> 걸을 직선 찾고 walk
-                    else: # yellow edge y 좌표 가까이 X
-                        self.mode = 'return_line' # --> find_V
+                    if edge_info["EDGE_POS"][1] > 450:  # yellow edge y 좌표 가까이 O
+                        self._motion.grab(switch=False)
+                        self._motion.turn(dir=self.direction, loop=2)
+                        self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
+                    else:  # yellow edge y 좌표 가까이 X
+                        self.mode = 'return_line'  # --> find_V
                 time.sleep(0.5)
 
             elif self.curr_room_color == 'GREEN':
                 if edge_info["EDGE_POS"]:
-                    if edge_info["EDGE_POS"][1] > 450: # yellow edge y 좌표 가까이 O
+                    if edge_info["EDGE_POS"][1] > 450:  # yellow edge y 좌표 가까이 O
                         self._motion.walk(dir='FORWARD', loop=1)
-                        self._motion.turn(dir=self.direction, loop = 2)
-                        self.mode = 'find_corner' # --> 걸을 직선 찾고 walk
+                        self._motion.turn(dir=self.direction, loop=2)
+                        self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
 
                     else: # yellow edge y 좌표 가까이 X
-                        self.mode = 'return_line' # --> find_V
+                        self.mode = 'return_line'  # --> find_V
                         # self.return_line()
                         self._motion.walk(dir='FORWARD', loop=1)
                     time.sleep(0.5)
 
                 else: # yellow edge 감지 X 
-                    self.mode = 'find_edge' # --> return_line
+                    self.mode = 'find_edge'  # --> return_line
                     self.find_edge()
 
         elif self.mode in ['find_corner']:
@@ -644,7 +647,7 @@ class Robot:
                     self._motion.walk(dir='RIGHT', loop=1)
             else:
                 self._motion.turn(self.direction, 1)
-            time.sleep(1)
+            time.sleep(0.5)
 
         # 나가기
         elif self.mode in ['is_finish_line']:
