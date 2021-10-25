@@ -29,6 +29,9 @@ hsv_Lower1 = 0
 hsv_Upper1 = 0
 
 # -----------
+       # yellow_lower = np.array([10,40,95])
+       # yellow_upper = np.array([56, 200, 255])
+
 color_num = [0, 1, 2, 3, 4]
 
 h_max = [255, 65, 196, 111, 110]
@@ -305,7 +308,7 @@ if __name__ == '__main__':
     cv2.imshow(Top_name, img)
     # ---------------------------
     camera = WebcamVideoStream(-1).start()
-    #video_path = "./video/out_room.mp4"
+    #video_path = "Sensor/src/line_test/case2.h264"
     #camera = FileVideoStream(video_path).start()
     # ---------------------------
     #camera.set(3, W_View_size)

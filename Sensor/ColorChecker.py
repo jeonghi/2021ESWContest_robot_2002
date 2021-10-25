@@ -1,48 +1,8 @@
 import cv2
 import numpy as np
 
-
-
 # background 가 흰색이라 hue 값만으로 pixel rate 판단하면 위험할 수 있기때문에 테스트 해보고 수정할 것
 class ColorPreProcessor():
-    COLORS = {
-
-        ## usage : from Colorchecker import ColorPreProcessor
-        ## COLORS = ColorPreProcessor.COLORS
-        "GREEN" : {
-            "AREA" : {
-                "upper": [[82, 212, 255], [82, 212, 255], [82, 212, 255]],
-                "lower": [[21, 53, 35], [21, 53, 35], [21, 53, 35]],
-            }
-        },
-        "BLUE" : {
-            "MILK" : {
-                "upper": [[121, 255, 255], [101, 255, 255], [101, 255, 255]],
-                "lower": [[101, 95, 63], [81, 95, 63], [81, 95, 63]],
-            },
-            "ABCD" : {
-                "upper": [[55, 94, 149], [55, 94, 149], [55, 94, 149]],
-                "lower": [[139, 145, 186], [139, 145, 186], [139, 145, 186]],
-            },
-        },
-        "RED" : {
-            "MILK":
-                {
-                    "upper": [[55, 94, 149], [55, 94, 149], [55, 94, 149]],
-                    "lower": [[139, 145, 186], [139, 145, 186], [139, 145, 186]],
-
-                },
-            "ABCD":
-                {
-                    "upper": [[55, 94, 149], [55, 94, 149], [55, 94, 149]],
-                    "lower": [[139, 145, 186], [139, 145, 186], [139, 145, 186]],
-                }
-        }
-    }
-
-
-
-
 
     @staticmethod
     def get_color_binary_image(src:np.array, color:dict):  # 인자로 넘겨 받은 색상만 남기도록 이진화한뒤 원본 이미지와 이진 이미지 반
@@ -97,14 +57,23 @@ class ColorPreProcessor():
 
     @staticmethod
     def get_mean_value_for_non_zero(src: np.array) -> int:
+        print(src)
         src_mean = np.true_divide(src.sum(), (src != 0).sum())
+        print(src_mean)
         return int(np.mean(src_mean))
 
     @staticmethod
     def check_red_or_blue(src: np.array) -> str:
-        ycrcb = cv2.cvtColor(src, cv2.COLOR_BGR2YCrCb)
-        y, cr, cb = cv2.split(ycrcb)
-        answer = "RED" if np.mean(cr) > np.mean(cb) else "BLUE"
+
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
+        h = cv2.bitwise_and(h, h, mask=mask)
+        red_mask = ColorPreProcessor.get_red_mask(h)
+        cv2.imshow("red", red_mask)
+        blue_mask = ColorPreProcessor.get_blue_mask(h)
+        cv2.imshow("blue", blue_mask)
+        answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
         return answer
 
     @staticmethod

@@ -14,27 +14,32 @@ class Motion:
     head_angle1 = 'UPDOWN_CENTER'
     head_angle2 = 'LEFTRIGHT_CENTER'
 
-    def __init__(self, DEBUG):
+    def __init__(self, sleep_time=0):
         self.serial_use = 1
         self.serial_port = None
         self.Read_RX = 0
         self.receiving_exit = 1
         self.threading_Time = 0.01
+        self.sleep_time = sleep_time
         self.lock = Lock()
         self.distance = 0
-        self.debug = DEBUG
         BPS = 4800  # 4800,9600,14400, 19200,28800, 57600, 115200
 
         # ---------local Serial Port : ttyS0 --------
         # ---------USB Serial Port : ttyAMA0 --------
-        if not self.debug:
-            self.serial_port = serial.Serial('/dev/ttyS0', BPS, timeout=0.01)
-            self.serial_port.flush()  # serial cls
-            self.serial_t = Thread(target=self.Receiving, args=(self.serial_port,))
-            self.serial_t.daemon = True
-            self.serial_t.start()
-            time.sleep(0.1)
+        self.serial_port = serial.Serial('/dev/ttyS0', BPS, timeout=0.01)
+        self.serial_port.flush()  # serial cls
+        self.serial_t = Thread(target=self.Receiving, args=(self.serial_port,))
+        self.serial_t.daemon = True
+        self.serial_t.start()
+        time.sleep(0.1)
 
+    # DELAY DECORATOR
+    def sleep(self, func):
+        def decorated():
+            func()
+            time.sleep(self.sleep_time)
+        return decorated
 
 
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
@@ -53,7 +58,6 @@ class Motion:
             return 0
 
 
-
     def Receiving(self, ser):
         self.receiving_exit = 1
         while True:
@@ -65,7 +69,7 @@ class Motion:
                 # Rx, 수신
                 result = ser.read(1)
                 RX = ord(result)
-                print ("RX=" + str(RX))
+                #print ("RX=" + str(RX))
 
                 # -----  remocon 16 Code  Exit ------
                 if RX == 16:
@@ -81,24 +85,22 @@ class Motion:
         """dir={'E', 'W', 'S', 'N'}
         """
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
-        
-        if not self.debug:
-            self.TX_data_py2(dir_list[dir])
-        else:
-            print(dir)
-
+        self.TX_data_py2(dir_list[dir])
 
 
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
         area_list = {'GREEN':67,'BLACK':68}
-        
-        if not self.debug:
-            self.TX_data_py2(area_list[area])
-        else:
-            print(area)
+        self.TX_data_py2(area_list[area])
 
+
+    def notice_alpha(self, ls):
+        alpha_list = {'A':85, 'B':86, 'C':87, 'D':88}
+        for i in ls:
+            if i in alpha_list:
+                self.TX_data_py2(alpha_list[i])
+                time.sleep(2)
 
 
     def set_head(self, dir, angle=0):
@@ -130,30 +132,31 @@ class Motion:
                 30:51, 45:52, 60:53, 90:54
             }
         }
-        
-        if not self.debug:
-            if dir in center_list:
-                self.TX_data_py2(center_list[dir])
-            else:
-                self.TX_data_py2(dir_list[dir][angle])
+        if dir in center_list:
+            self.TX_data_py2(center_list[dir])
         else:
-            if dir in center_list:
-                print(dir)
-            else:
-                print(dir, angle)
+            self.TX_data_py2(dir_list[dir][angle])
+        time.sleep(0.3)
 
 
-    def walk(self, dir, loop=1, grab=False):
+    def is_grabbed(self) -> bool :
+        if self.get_IR() > 65:
+            return True
+        return False
+
+    def walk(self, dir, loop=1, grab=False, IR=False):
         dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
-            if not self.debug:
-                self.TX_data_py2(dir_list[dir])
-            else:
-                print(dir)
+            self.TX_data_py2(dir_list[dir])
+
+        if IR:
+            if self.get_IR() > 65:
+                return True
+            return False
 
 
-    def turn(self, dir, loop=1, sleep=0.5, grab=False,sliding=False):
+    def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, IR=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """
@@ -163,43 +166,41 @@ class Motion:
             if sliding:
                 dir_list[dir]+=9
         for _ in range(loop):
-            if not self.debug:
-                self.TX_data_py2(dir_list[dir])
-                time.sleep(sleep)
-            else:
-                print(dir)
+            self.TX_data_py2(dir_list[dir])
+            time.sleep(sleep)
+        
+        if IR:
+            if self.get_IR() > 65:
+                return True
+            return False
 
 
     def get_IR(self) -> int:
         """get IR value and return self.distance
         """
-        if not self.debug:
-            self.TX_data_py2(5)
-            self.TX_data_py2(5)
-        else:
-            print("get IR")
-            
+        self.TX_data_py2(5)
+        self.TX_data_py2(5)
         return self.distance
 
 
+    # 문 여는 함수
     def open_door(self, loop=1):
+        if self.get_IR() > 65:
+            self.turn(dir='SLIDING_LEFT', loop=5)
         for _ in range(loop):
-            if not self.debug:
-                self.TX_data_py2(66)
-            else:
-                print("TX 66")
+            self.TX_data_py2(90)
 
 
-
-    def grab(self, switch=True):
+    def grab(self, switch=True, IR=False):
         """if switch=True then grab ON, else then grab OFF
         """
         tx = 65 if switch else 66
-        
-        if not self.debug:
-            self.TX_data_py2(tx)
-        else:
-            print(tx)
+        self.TX_data_py2(tx)
+
+        if IR:
+            if self.get_IR() > 65:
+                return True
+            return False
 
 
     def get_head(self):
@@ -209,39 +210,26 @@ class Motion:
 
 
     def basic_form(self):
-        self.TX_data_py2(45)
-        self.TX_data_py2(54)
+        self.TX_data_py2(46)
+        self.TX_data_py2(55)
         self.TX_data_py2(10)
 
 
-    def basic_form(self):
-        if not self.debug:
-            self.TX_data_py2(46)
-            self.TX_data_py2(55)
-            self.TX_data_py2(10)
-        else:
-            print(46)
-            print(55)
-            print(10)
-
-
-def move_arm(self, grab=True, level=2):
-    """level: if grab is True, {1,2,3} else grab is False, {1,2}
-    """
-    angle_list = [30, 90, 60]
-    if grab:
-        self.TX_data_py2(75 + level)
-        time.sleep(0.5)
-        self.set_head(dir='DOWN', angle=angle_list[level - 1])
-    else:
-        self.TX_data_py2(73 + level)
-        time.sleep(0.5)
-        self.set_head(dir='DOWN', angle=100)
+    def move_arm(self, dir='HIGH'):
+        """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
+        팔을 위로 하면 머리는 아래로 숙임.
+        """
+        angle_list = [35, 90, 60]
+        level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
+        self.TX_data_py2(76+level[dir])
+        time.sleep(0.1)
+        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
+    
 
 
 # **************************************************
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.TX_data_py2(16)
-    
+    #motion.notice_alpha(['B', 'A', 'D', 'C'])
+    motion.open_door()

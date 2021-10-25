@@ -163,7 +163,7 @@ if __name__ == "__main__":
             mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("roi thresh", mask)
             cv2.waitKey(1)
-            print(hashDetector.detect_alphabet_hash(roi))
+            #print(hashDetector.detect_alphabet_hash(roi))
 
         #cv2.imshow("src", src)
         #cv2.imshow("mask", mask)
