@@ -1,48 +1,8 @@
 import cv2
 import numpy as np
 
-
-
 # background 가 흰색이라 hue 값만으로 pixel rate 판단하면 위험할 수 있기때문에 테스트 해보고 수정할 것
 class ColorPreProcessor():
-    COLORS = {
-
-        ## usage : from Colorchecker import ColorPreProcessor
-        ## COLORS = ColorPreProcessor.COLORS
-        "GREEN" : {
-            "AREA" : {
-                "upper": [[82, 212, 255], [82, 212, 255], [82, 212, 255]],
-                "lower": [[21, 53, 35], [21, 53, 35], [21, 53, 35]],
-            }
-        },
-        "BLUE" : {
-            "MILK" : {
-                "upper": [[121, 255, 255], [101, 255, 255], [101, 255, 255]],
-                "lower": [[101, 95, 63], [81, 95, 63], [81, 95, 63]],
-            },
-            "ABCD" : {
-                "upper": [[55, 94, 149], [55, 94, 149], [55, 94, 149]],
-                "lower": [[139, 145, 186], [139, 145, 186], [139, 145, 186]],
-            },
-        },
-        "RED" : {
-            "MILK":
-                {
-                    "upper": [[55, 94, 149], [55, 94, 149], [55, 94, 149]],
-                    "lower": [[139, 145, 186], [139, 145, 186], [139, 145, 186]],
-
-                },
-            "ABCD":
-                {
-                    "upper": [[55, 94, 149], [55, 94, 149], [55, 94, 149]],
-                    "lower": [[139, 145, 186], [139, 145, 186], [139, 145, 186]],
-                }
-        }
-    }
-
-
-
-
 
     @staticmethod
     def get_color_binary_image(src:np.array, color:dict):  # 인자로 넘겨 받은 색상만 남기도록 이진화한뒤 원본 이미지와 이진 이미지 반
