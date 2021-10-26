@@ -712,9 +712,10 @@ class Robot:
         # 나가기
         elif self.mode in ['finish']:
             if self.direction == 'LEFT':
-                self._motion.walk(dir='LEFT', loop=8)
+                print("self._motion.open_door(dir='LEFT', loop=8)")
+                #self._motion.open_door(dir='LEFT', loop=8)
             else:
-                self._motion.walk(dir='RIGHT', loop=8)
+                self._motion.open_door(loop=8)
 
             if self.black_room:
                 self._motion.notice_direction(self.black_room)
