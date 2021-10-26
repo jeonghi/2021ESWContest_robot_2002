@@ -375,11 +375,6 @@ class Robot:
             
         # 3) 화살표 방향 인식
         elif self.mode in ['detect_direction']:
-            if line_info['H']:
-                self._motion.walk(dir='RIGHT')  # 팔올린 채로
-            else:
-                self._motion.turn(dir='RIGHT')
-
 
             self._motion.set_head(dir='DOWN', angle=90)
             if self.detect_direction():
