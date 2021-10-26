@@ -208,7 +208,10 @@ class Robot:
         if 85 < line_info["DEGREE"] < 95:
             if go:
                 if 290 < line_info["V_X"][0] < 350:
-                    self._motion.walk(dir='FORWARD', loop=3, grab=self.is_grab) # 팔뻗기
+                    if line_info["H"]:
+                        self._motion.walk(dir='FORWARD', loop=1, grab=self.is_grab) # 팔뻗기
+                    else:
+                        self._motion.walk(dir='FORWARD', loop=4, grab=self.is_grab)  # 팔뻗기
                 else:
                     if line_info["V_X"][0] < 290:
                         self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
