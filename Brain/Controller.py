@@ -50,13 +50,13 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        self.mode = "walk"
-        self.direction = "LEFT"
-        self.color = "YELLOW"
-        self.box_pos = None
-        self.curr_room_color = None
-        self.alphabet_color = None
-        self.alphabet = None
+        #self.mode = "walk"
+        #self.direction = "LEFT"
+        #self.color = "YELLOW"
+        #self.box_pos = None
+        #self.curr_room_color = None
+        #self.alphabet_color = None
+        #self.alphabet = None
         
         #self.mode = 'start_mission'
         #self.direction = 'LEFT'
@@ -329,6 +329,7 @@ class Robot:
             cv2.destroyAllWindows()
 
         if self.DEBUG:
+            print(self.mode)
             if self.color == 'YELLOW':
                 line_info, edge_info = self.line_tracing(line_visualization=True, edge_visualization=False)
             elif self.color == 'GREEN':
@@ -348,7 +349,7 @@ class Robot:
             if self.detect_door_alphabet():
                 self._motion.set_head(dir="DOWN", angle=10)
                 self._motion.walk(dir='RIGHT', loop=4)
-                self._motion.turn(dir='LEFT', loop=2)
+                self._motion.turn(dir='LEFT', loop=4)
                 self.mode = "entrance_1"
                 time.sleep(0.3)
             else:
@@ -361,14 +362,16 @@ class Robot:
                 self._motion.turn(dir='LEFT')  # 팔올린 채로
 
             if line_info['V']:
-                self._motion.turn(dir='RIGHT', loop=2)
+                self._motion.basic_form()
+                self._motion.turn(dir='RIGHT', loop=4)
                 self.mode = 'entrance_2'
 
         elif self.mode in ['entrance_2']:
             if line_info['H']:
+                
                 self.mode = 'detect_direction'
             else:
-                self._motion.turn(dir='LEFT')
+                self._motion.turn(dir='RIGHT')
 
             
         # 3) 화살표 방향 인식
@@ -376,9 +379,6 @@ class Robot:
 
             self._motion.set_head(dir='DOWN', angle=90)
             if self.detect_direction():
-                self._motion.walk("BACKWARD", 1)
-                time.sleep(0.5)
-            else:
                 self._motion.set_head(dir='DOWN', angle=10)
                 time.sleep(0.3)
                 # if line_info['DEGREE'] != 0:
@@ -389,6 +389,10 @@ class Robot:
                 self._motion.turn(self.direction, 8)
                 self.mode = 'walk'
                 self.walk_info = '│'
+            else:
+                self._motion.walk("BACKWARD", 1)
+                time.sleep(0.5)
+                
 
 
         # 3) 화살표 방향 인식
@@ -721,4 +725,3 @@ class Robot:
                 self._motion.notice_direction(self.black_room)
                 self.black_room.clear()
             
-e

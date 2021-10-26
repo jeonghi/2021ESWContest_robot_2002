@@ -46,7 +46,6 @@ class ImageProcessor:
 
         self.line_detector = LineDetector()
         self.color_preprocessor = ColorPreProcessor()
-        self.COLORS = self.color_preprocessor.COLORS
 
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
