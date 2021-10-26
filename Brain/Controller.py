@@ -351,13 +351,40 @@ class Robot:
             self._motion.set_head(dir="DOWN", angle=self.curr_head4door_alphabet[0])
             if self.detect_door_alphabet():
                 self._motion.set_head(dir="DOWN", angle=10)
-                self.mode = "walk"
+                self._motion.walk(dir='RIGHT', loop=4)
+                # 팔올리기
+                self._motion.turn(dir='RIGHT', loop=2)
+                self.mode = "entrance_1"
                 time.sleep(0.3)
             else:
                 self.curr_head4door_alphabet.rotate(-1)
 
+        elif self.mode in ['entrance_1']:
+            if line_info['H'] is False:
+                self._motion.turn(dir='RIGHT') # 팔올린 채로
+            else:
+                self._motion.walk(dir='RIGHT') # 팔올린 채로
+
+            if line_info['V'] is True:
+                # 팔내리기
+                self._motion.turn(dir='RIGHT', loop=2)
+                self.mode = 'entrance_2'
+            else:
+                pass
+
+        elif self.mode in ['entrance_2']:
+            if line_info['H'] is False:
+                self._motion.turn(dir='RIGHT')
+            else:
+                self.mode = 'detect_direction'
+            
         # 3) 화살표 방향 인식
         elif self.mode in ['detect_direction']:
+            if line_info['H'] is False:
+                self._motion.turn(dir='RIGHT')
+            else:
+                self._motion.walk(dir='RIGHT') # 팔올린 채로
+
             self._motion.set_head(dir='DOWN', angle=90)
             if self.detect_direction():
                 self._motion.walk("BACKWARD", 1)
@@ -373,6 +400,25 @@ class Robot:
                 self._motion.turn(self.direction, 8)
                 self.mode = 'walk'
                 self.walk_info = '│'
+
+
+        # 3) 화살표 방향 인식
+        #elif self.mode in ['detect_direction']:
+            #self._motion.set_head(dir='DOWN', angle=90)
+            #if self.detect_direction():
+                #self._motion.walk("BACKWARD", 1)
+                #time.sleep(0.5)
+            #else:
+                #self._motion.set_head(dir='DOWN', angle=10)
+                #time.sleep(0.3)
+                # if line_info['DEGREE'] != 0:
+                # self.walk(line_info, True)
+                # else:
+                #self._motion.walk('FORWARD', 4)  # 너무 뒤에서 멈추면 추가
+                #self._motion.walk(self.direction, 4)
+                #self._motion.turn(self.direction, 8)
+                #self.mode = 'walk'
+                #self.walk_info = '│'
 
         # 걷기 # 보정 추가로 넣기
         elif self.mode in ['walk']:
@@ -651,7 +697,7 @@ class Robot:
 
         # 나가기
         elif self.mode in ['is_finish_line']:
-            if line_info['H']:
+            if line_info['H'] < 150 : # 수정 필요
                 self.walk(line_info, True)
             else: #line_info['H'] == False
                 if self.count < 3:
@@ -660,14 +706,18 @@ class Robot:
                      #self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
                 else:
                     self.mode = 'finish' # --> stop!
-                    self._motion.turn(dir=self.direction, loop=10)
+                    #self._motion.turn(dir=self.direction, loop=10)
             time.sleep(1)
 
         # 나가기
         elif self.mode in ['finish']:
-            self.mode = 'walk'
-            self.walk_info = '│'
+            if self.direction == 'LEFT':
+                self._motion.walk(dir = 'LEFT', loop = 8)
+            else:
+                self._motion.walk(dir = 'RIGHT', loop = 8)
+
             if self.black_room:
                 self._motion.notice_direction(self.black_room)
                 self.black_room.clear()
             
+e

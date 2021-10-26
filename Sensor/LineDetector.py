@@ -414,7 +414,7 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture(-1)
+    video = cv2.VideoCapture("Sensor/src/green_room_test/green_area1.h264")
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
@@ -430,8 +430,8 @@ if __name__ == "__main__":
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
 
-        line_info, edge_info, result = line_detector.get_all_lines(src, color='YELLOW', line_visualization=False,
-                                                                   edge_visualization=True)
+        line_info, edge_info, result = line_detector.get_all_lines(src, color='GREEN', line_visualization=True,
+                                                                   edge_visualization=False)
         print(line_info)
         print(edge_info)
         cv2.imshow('result', result)
