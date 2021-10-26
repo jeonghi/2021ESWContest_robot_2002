@@ -7,10 +7,10 @@ import time
 import sys
 from collections import deque
 
+
 class Robot:
 
     def __init__(self, video_path ="", mode="start", DEBUG=False):
-
         # 모듈들 객체 생성
         self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
@@ -116,7 +116,7 @@ class Robot:
             (cor_x, cor_y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
             (box_x, box_y) = box_info
             dx = 100
-            if cor_x - dx <= box_x <= cor_x + dx :
+            if cor_x - dx <= box_x <= cor_x + dx:
                 if box_y <= cor_y:
                     self.box_pos = "MIDDLE"
                 else:
@@ -124,11 +124,8 @@ class Robot:
                         self.box_pos = "RIGHT"
                     else:
                         self.box_pos = "LEFT"
-
-
-            elif box_x < cor_x -dx:
+            elif box_x < cor_x - dx :
                 self.box_pos = "LEFT"
-
             else:
                 self.box_pos = "RIGHT"
         elif self.direction == "RIGHT":
@@ -348,29 +345,27 @@ class Robot:
             if self.detect_door_alphabet():
                 self._motion.set_head(dir="DOWN", angle=10)
                 self._motion.walk(dir='RIGHT', loop=4)
-                # 팔올리기
-                self._motion.turn(dir='RIGHT', loop=2)
+                self._motion.turn(dir='LEFT', loop=2)
                 self.mode = "entrance_1"
                 time.sleep(0.3)
             else:
                 self.curr_head4door_alphabet.rotate(-1)
-            if line_info['H']:
-                self._motion.walk(dir='RIGHT')  # 팔올린 채로
-            else:
-                self._motion.turn(dir='RIGHT')  # 팔올린 채로
 
         elif self.mode in ['entrance_1']:
+            if line_info['H']:
+                self._motion.open_door(loop=3)  # 팔올린 채로
+            else:
+                self._motion.turn(dir='LEFT')  # 팔올린 채로
+
             if line_info['V']:
                 self._motion.turn(dir='RIGHT', loop=2)
                 self.mode = 'entrance_2'
-            else:
-                pass
 
         elif self.mode in ['entrance_2']:
             if line_info['H']:
                 self.mode = 'detect_direction'
             else:
-                self._motion.turn(dir='RIGHT')
+                self._motion.turn(dir='LEFT')
 
             
         # 3) 화살표 방향 인식
