@@ -19,12 +19,12 @@ class Robot:
         # 멤버 변수 셋팅
         self.mode: str = mode
         self.color: str = "YELLOW"
-        self.direction: str = 'RIGHT'
+        self.direction: str = None
         self.alphabet: str = None
         self.alphabet_color: str = None
         self.curr_room_color: str = None
         self.cube_grabbed: bool = False
-        self.count: int = 3
+        self.count: int = 0
         self.progress_of_robot: list = [None]
         self.is_grab: bool = False
         self.walk_info: str = None
@@ -145,7 +145,7 @@ class Robot:
         return False
 
     def recognize_area_color(self) -> bool:
-
+        time.sleep(1)
         self.color = 'GREEN'
         line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
         if edge_info['EDGE_DOWN']:
@@ -348,8 +348,9 @@ class Robot:
             self._motion.set_head(dir="DOWN", angle=self.curr_head4door_alphabet[0])
             if self.detect_door_alphabet():
                 self._motion.set_head(dir="DOWN", angle=10)
+                self._motion.walk(dir='FORWARD', loop=2)
                 self._motion.walk(dir='RIGHT', loop=4)
-                self._motion.turn(dir='SLIDING_LEFT', loop=2)
+                self._motion.turn(dir='SLIDING_LEFT', loop=3)
                 self.mode = "entrance_1"
                 time.sleep(0.3)
             else:
@@ -359,11 +360,12 @@ class Robot:
             if line_info['H']:
                 self._motion.open_door()  # 팔올린 채로
             else:
-                self._motion.turn(dir='SLIDING_LEFT')
+                self._motion.turn(dir='LEFT')
 
             if line_info['V']:
                 self._motion.basic_form()
-                self._motion.turn(dir='RIGHT', loop=4)
+                self._motion.turn(dir='SLIDING_RIGHT', loop=3)
+                self._motion.walk(dir='BACKWARD')
                 self.mode = 'entrance_2'
 
         elif self.mode in ['entrance_2']:
@@ -371,7 +373,7 @@ class Robot:
                 
                 self.mode = 'detect_direction'
             else:
-                self._motion.turn(dir='SLIDING_RIGHT')
+                self._motion.turn(dir='RIGHT')
 
             
         # 3) 화살표 방향 인식
