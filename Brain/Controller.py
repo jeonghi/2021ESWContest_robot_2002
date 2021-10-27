@@ -19,12 +19,12 @@ class Robot:
         # 멤버 변수 셋팅
         self.mode: str = mode
         self.color: str = "YELLOW"
-        self.direction: str = None
+        self.direction: str = 'RIGHT'
         self.alphabet: str = None
         self.alphabet_color: str = None
         self.curr_room_color: str = None
         self.cube_grabbed: bool = False
-        self.count: int = 0
+        self.count: int = 3
         self.progress_of_robot: list = [None]
         self.is_grab: bool = False
         self.walk_info: str = None
@@ -349,7 +349,7 @@ class Robot:
             if self.detect_door_alphabet():
                 self._motion.set_head(dir="DOWN", angle=10)
                 self._motion.walk(dir='RIGHT', loop=4)
-                self._motion.turn(dir='LEFT', loop=4)
+                self._motion.turn(dir='SLIDING_LEFT', loop=2)
                 self.mode = "entrance_1"
                 time.sleep(0.3)
             else:
@@ -357,7 +357,7 @@ class Robot:
 
         elif self.mode in ['entrance_1']:
             if line_info['H']:
-                self._motion.open_door(loop=3)  # 팔올린 채로
+                self._motion.open_door()  # 팔올린 채로
             else:
                 self._motion.turn(dir='SLIDING_LEFT')
 
@@ -690,7 +690,7 @@ class Robot:
 
         # 나가기
         elif self.mode in ['is_finish_line']:
-            if line_info['H'] and line_info['H_Y'] < 150:
+            if line_info['H'] and line_info['H_Y'][0] < 150:
                 self.walk(line_info, True)
             else:
                 if self.count < 3:
@@ -699,19 +699,6 @@ class Robot:
                 else:
                     self.mode = 'finish'
             time.sleep(0.5)
-
-
-            if line_info['H'] < 150 : # 수정 필요
-                self.walk(line_info, True)
-            else: #line_info['H'] == False
-                if self.count < 3:
-                     self.mode = 'walk'
-                     self.walk_info = '│'
-                     #self.count += 1 # count 방식 미션 grap_off 기준으로 count하면 좋을 듯 :: 중요
-                else:
-                    self.mode = 'finish' # --> stop!
-                    #self._motion.turn(dir=self.direction, loop=10)
-            time.sleep(1)
 
         # 나가기
         elif self.mode in ['finish']:
