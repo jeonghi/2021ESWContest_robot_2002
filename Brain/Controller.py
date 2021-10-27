@@ -211,7 +211,7 @@ class Robot:
                     if line_info["H"]:
                         self._motion.walk(dir='FORWARD', loop=1, grab=self.is_grab) # 팔뻗기
                     else:
-                        self._motion.walk(dir='FORWARD', loop=4, grab=self.is_grab)  # 팔뻗기
+                        self._motion.walk(dir='FORWARD', loop=3, grab=self.is_grab)  # 팔뻗기
                 else:
                     if line_info["V_X"][0] < 290:
                         self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
@@ -365,18 +365,22 @@ class Robot:
                 self._motion.turn(dir='LEFT')
                 
         elif self.mode in ['entrance_2']:
-            if line_info['H_DEGREE'] > 174:
-                self._motion.open_door()
-            else:
-                if edge_info['EDGE_L'] :
-                    self._motion.turn(dir= 'RIGHT',grab = True) # 은선 바꿔줭
-                elif edge_info['EDGE_R'] :
-                    self._motion.turn(dir= 'LEFT',grab = True) # 은선 바꿔줭
+            if line_info['H']:  #and line_info['H_Y'][0] <175: # 상황 보고 추가
+                if line_info['H_DEGREE'] > 173:
+                    self._motion.open_door(loop=2)
                 else:
-                    print('H, L, R 모두 없음 예외 처리 필요')
+                    if edge_info['EDGE_L'] :
+                        self._motion.turn(dir= 'RIGHT',grab = True) # 은선 바꿔줭
+                    elif edge_info['EDGE_R'] :
+                        self._motion.turn(dir= 'LEFT',grab = True) # 은선 바꿔줭
+                    else:
+                        print('H, L, R 모두 없음 예외 처리 필요')
+            else: # H가 너무 가깝다는 것, H 업다는 것
+                self._motion.walk(dir='BACKWARD')
             
             if line_info['V']:
                 self._motion.basic_form()
+                self._motion.walk(dir='LEFT', loop=1)
                 self._motion.turn(dir='SLIDING_RIGHT', loop=4)
                 self.mode = 'entrance_3'
 
@@ -397,7 +401,7 @@ class Robot:
                 # if line_info['DEGREE'] != 0:
                 # self.walk(line_info, True)
                 # else:
-                self._motion.walk('FORWARD', 2)  # 너무 뒤에서 멈추면 추가
+                self._motion.walk('FORWARD', 3)  # 너무 뒤에서 멈추면 추가
                 self._motion.walk(self.direction, 4)
                 self._motion.turn(self.direction, 8)
                 self.mode = 'walk'
