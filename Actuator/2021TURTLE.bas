@@ -1616,7 +1616,18 @@ GOSUB_RX_EXIT2:
     DELAY 200
 
     RETURN
-
+    
+문열기동작2:
+	SPEED 5
+	
+    MOVE G6B,130,  90, 10
+    MOVE G6C,100, 190 , 10	
+    WAIT
+    
+    DELAY 200
+    
+    RETURN
+	
 
 왼쪽턴3:
     MOTORMODE G6A,3,3,3,3,2
@@ -2867,7 +2878,7 @@ D지역:
     MOVE G6D, 100, 150, 30,   150, 100,
     MOVE G6B, 140, 30, 80,	  ,	  ,
     MOVE G6C, 140, 30, 80,	  ,   ,
-    WAIT
+    WAIT 
 
     DELAY 50
     GOTO 물건집기_2
@@ -4120,3 +4131,9 @@ KEY90:
     GOSUB 오른쪽옆으로걷기
 
     GOTO RX_EXIT
+    
+KEY91:
+	ETX 4800, 91
+	GOSUB 문열기동작2
+	GOSUB 왼쪽옆으로걷기
+	GOTO RX_EXIT

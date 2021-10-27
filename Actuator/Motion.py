@@ -80,7 +80,6 @@ class Motion:
                 elif RX != 200:
                      self.distance = RX
 
-
     def notice_direction(self, dir):
         """dir={'E', 'W', 'S', 'N'}
         """
@@ -144,12 +143,11 @@ class Motion:
             return True
         return False
 
-    def walk(self, dir, loop=1, sleep=0.3, grab=False, IR=False):
+    def walk(self, dir, loop=1, grab=False, IR=False):
         dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
-            time.sleep(sleep)
 
         if IR:
             if self.get_IR() > 65:
@@ -175,6 +173,8 @@ class Motion:
                 return True
             return False
 
+    def ready_open(self):
+        self.turn("SLIDING_LEFT", 5)
 
     def get_IR(self) -> int:
         """get IR value and return self.distance
@@ -183,13 +183,11 @@ class Motion:
         self.TX_data_py2(5)
         return self.distance
 
-
     # 문 여는 함수
-    def open_door(self, loop=1):
-        if self.get_IR() > 65:
-            self.turn(dir='SLIDING_LEFT', loop=5)
+    def open_door(self, dir='RIGHT', loop=1):
+        n = 90 if dir == 'RIGHT' else 91
         for _ in range(loop):
-            self.TX_data_py2(90)
+            self.TX_data_py2(n)
 
 
     def grab(self, switch=True, IR=False):
