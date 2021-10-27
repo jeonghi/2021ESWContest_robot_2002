@@ -71,30 +71,43 @@ class ImageProcessor:
         # 그레이스케일화
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-        #_, mask = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
-        cv2.imshow("mask", mask)
+        _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV)
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
 
         for cnt in cnts1:
-            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
-            vertice = len(approx)
-            if vertice == 4 and cv2.contourArea(cnt) > 2500:
-                target = Target(contour=cnt)
-                no_canny_targets.append(target)
-                if visualization:
-                           setLabel(canvas, cnt, "no_canny")
+
+            (_, _, width, height) = cv2.boundingRect(cnt)
+            area = cv2.contourArea(cnt)
+
+            # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            if not (800 < area < 10000 and area_ratio <= 1.6):
+                continue
+
+            target = Target(contour=cnt)
+            no_canny_targets.append(target)
+            if visualization:
+                setLabel(canvas, cnt, "no_canny")
 
         for cnt in cnts2:
+            (_, _, width, height) = cv2.boundingRect(cnt)
+            area = cv2.contourArea(cnt)
+
+            # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if vertice == 4 and cv2.contourArea(cnt) > 2500:
-                target = Target(contour=cnt)
-                canny_targets.append(target)
-                if visualization:
-                    setLabel(canvas, cnt, "canny", color=(0,0,255))
+            if not (vertice == 4 and area > 2500 and area_ratio <= 1.6):
+                continue
+            target = Target(contour=cnt)
+            canny_targets.append(target)
+            if visualization:
+                setLabel(canvas, cnt, "canny", color=(0,0,255))
+
 
         target = Target.non_maximum_suppression4targets(canny_targets, no_canny_targets, threshold=0.7)
 
@@ -113,11 +126,11 @@ class ImageProcessor:
         if visualization:
             pos = target.get_pts()
             setLabel(roi_canvas, target.get_pts(), label="roi", color=(255,0,0))
-            roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
+            #roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("src", cv2.hconcat(
                 [canvas, roi_canvas]))
             cv2.waitKey(1)
-        answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask)
+        answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask, threshold=0.6)
         return answer
 
     def get_arrow_direction(self, visualization: bool = False):
@@ -428,16 +441,16 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    #imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="src/door_test/W.h264")
+    #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
-        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        #print(alphabet)
+        #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
+        alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        print(alphabet)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
-        print(result)
+        #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        #print(result)

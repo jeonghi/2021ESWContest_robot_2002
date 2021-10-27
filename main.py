@@ -8,10 +8,10 @@ from Sensor.VideoRecorder import VideoRecorder
 import cv2
 #import kbhit # press any key to exit
 
-VIDEO_PATH = -1
+VIDEO_PATH = ""
 
 def main():
-    robot = Robot(video_path=VIDEO_PATH, DEBUG=True)
+    robot = Robot(video_path=VIDEO_PATH, debug=True)
     robot.set_basic_form()
     #====================== debug ======================
 
