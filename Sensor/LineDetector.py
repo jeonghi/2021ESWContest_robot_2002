@@ -33,7 +33,7 @@ class LineDetector:
             if what_line == 'vertical':
                 color = [0, 0, 255]
             elif what_line == 'compact_horizontal' or what_line == "horizontal_D":
-                color = [255, 255, 255]
+                color = [150, 150, 150]
             elif what_line == 'horizontal':
                 color = [0, 255, 0]
             elif what_line == 'lines':
@@ -118,8 +118,8 @@ class LineDetector:
                 edge_lines_R_degree = slope_degree[(slope_degree) > 0]
                 edge_lines_R = edge_lines_R[:, None]
 
-                horizontal_lines = lines[np.abs(slope_degree) > 160]
-                horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 160]
+                horizontal_lines = lines[np.abs(slope_degree) > 170]
+                horizontal_slope_degree = slope_degree[np.abs(slope_degree) > 170]
                 horizontal_lines = horizontal_lines[:, None]
                 
                 compact_horizontal_lines = lines[np.abs(slope_degree) > 175]

@@ -10,12 +10,12 @@ from collections import deque
 
 class Robot:
 
-    def __init__(self, video_path: str = "", mode: str = "start", debug: bool = False):
+    def __init__(self, video_path ="", mode="start", DEBUG=False):
         # 모듈들 객체 생성
-        self._motion: Motion = Motion()
-        self._image_processor: ImageProcessor = ImageProcessor(video_path=video_path)
-        self._line_detector: LineDetector = LineDetector()
-        self.DEBUG: bool = debug
+        self._motion = Motion()
+        self._image_processor = ImageProcessor(video_path=video_path)
+        self._line_detector = LineDetector()
+        self.DEBUG = DEBUG
         # 멤버 변수 셋팅
         self.mode: str = mode
         self.color: str = "YELLOW"
@@ -34,8 +34,8 @@ class Robot:
         self.black_room: list = []
 
         self.return_head: str = ""  # return 할 때 고개 각도 바꿀 지 고민 중 10/08
-        self.mode_history: str = mode
-
+        self.mode_history: str = self.mode
+        self.box_pos: str = ""
         # "start"("detect_room_alphabet") , "walk", "detect_direction", "start_mission",
         #self.mode = "start"
         #self.direction = "" # "LEFT", "RIGHT"
@@ -90,8 +90,7 @@ class Robot:
         self.is_grab = False
         self.cube_grabbed = False
 
-    @staticmethod
-    def get_distance_from_baseline(self, box_info: tuple, baseline: tuple = (320, 370)) -> tuple :
+    def get_distance_from_baseline(self, box_info, baseline=(320, 370)):
         """
         :param box_info: 우유팩 위치 정보를 tuple 형태로 받아온다. 우유팩 영역 중심 x좌표와 y좌표 순서
         :param baseline: 우유팩 위치 정보와 비교할 기준점이다.
@@ -99,7 +98,7 @@ class Robot:
         """
         (bx, by) = baseline
         (cx, cy) = box_info
-        return bx-cx, by-cy
+        return (bx-cx, by-cy)
 
     def detect_door_alphabet(self) -> bool:
         """
@@ -228,7 +227,7 @@ class Robot:
             self._motion.turn(dir='RIGHT', loop=1, grab=self.is_grab) # 팔뻗기
         time.sleep(0.3)
 
-    def find_edge(self) -> None: #find_corner_for_outroom
+    def find_edge(self): #find_corner_for_outroom
         if self.curr_room_color == 'BLACK':
             self._motion.turn(dir=self.direction, loop=1, grab=True)  # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
         else:
@@ -244,7 +243,7 @@ class Robot:
                     self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
         time.sleep(0.3)
 
-    def catch_box(self) -> None:
+    def catch_box(self):
         self._motion.grab()
         if self.curr_room_color == 'GREEN':
             if self.box_pos == 'RIGHT':
@@ -359,19 +358,30 @@ class Robot:
 
         elif self.mode in ['entrance_1']:
             if line_info['H']:
-                self._motion.open_door()  # 팔올린 채로
+                self._motion.open_door()
+                self.mode = "entrance_2"
+                #self._motion.open_door()  # 팔올린 채로
             else:
                 self._motion.turn(dir='LEFT')
-
+                
+        elif self.mode in ['entrance_2']:
+            if line_info['H_DEGREE'] > 174:
+                self._motion.open_door()
+            else:
+                if edge_info['EDGE_L'] :
+                    self._motion.turn(dir= 'RIGHT',grab = True) # 은선 바꿔줭
+                elif edge_info['EDGE_R'] :
+                    self._motion.turn(dir= 'LEFT',grab = True) # 은선 바꿔줭
+                else:
+                    print('H, L, R 모두 없음 예외 처리 필요')
+            
             if line_info['V']:
                 self._motion.basic_form()
                 self._motion.turn(dir='SLIDING_RIGHT', loop=4)
-                self._motion.walk(dir='BACKWARD')
-                self.mode = 'entrance_2'
+                self.mode = 'entrance_3'
 
-        elif self.mode in ['entrance_2']:
+        elif self.mode in ['entrance_3']:
             if line_info['H']:
-                
                 self.mode = 'detect_direction'
             else:
                 self._motion.turn(dir='RIGHT')
@@ -387,7 +397,7 @@ class Robot:
                 # if line_info['DEGREE'] != 0:
                 # self.walk(line_info, True)
                 # else:
-                self._motion.walk('FORWARD', 4)  # 너무 뒤에서 멈추면 추가
+                self._motion.walk('FORWARD', 2)  # 너무 뒤에서 멈추면 추가
                 self._motion.walk(self.direction, 4)
                 self._motion.turn(self.direction, 8)
                 self.mode = 'walk'
@@ -510,7 +520,7 @@ class Robot:
             box_info = self._image_processor.get_milk_info(color=self.alphabet_color, edge_info=edge_info)
             if box_info:
                 (cx, cy) = box_info
-                (dx, dy) = Robot.get_distance_from_baseline(box_info=box_info)
+                (dx, dy) = self.get_distance_from_baseline(box_info=box_info)
 
 
                 if dy > 10:  # 기준선 보다 위에 있다면

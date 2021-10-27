@@ -11,7 +11,7 @@ import cv2
 VIDEO_PATH = ""
 
 def main():
-    robot = Robot(video_path=VIDEO_PATH, debug=True)
+    robot = Robot(video_path=VIDEO_PATH, DEBUG=True)
     robot.set_basic_form()
     #====================== debug ======================
 
