@@ -359,7 +359,7 @@ class Robot:
             if line_info['H']:
                 self._motion.open_door(loop=3)  # 팔올린 채로
             else:
-                self._motion.turn(dir='LEFT')  # 팔올린 채로
+                self._motion.turn(dir='SLIDING_LEFT')
 
             if line_info['V']:
                 self._motion.basic_form()
@@ -371,7 +371,7 @@ class Robot:
                 
                 self.mode = 'detect_direction'
             else:
-                self._motion.turn(dir='RIGHT')
+                self._motion.turn(dir='SLIDING_RIGHT')
 
             
         # 3) 화살표 방향 인식
@@ -716,8 +716,7 @@ class Robot:
         # 나가기
         elif self.mode in ['finish']:
             if self.direction == 'LEFT':
-                print("self._motion.open_door(dir='LEFT', loop=8)")
-                #self._motion.open_door(dir='LEFT', loop=8)
+                self._motion.open_door(dir='LEFT', loop=8)
             else:
                 self._motion.open_door(loop=8)
 
