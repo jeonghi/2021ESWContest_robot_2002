@@ -10,12 +10,12 @@ from collections import deque
 
 class Robot:
 
-    def __init__(self, video_path ="", mode="start", DEBUG=False):
+    def __init__(self, video_path: str = "", mode: str = "start", debug: bool = False):
         # 모듈들 객체 생성
-        self._motion = Motion()
-        self._image_processor = ImageProcessor(video_path=video_path)
-        self._line_detector = LineDetector()
-        self.DEBUG = DEBUG
+        self._motion: Motion = Motion()
+        self._image_processor: ImageProcessor = ImageProcessor(video_path=video_path)
+        self._line_detector: LineDetector = LineDetector()
+        self.DEBUG: bool = debug
         # 멤버 변수 셋팅
         self.mode: str = mode
         self.color: str = "YELLOW"
@@ -34,7 +34,7 @@ class Robot:
         self.black_room: list = []
 
         self.return_head: str = ""  # return 할 때 고개 각도 바꿀 지 고민 중 10/08
-        self.mode_history: str = self.mode
+        self.mode_history: str = mode
 
         # "start"("detect_room_alphabet") , "walk", "detect_direction", "start_mission",
         #self.mode = "start"
@@ -90,7 +90,8 @@ class Robot:
         self.is_grab = False
         self.cube_grabbed = False
 
-    def get_distance_from_baseline(self, box_info, baseline=(320, 370)):
+    @staticmethod
+    def get_distance_from_baseline(self, box_info: tuple, baseline: tuple = (320, 370)) -> tuple :
         """
         :param box_info: 우유팩 위치 정보를 tuple 형태로 받아온다. 우유팩 영역 중심 x좌표와 y좌표 순서
         :param baseline: 우유팩 위치 정보와 비교할 기준점이다.
@@ -98,7 +99,7 @@ class Robot:
         """
         (bx, by) = baseline
         (cx, cy) = box_info
-        return (bx-cx, by-cy)
+        return bx-cx, by-cy
 
     def detect_door_alphabet(self) -> bool:
         """
@@ -227,7 +228,7 @@ class Robot:
             self._motion.turn(dir='RIGHT', loop=1, grab=self.is_grab) # 팔뻗기
         time.sleep(0.3)
 
-    def find_edge(self): #find_corner_for_outroom
+    def find_edge(self) -> None: #find_corner_for_outroom
         if self.curr_room_color == 'BLACK':
             self._motion.turn(dir=self.direction, loop=1, grab=True)  # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
         else:
@@ -243,7 +244,7 @@ class Robot:
                     self._motion.turn(dir='LEFT', loop=1) # 박스 위치 감지하고 들어오는 방향 기억해서 넣어주기
         time.sleep(0.3)
 
-    def catch_box(self):
+    def catch_box(self) -> None:
         self._motion.grab()
         if self.curr_room_color == 'GREEN':
             if self.box_pos == 'RIGHT':
@@ -509,7 +510,7 @@ class Robot:
             box_info = self._image_processor.get_milk_info(color=self.alphabet_color, edge_info=edge_info)
             if box_info:
                 (cx, cy) = box_info
-                (dx, dy) = self.get_distance_from_baseline(box_info=box_info)
+                (dx, dy) = Robot.get_distance_from_baseline(box_info=box_info)
 
 
                 if dy > 10:  # 기준선 보다 위에 있다면

@@ -95,32 +95,41 @@ class Target:
 
     @staticmethod
     def non_maximum_suppression4targets(targets1:list, targets2:list, threshold:float): # -> return Target Object
-        maximum_set = None
+
         if targets1 and targets2:
+            maximum_set = None
             for target1 in targets1:
                 for target2 in targets2:
                     iou = Target.compute_iou4target(target1, target2)
                     if iou > threshold:
                         threshold = iou
                         maximum_set = (target1, target2)
+            if maximum_set:
+                t1: Target = maximum_set[0]
+                t2: Target = maximum_set[1]
+                # obtain x1, y1, x2, y2 of the intersection
+                x1 = max(t1.x, t2.x)
+                y1 = max(t1.y, t2.y)
+                x2 = min(t1.x + t1.width, t2.x + t2.width)
+                y2 = min(t1.y + t1.height, t2.y + t2.height)
 
-        if maximum_set :
-            t1: Target = maximum_set[0]
-            t2: Target = maximum_set[1]
-            # obtain x1, y1, x2, y2 of the intersection
-            x1 = max(t1.x, t2.x)
-            y1 = max(t1.y, t2.y)
-            x2 = min(t1.x + t1.width, t2.x + t2.width)
-            y2 = min(t1.y + t1.height, t2.y + t2.height)
+                # compute the width and height of the intersection
+                width = max(0, x2 - x1 + 1)
+                height = max(0, y2 - y1 + 1)
+                area = width * height
+                centroid = (center_x, center_y) = (x1 + (width // 2), y1 + (height // 2))
+                stats = (x1, y1, width, height, area)
 
-            # compute the width and height of the intersection
-            width = max(0, x2 - x1 + 1)
-            height = max(0, y2 - y1 + 1)
-            area = width * height
-            centroid = (center_x, center_y) = (x1 + (width//2), y1 + (height//2))
-            stats = (x1, y1, width, height, area)
+                return Target(color=t1.get_color(), stats=stats, centroid=centroid)
+            else:
+                return None
 
-            return Target(color=t1.get_color(), stats=stats, centroid=centroid)
+        elif targets1:
+            return max(targets1, key=lambda target: target.get_area())
+
+        elif targets2:
+            return max(targets2, key=lambda target: target.get_area())
+
         else:
             return None
 
