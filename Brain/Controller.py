@@ -350,7 +350,7 @@ class Robot:
                 self._motion.set_head(dir="DOWN", angle=10)
                 self._motion.walk(dir='FORWARD', loop=2)
                 self._motion.walk(dir='RIGHT', loop=4)
-                self._motion.turn(dir='SLIDING_LEFT', loop=3)
+                self._motion.turn(dir='SLIDING_LEFT', loop=4)
                 self.mode = "entrance_1"
                 time.sleep(0.3)
             else:
@@ -364,7 +364,7 @@ class Robot:
 
             if line_info['V']:
                 self._motion.basic_form()
-                self._motion.turn(dir='SLIDING_RIGHT', loop=3)
+                self._motion.turn(dir='SLIDING_RIGHT', loop=4)
                 self._motion.walk(dir='BACKWARD')
                 self.mode = 'entrance_2'
 
