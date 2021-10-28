@@ -182,6 +182,12 @@ class Motion:
         self.TX_data_py2(5)
         self.TX_data_py2(5)
         return self.distance
+    #문 열 때 도는 함수
+    def open_door_turn(self, dir,loop=1, sleep=0.5):
+        dir_list={'RIGHT':92, 'LEFT':93}
+        for _ in range(loop):
+            self.TX_data_py2(dir_list[dir])
+            time.sleep(sleep)
 
     # 문 여는 함수
     def open_door(self, dir='RIGHT', loop=1):
