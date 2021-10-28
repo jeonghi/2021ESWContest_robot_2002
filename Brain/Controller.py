@@ -385,15 +385,15 @@ class Robot:
                     self._motion.open_door(loop=2)
                 else:
                     if edge_info['EDGE_L'] :
-                        self._motion.turn(dir= 'RIGHT') # 은선 바꿔줭
+                        self._motion.open_door_turn(dir= 'RIGHT') # 수정 완료
                     elif edge_info['EDGE_R'] :
-                        self._motion.turn(dir= 'LEFT') # 은선 바꿔줭
+                        self._motion.open_door_turn(dir= 'LEFT') # 수정 완료
                     else:
                         print('H, L, R 모두 없음 예외 처리 필요')
             elif line_info['ALL_Y'][1] < 80:
-                self._motion.walk(dir='FORWARD') # 은선 바꿔줭 
+                self._motion.open_door_walk(dir='FORWARD') # 수정 완료
             else: # H가 너무 가깝다는 것, H 업다는 것
-                self._motion.walk(dir='BACKWARD') # 은선 바꿔줭
+                self._motion.open_door_walk(dir='BACKWARD') # 수정 완료
                 time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
                     
             
