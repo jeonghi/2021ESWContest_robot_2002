@@ -613,9 +613,11 @@ class Robot:
                         if line_info["ALL_Y"][1] < 140 : # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
+                            print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
                         else:
                             self._motion.set_head(dir='DOWN', angle=45)
                             self.return_head = '45'
+                            print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                         self.mode = 'find_edge'
                     else:
                         if self.curr_room_color == 'BLACK':
@@ -627,15 +629,16 @@ class Robot:
                         if line_info["ALL_Y"][1] < 140 : # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
+                            print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
                         else:
                             self._motion.set_head(dir='DOWN', angle=45)
                             self.return_head = '45'
+                            print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                         self.mode = 'find_edge'
 
                     else:
                         if self.curr_room_color == 'BLACK':
                             self._motion.turn(dir=self.direction, loop=1, grab=True)
-
                         else:
                             self._motion.turn(dir='RIGHT', loop=1)
             else:
@@ -643,11 +646,11 @@ class Robot:
                         if line_info["ALL_Y"][1] < 140 :  # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
-
+                            print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
                         else:
                             self._motion.set_head(dir='DOWN', angle=45)
                             self.return_head = '45'
-
+                            print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                         self.mode = 'find_edge'
                 else:
                     if self.curr_room_color == 'BLACK':
@@ -674,12 +677,14 @@ class Robot:
                 if line_info["ALL_Y"][1] >= 140 :
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
+                    print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                     time.sleep(0.5)
                         
             elif self.return_head == '45':
                 if line_info["ALL_Y"][1] >= 140 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
+                    print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                     time.sleep(0.5)
             
             if self.curr_room_color == 'BLACK':
@@ -745,7 +750,6 @@ class Robot:
             else:
                 self._motion.open_door(loop=8)
                 print("right")
-            print("haha")
 
             if self.black_room:
                 self._motion.notice_alpha(self.black_room)
