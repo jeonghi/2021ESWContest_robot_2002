@@ -155,6 +155,7 @@ class Motion:
             return False
 
 
+
     def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, IR=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
@@ -182,18 +183,22 @@ class Motion:
         self.TX_data_py2(5)
         self.TX_data_py2(5)
         return self.distance
+    # 문 여는 함수
+    def open_door(self, dir='RIGHT', loop=1):
+        n = 90 if dir == 'RIGHT' else 91
+        for _ in range(loop):
+            self.TX_data_py2(n)
+
     #문 열 때 도는 함수
     def open_door_turn(self, dir,loop=1, sleep=0.5):
         dir_list={'RIGHT':92, 'LEFT':93}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
-
-    # 문 여는 함수
-    def open_door(self, dir='RIGHT', loop=1):
-        n = 90 if dir == 'RIGHT' else 91
+    def open_door_walk(self,dir,loop=1):
+        dir_list={'FORWARD':94, 'BACKWARD':95}
         for _ in range(loop):
-            self.TX_data_py2(n)
+            self.TX_data_py2(dir_list[dir])
 
 
     def grab(self, switch=True, IR=False):
