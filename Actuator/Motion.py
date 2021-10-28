@@ -191,7 +191,7 @@ class Motion:
 
     #문 열 때 도는 함수
     def open_door_turn(self, dir,loop=1, sleep=0.5):
-        dir_list={'RIGHT':92, 'LEFT':93}
+        dir_list={'RIGHT':93, 'LEFT':92}
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
