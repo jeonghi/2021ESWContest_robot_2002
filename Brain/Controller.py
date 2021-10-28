@@ -50,13 +50,15 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        #self.mode = "walk"
-        #self.direction = "LEFT"
-        #self.color = "YELLOW"
-        #self.box_pos = None
-        #self.curr_room_color = None
-        #self.alphabet_color = None
-        #self.alphabet = None
+        self.mode = "walk"
+        self.direction = "LEFT"
+        self.color = "YELLOW"
+        self.box_pos = None
+        self.curr_room_color = None
+        self.alphabet_color = None
+        self.alphabet = None
+        self.black_room = ["A", "C"]
+        self.count = 3
         
         #self.mode = 'start_mission'
         #self.direction = 'LEFT'
@@ -211,7 +213,7 @@ class Robot:
                     if line_info["H"]:
                         self._motion.walk(dir='FORWARD', loop=1, grab=self.is_grab) # 팔뻗기
                     else:
-                        self._motion.walk(dir='FORWARD', loop=4, grab=self.is_grab)  # 팔뻗기
+                        self._motion.walk(dir='FORWARD', loop=3, grab=self.is_grab)  # 팔뻗기
                 else:
                     if line_info["V_X"][0] < 290:
                         self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
@@ -738,11 +740,14 @@ class Robot:
         # 나가기
         elif self.mode in ['finish']:
             if self.direction == 'LEFT':
-                self._motion.open_door(dir='LEFT', loop=8)
+                self._motion.open_door(dir='LEFT', loop=1)
+                print("left")
             else:
                 self._motion.open_door(loop=8)
+                print("right")
+            print("haha")
 
             if self.black_room:
-                self._motion.notice_direction(self.black_room)
+                self._motion.notice_alpha(self.black_room)
                 self.black_room.clear()
             

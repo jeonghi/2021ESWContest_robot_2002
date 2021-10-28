@@ -71,7 +71,7 @@ class ImageProcessor:
         # 그레이스케일화
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV)
+        _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -441,8 +441,8 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/door_test/W.h264")
-    #imageProcessor = ImageProcessor(video_path="")
+    #imageProcessor = ImageProcessor(video_path="src/door_test/W.h264")
+    imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
