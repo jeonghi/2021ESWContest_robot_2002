@@ -425,10 +425,8 @@ class ImageProcessor:
 
 
 
-    def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False, ROI:bool=False):
+    def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
         src = self.get_image()
-        if ROI:
-            src = src[:][0:400]
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         #print(line_info)
         #print(edge_info)

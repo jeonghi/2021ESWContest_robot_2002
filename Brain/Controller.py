@@ -36,7 +36,6 @@ class Robot:
         self.mode_history: str = self.mode
         self.box_pos: str = ""
         self.out_map: int = 0
-        self.is_ROI = False
         
         # "start"("detect_room_alphabet") , "walk", "detect_direction", "start_mission",
         #self.mode = "start"
@@ -166,8 +165,8 @@ class Robot:
 
         return False
 
-    def line_tracing(self, line_visualization=False, edge_visualization=False, ROI = False):
-        line_info, edge_info, result = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI = ROI)
+    def line_tracing(self, line_visualization=False, edge_visualization=False):
+        line_info, edge_info, result = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization)
         return line_info, edge_info
 
     def detect_direction(self) -> bool:
@@ -336,9 +335,6 @@ class Robot:
                 self.progress_of_robot.append(self.mode_history)
             self.mode_history = self.mode
             cv2.destroyAllWindows()
-
-        if self.mode == 'entrance_dont_edit_2_ROI':
-            line_info, edge_info = self.line_tracing(line_visualization=True, edge_visualization=False, ROI = True)
         
         if self.DEBUG:
             print(self.mode, self.walk_info)
