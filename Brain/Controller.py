@@ -36,6 +36,7 @@ class Robot:
         self.mode_history: str = self.mode
         self.box_pos: str = ""
         self.out_map: int = 0
+        self.is_ROI = False
         
         # "start"("detect_room_alphabet") , "walk", "detect_direction", "start_mission",
         #self.mode = "start"
@@ -165,8 +166,8 @@ class Robot:
 
         return False
 
-    def line_tracing(self, line_visualization=False, edge_visualization=False):
-        line_info, edge_info, result = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization)
+    def line_tracing(self, line_visualization=False, edge_visualization=False, ROI = False):
+        line_info, edge_info, result = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI = ROI)
         return line_info, edge_info
 
     def detect_direction(self) -> bool:
@@ -336,6 +337,9 @@ class Robot:
             self.mode_history = self.mode
             cv2.destroyAllWindows()
 
+        if self.mode == 'entrance_dont_edit_2_ROI':
+            line_info, edge_info = self.line_tracing(line_visualization=True, edge_visualization=False, ROI = True)
+        
         if self.DEBUG:
             print(self.mode, self.walk_info)
             if self.color == 'YELLOW':
@@ -374,7 +378,7 @@ class Robot:
                 
         elif self.mode in ['entrance_dont_edit_2']:
             print(line_info, edge_info)
-            if line_info['V'] and line_info['H']:
+            if line_info['V']:
                 if 80 <= line_info['H_Y'][1] < 250:  #and line_info['H_Y'][0] <175: # 상황 보고 추가
                     if line_info['H_DEGREE'] > 175:
                         self._motion.basic_form()
@@ -393,15 +397,24 @@ class Robot:
                 else: # H가 너무 가깝다는 것, H 업다는 것
                     self._motion.walk(dir='BACKWARD') # 수정 완료
                     time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
-            elif not line_info['H']:
-                #if edge_info['EDGE_L'] :
-                    #self._motion.turn(dir= 'RIGHT') # 수정 완료
-                #elif edge_info['EDGE_R'] :
-                    #self._motion.turn(dir= 'LEFT') # 수정 완료
-                #else:
-                self._motion.turn(dir= 'LEFT')
             else:
-                self._motion.open_door(loop = 1)
+                if line_info['H']:
+                    self._motion.open_door(loop = 1)
+                else:
+                    self.mode = 'entrance_dont_edit_2_ROI'
+                    
+        elif self.mode in ['entrance_dont_edit_2_ROI']:
+            if not line_info['H']:
+                if line_info['H_DEGREE'] > 175:
+                    self.mode = 'entrance_dont_edit_2'
+                else:
+                    if edge_info['EDGE_L'] :
+                        self._motion.turn(dir= 'RIGHT') # 수정 완료
+                    elif edge_info['EDGE_R'] :
+                        self._motion.turn(dir= 'LEFT') # 수정 완료
+                    else:
+                        self._motion.turn(dir= 'LEFT')
+                    
                 
         elif self.mode in ['entrance_dont_edit_3']:
             if line_info['H']:
