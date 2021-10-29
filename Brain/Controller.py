@@ -688,7 +688,7 @@ class Robot:
 
             else: # yellow edge 감지 X
                 if line_info['DEGREE'] == 0 :
-                    print('yellow edge 감지 X ', line_info['DEGREE'], '가 0이면 노란 선이 존재하지 않음 return_head 값 높여주기')
+                    print('yellow edge 감지 X --만약 edge 중앙인데', 'line_info[DEGREE]:',line_info[DEGREE], '가 0이면 노란 선이 존재하지 않음 return_head 값 높여주기')
                 else:
                     print('yellow edge 감지 X ', edge_info["EDGE_POS"][0], 'edge 중앙 값 다시 설정 필요함')
                 self.mode = 'find_edge'# --> find_edge
