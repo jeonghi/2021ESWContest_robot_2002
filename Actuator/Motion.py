@@ -144,6 +144,9 @@ class Motion:
         return False
 
     def walk(self, dir, loop=1, grab=False, IR=False):
+        """
+        dir_list = ['FORWARD', 'BACKWARD', 'LEFT', 'RIGHT', 'LEFT2', 'RIGHT2']
+        """
         dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59, 'LEFT2':96, 'RIGHT2':97}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
@@ -167,6 +170,9 @@ class Motion:
             dir_list[dir] += 11# if grab is true, change walk motion with grab
             if sliding:
                 dir_list[dir]+=9
+        else:
+            if sliding:
+                dir_list[dir] -= 2
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
