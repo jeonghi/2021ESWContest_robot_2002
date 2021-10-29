@@ -1639,8 +1639,6 @@ GOSUB_RX_EXIT2:
         보행순서 = 1
         MOVE G6A,95,  78, 147,  93, 101
         MOVE G6D,101,  76, 149,  93, 98
-        MOVE G6B,100
-        MOVE G6C,100
         WAIT
 
         GOTO 문열기걷기_1
@@ -1648,8 +1646,6 @@ GOSUB_RX_EXIT2:
         보행순서 = 0
         MOVE G6D,95,  76, 149,  93, 101
         MOVE G6A,101,  78, 147,  93, 98
-        MOVE G6B,100
-        MOVE G6C,100
         WAIT
 
         GOTO 문열기걷기_4
@@ -1661,8 +1657,6 @@ GOSUB_RX_EXIT2:
 문열기걷기_1:
     MOVE G6A,95,  92, 125, 100, 104
     MOVE G6D,104,  77, 149,  93,  102
-    MOVE G6B, 85
-    MOVE G6C,115
     WAIT
 
 
@@ -1685,19 +1679,19 @@ GOSUB_RX_EXIT2:
     ERX 4800,A, 문열기걷기_4
     IF A <> A_old THEN
 문열기걷기_2_stop:
-        MOVE G6D,95,  90, 127, 95, 104
-        MOVE G6A,104,  78, 145,  91,  102
-        MOVE G6C, 100
-        MOVE G6B,100
-        WAIT
-        HIGHSPEED SETOFF
-        SPEED 15
-        'GOSUB 안정화자세
-        ' SPEED 5
-        '  GOSUB 기본자세2
+    MOVE G6D,95,  90, 127, 95, 104
+    MOVE G6A,104,  78, 145,  91,  102
+    WAIT
+    HIGHSPEED SETOFF
+    SPEED 15
+    'GOSUB 안정화자세
+    ' SPEED 5
+    '  GOSUB 기본자세2
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 145,  93, 100, 100
 
-        'DELAY 400
-        GOTO RX_EXIT
+    'DELAY 400
+    GOTO RX_EXIT
     ENDIF
 
     '*********************************
@@ -1705,8 +1699,6 @@ GOSUB_RX_EXIT2:
 문열기걷기_4:
     MOVE G6D,95,  95, 122, 100, 104
     MOVE G6A,104,  79, 147,  93,  102
-    MOVE G6C, 85
-    MOVE G6B,115
     WAIT
 
 
@@ -1730,14 +1722,14 @@ GOSUB_RX_EXIT2:
 문열기걷기_5_stop:
         MOVE G6A,95,  92, 125, 95, 104
         MOVE G6D,104,  78, 145,  91,  102
-        MOVE G6B, 100
-        MOVE G6C,100
         WAIT
         HIGHSPEED SETOFF
         SPEED 15
         '   GOSUB 안정화자세
         '  SPEED 5
         ' GOSUB 기본자세2
+        MOVE G6A,100,  76, 145,  93, 100, 100
+    	MOVE G6D,100,  76, 145,  93, 100, 100
 
         'DELAY 400
         GOTO RX_EXIT
@@ -1762,8 +1754,6 @@ GOSUB_RX_EXIT2:
         보행순서 = 1
         MOVE G6A,95,  76, 145,  93, 101
         MOVE G6D,101,  76, 145,  93, 98
-        MOVE G6B, 190, 10, 50
-        MOVE G6C, 190, 10, 50
         WAIT
 
         GOTO 문열기걷기후진_1
@@ -1771,8 +1761,6 @@ GOSUB_RX_EXIT2:
         보행순서 = 0
         MOVE G6D,95,  76, 145,  93, 101
         MOVE G6A,101,  76, 145,  93, 98
-        MOVE G6B, 190, 10, 50
-        MOVE G6C, 190, 10, 50
         WAIT
 
         GOTO 문열기걷기후진_4
@@ -1784,8 +1772,6 @@ GOSUB_RX_EXIT2:
 문열기걷기후진_1:
     MOVE G6D,104,  76, 147,  93,  102
     MOVE G6A,95,  95, 120, 95, 104
-    MOVE G6B, 190, 10, 50
-    MOVE G6C, 190, 10, 50
     WAIT
 
 
@@ -1807,8 +1793,6 @@ GOSUB_RX_EXIT2:
 문열기걷기후진_3_stop:
         MOVE G6D,95,  85, 130, 100, 104
         MOVE G6A,104,  77, 146,  93,  102
-        MOVE G6B, 190, 10, 50
-        MOVE G6C, 190, 10, 50
         WAIT
 
         'SPEED 15
@@ -1816,6 +1800,8 @@ GOSUB_RX_EXIT2:
         '       HIGHSPEED SETOFF
         '      SPEED 5
         '     GOSUB 기본자세2
+        MOVE G6A,100,  76, 145,  93, 100, 100
+    	MOVE G6D,100,  76, 145,  93, 100, 100
 
         '   DELAY 400
         GOTO RX_EXIT
@@ -1825,8 +1811,6 @@ GOSUB_RX_EXIT2:
 문열기걷기후진_4:
     MOVE G6A,104,  76, 147,  93,  102
     MOVE G6D,95,  95, 120, 95, 104
-    MOVE G6B, 190, 10, 50
-    MOVE G6C, 190, 10, 50
     WAIT
 
 
@@ -1848,8 +1832,6 @@ GOSUB_RX_EXIT2:
 문열기걷기후진_6_stop:
         MOVE G6A,95,  85, 130, 100, 104
         MOVE G6D,104,  77, 146,  93,  102
-        MOVE G6B, 190, 10, 50
-        MOVE G6C, 190, 10, 50
         WAIT
 
         'SPEED 15
@@ -1857,6 +1839,8 @@ GOSUB_RX_EXIT2:
         '       HIGHSPEED SETOFF
         '      SPEED 5
         '     GOSUB 기본자세2
+        MOVE G6A,100,  76, 145,  93, 100, 100
+    	MOVE G6D,100,  76, 145,  93, 100, 100
 
         '  DELAY 400
         GOTO RX_EXIT
@@ -1864,8 +1848,12 @@ GOSUB_RX_EXIT2:
 
     GOTO 문열기걷기후진_1
 
+문열기왼쪽3:
+    MOTORMODE G6A,3,3,3,3,2
+    MOTORMODE G6D,3,3,3,3,2
+
 문열기왼쪽3_LOOP:
-    '	SPEED 5
+    'SPEED 5
 
     'MOVE G6B,130,  90, 10
     'MOVE G6C,100, 190 , 10	
@@ -1924,9 +1912,15 @@ GOSUB_RX_EXIT2:
 
     SPEED 12
     ' GOSUB 기본자세2
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 145,  93, 100, 100
 
 
     GOTO RX_EXIT
+
+문열기오른쪽3:
+    MOTORMODE G6A,3,3,3,3,2
+    MOTORMODE G6D,3,3,3,3,2
 
 문열기오른쪽3_LOOP:
     '   MOVE G6C,130,  90, 10
@@ -1983,6 +1977,8 @@ GOSUB_RX_EXIT2:
     ENDIF
     SPEED 12
     '  GOSUB 기본자세2
+    MOVE G6A,100,  76, 145,  93, 100, 100
+    MOVE G6D,100,  76, 145,  93, 100, 100
 
     GOTO RX_EXIT
 
@@ -4276,7 +4272,8 @@ KEY18: ' E
     '***************
 KEY19: 'P2
     ETX 4800, 19
-    GOSUB 양팔벌리기
+    보행횟수= 1
+    GOTO 문열기걷기후진
     GOTO RX_EXIT
     '***************
 KEY20: 'B
@@ -4623,14 +4620,14 @@ KEY91:
     GOTO RX_EXIT
 KEY92:
     ETX  4800,92
-    GOTO 문열기왼쪽3_LOOP
+    GOTO 문열기왼쪽3
 
 
     GOTO RX_EXIT
     '***************
 KEY93:
     ETX  4800,93
-    GOTO 문열기오른쪽3_LOOP
+    GOTO 문열기오른쪽3
 
 
     GOTO RX_EXIT
