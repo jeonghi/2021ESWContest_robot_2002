@@ -144,10 +144,12 @@ class Motion:
         return False
 
     def walk(self, dir, loop=1, grab=False, IR=False):
-        dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59}
+        dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59, 'LEFT2':96, 'RIGHT2':97}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
+            if dir in ['LEFT', 'RIGHT']:
+                time.sleep(0.1)
 
         if IR:
             if self.get_IR() > 65:
