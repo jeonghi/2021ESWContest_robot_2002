@@ -363,112 +363,47 @@ class Robot:
                 self._motion.walk(dir='FORWARD', loop=2)
                 self._motion.walk(dir='RIGHT', loop=4)
                 self._motion.turn(dir='SLIDING_LEFT', loop=4)
-                self.mode = "entrance_dont_edit"
+                self.mode = "start_line"
+                #self.mode = "entrance_dont_edit"
                 #self.mode = 'entrance_do_edit'
                 time.sleep(0.3)
             else:
                 self.curr_head4door_alphabet.rotate(-1)
                 
-        elif self.mode in ['entrance_dont_edit']:
+        elif self.mode in ['start_line']:
+            print(line_info, edge_info)
             if line_info['H']:
                 self._motion.open_door(loop = 1)
-                self.mode = "entrance_dont_edit_2"
+                self.mode = "entrance"
             else:
                 self._motion.turn(dir='LEFT')
                 
-        elif self.mode in ['entrance_dont_edit_2']:
+        elif self.mode in ['entrance']:
             print(line_info, edge_info)
-            if line_info['V']:
-                if 80 <= line_info['H_Y'][1] < 250:  #and line_info['H_Y'][0] <175: # 상황 보고 추가
-                    if line_info['H_DEGREE'] > 175:
-                        self._motion.basic_form()
-                        #self._motion.walk(dir='LEFT', loop=1)
-                        self._motion.turn(dir='SLIDING_RIGHT', loop=4)
-                        self.mode = 'entrance_dont_edit_3'
-                    else:
-                        if edge_info['EDGE_L'] :
-                            self._motion.turn(dir= 'RIGHT') # 수정 완료
-                        elif edge_info['EDGE_R'] :
-                            self._motion.turn(dir= 'LEFT') # 수정 완료
-                        else:
-                            self._motion.turn(dir= 'LEFT')
-                elif line_info['H_Y'][1] < 80:
-                    self._motion.walk(dir='FORWARD') # 수정 완료
-                else: # H가 너무 가깝다는 것, H 업다는 것
-                    self._motion.walk(dir='BACKWARD') # 수정 완료
-                    time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
-            else:
-                if line_info['H']:
+            if not line_info['V']:
+                if (edge_info['L_Y'][0]< 5 and edge_info['L_Y'][0] > 240) and (edge_info['R_Y'][0]< 5 and edge_info['R_Y'][0] > 240):
+                    self._motion.basic_form()
+                    self._motion.turn(dir='SLIDING_RIGHT', loop=2)
+                    self.mode = 'direction_line'
+                else:
                     self._motion.open_door(loop = 1)
-                else:
-                    self.mode = 'entrance_dont_edit_2_ROI'
-                    
-        elif self.mode in ['entrance_dont_edit_2_ROI']:
-            if not line_info['H']:
-                if line_info['H_DEGREE'] > 175:
-                    self.mode = 'entrance_dont_edit_2'
-                else:
-                    if edge_info['EDGE_L'] :
-                        self._motion.turn(dir= 'RIGHT') # 수정 완료
-                    elif edge_info['EDGE_R'] :
-                        self._motion.turn(dir= 'LEFT') # 수정 완료
-                    else:
-                        self._motion.turn(dir= 'LEFT')
-                    
-                
-        elif self.mode in ['entrance_dont_edit_3']:
-            if line_info['H']:
-                #self._motion.walk(dir='LEFT', wide=True, loop=1)
-                self._motion.set_head(dir='DOWN', angle=90)
-                time.sleep(1.2)
-                self.mode = 'detect_direction'
             else:
-                self._motion.turn(dir='RIGHT')
-                
-#------------------------------------------------------------------------------------------------------------------------------------
-
-        elif self.mode in ['entrance_do_edit']:
-            if line_info['H']:
-                self._motion.open_door(loop = 1)
-                self.mode = "entrance_do_edit_2"
-            else:
-                self._motion.turn(dir='LEFT')
-                
-        elif self.mode in ['entrance_do_edit_2']:
-            print(line_info, edge_info)
-            if line_info['V']:
-                self._motion.open_door(loop=1)
                 self._motion.basic_form()
-                #self._motion.walk(dir='LEFT', loop=1)
-                self._motion.turn(dir='SLIDING_RIGHT', loop=4)
-                self.mode = 'entrance_do_edit_3'
-
-            if (80 <= line_info['ALL_Y'][1] < 250) or (line_info['ALL_Y'][1]==0):  #and line_info['H_Y'][0] <175: # 상황 보고 추가
-                if line_info['H_DEGREE'] > 173:
-                    self._motion.open_door(loop=1)
-                else:
-                    if edge_info['EDGE_L'] :
-                        self._motion.open_door_turn(dir= 'RIGHT') # 수정 완료
-                    elif edge_info['EDGE_R'] :
-                        self._motion.open_door_turn(dir= 'LEFT') # 수정 완료
-                    else:
-                        print('H, L, R 모두 없음 예외 처리 필요')
-            elif line_info['ALL_Y'][1] < 80:
-                self._motion.open_door_walk(dir='FORWARD') # 수정 완료
-            else: # H가 너무 가깝다는 것, H 업다는 것
-                self._motion.open_door_walk(dir='BACKWARD') # 수정 완료
-                time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
-
-        elif self.mode in ['entrance_do_edit_3']:
+                self._motion.turn(dir='SLIDING_RIGHT', loop=3)
+                self.mode = 'direction_line'
+                
+        elif self.mode in ['direction_line']:
+            print(line_info, edge_info)
             if line_info['H']:
-                self._motion.walk(dir='LEFT', wide=True, loop=2)
-                self._motion.set_head(dir='DOWN', angle=90)
-                time.sleep(1)
-                self.mode = 'detect_direction'
+                if line_info['H_Y'][1] < 130:
+                    self.walk(line_info, True)
+                else:
+                    self._motion.set_head(dir='DOWN', angle=90)
+                    time.sleep(1.2)
+                    self.mode = 'detect_direction'
             else:
                 self._motion.turn(dir='RIGHT')
-
-            
+                
         # 3) 화살표 방향 인식
         elif self.mode in ['detect_direction']:
             

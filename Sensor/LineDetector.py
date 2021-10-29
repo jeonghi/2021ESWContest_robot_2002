@@ -439,8 +439,8 @@ if __name__ == "__main__":
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
 
-        line_info, edge_info, result = line_detector.get_all_lines(src, color='YELLOW', line_visualization=False,
-                                                                   edge_visualization=True)
+        line_info, edge_info, result = line_detector.get_all_lines(src, color='YELLOW', line_visualization=True,
+                                                                   edge_visualization=False)
         print(line_info)
         print(edge_info)
         cv2.imshow('result', result)
