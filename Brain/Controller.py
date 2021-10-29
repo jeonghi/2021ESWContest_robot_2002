@@ -19,19 +19,19 @@ class Robot:
         # 멤버 변수 셋팅
         self.mode: str = mode
         self.color: str = "YELLOW"
-        self.direction: str = 'LEFT'
+        self.direction: str = ''
         self.alphabet: str = None
         self.alphabet_color: str = None
         self.curr_room_color: str = None
         self.cube_grabbed: bool = False
-        self.count: int = 3
+        self.count: int = 0
         self.progress_of_robot: list = [None]
         self.is_grab: bool = False
         self.walk_info: str = None
         self.curr_head4box: deque = deque([75, 60, 35])
         self.curr_head4room_alphabet: deque = deque([85, 80])
         self.curr_head4door_alphabet: deque = deque([80, 75])
-        self.black_room: list = ["A", "C"]
+        self.black_room: list = []
         self.return_head: str = ""  # return 할 때 고개 각도 바꿀 지 고민 중 10/08
         self.mode_history: str = self.mode
         self.box_pos: str = ""
@@ -376,7 +376,7 @@ class Robot:
             print(line_info, edge_info)
             if line_info['V'] and line_info['H']:
                 if 80 <= line_info['H_Y'][1] < 250:  #and line_info['H_Y'][0] <175: # 상황 보고 추가
-                    if line_info['H_DEGREE'] > 173:
+                    if line_info['H_DEGREE'] > 175:
                         self._motion.basic_form()
                         #self._motion.walk(dir='LEFT', loop=1)
                         self._motion.turn(dir='SLIDING_RIGHT', loop=4)
@@ -387,19 +387,19 @@ class Robot:
                         elif edge_info['EDGE_R'] :
                             self._motion.turn(dir= 'LEFT') # 수정 완료
                         else:
-                            print('H, L, R 모두 없음 예외 처리 필요')
+                            self._motion.turn(dir= 'LEFT')
                 elif line_info['H_Y'][1] < 80:
                     self._motion.walk(dir='FORWARD') # 수정 완료
                 else: # H가 너무 가깝다는 것, H 업다는 것
                     self._motion.walk(dir='BACKWARD') # 수정 완료
                     time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
-            elif not line_info['V'] and not line_info['H']:
-                if edge_info['EDGE_L'] :
-                    self._motion.turn(dir= 'RIGHT') # 수정 완료
-                elif edge_info['EDGE_R'] :
-                    self._motion.turn(dir= 'LEFT') # 수정 완료
-                else:
-                    print('H, L, R 모두 없음 예외 처리 필요')
+            elif not line_info['H']:
+                #if edge_info['EDGE_L'] :
+                    #self._motion.turn(dir= 'RIGHT') # 수정 완료
+                #elif edge_info['EDGE_R'] :
+                    #self._motion.turn(dir= 'LEFT') # 수정 완료
+                #else:
+                self._motion.turn(dir= 'LEFT')
             else:
                 self._motion.open_door(loop = 1)
                 
@@ -524,7 +524,7 @@ class Robot:
                     if np.mean(line_info["H_X"]) < 320:
                         self.walk_info = '┐'
                     else:
-                            self.walk_info = '┌'
+                        self.walk_info = '┌'
                 else:
                     if line_info["V"]:
                         self.walk_info = '│'  # go
@@ -535,13 +535,17 @@ class Robot:
             time.sleep(0.3)
 
         elif self.mode in ['start_mission']:
-            self._motion.set_head(dir=self.direction, angle=45)
-            self._motion.set_head(dir="DOWN", angle=45)
-            time.sleep(0.5)
-            if self.recognize_area_color():
-                self.mode = 'detect_room_alphabet'
-            self._motion.set_head(dir="LEFTRIGHT_CENTER")
-            time.sleep(0.2)
+            if line_info['H_Y'][1] < 50:
+                self.walk(line_info, True)
+            else:
+                self._motion.walk(dir='FORWARD', loop = 1)
+                self._motion.set_head(dir=self.direction, angle=45)
+                self._motion.set_head(dir="DOWN", angle=45)
+                time.sleep(0.5)
+                if self.recognize_area_color():
+                    self.mode = 'detect_room_alphabet'
+                self._motion.set_head(dir="LEFTRIGHT_CENTER")
+                time.sleep(0.2)
 
         elif self.mode in ['detect_room_alphabet']:
             self._motion.set_head("DOWN", angle=self.curr_head4room_alphabet[0])
@@ -631,9 +635,12 @@ class Robot:
         elif self.mode in ['box_into_area']:
             self.box_into_area(line_info, edge_info)
             if self.box_pos == 'LEFT':
-               self._motion.turn(dir='RIGHT', sliding=True, loop=4)
+                self._motion.turn(dir='RIGHT', sliding=True, loop=4)
             elif self.box_pos == 'RIGHT':
-               self._motion.turn(dir='LEFT', sliding=True, loop=4)
+                self._motion.turn(dir='LEFT', sliding=True, loop=4)
+                
+            if self.curr_room_color == 'BLACK':
+                self._motion.turn(dir='LEFT', sliding=True, loop=4)
 
             self.mode = 'end_mission'
             self.color = 'YELLOW'
@@ -769,8 +776,11 @@ class Robot:
         # 나가기
         elif self.mode in ['is_finish_line']:
             if self.count < 3:
-                self.mode = 'walk'
-                self.walk_info = '│'
+                if line_info["H"]:
+                    self._motion.walk(dir='FORWARD')
+                else:
+                    self.mode = 'walk'
+                    self.walk_info = '│'
             else:
                 #self._motion.walk(dir='FORWARD')
                 self.mode = 'finish'
@@ -778,10 +788,10 @@ class Robot:
         # 나가기
         elif self.mode in ['finish']:
             if self.direction == 'LEFT':
-                self._motion.open_door(dir='LEFT', loop=13)
+                self._motion.open_door(dir='LEFT', loop=15)
                 print("left")
             else:
-                self._motion.open_door(loop=13)
+                self._motion.open_door(loop=15)
                 print("right")
             self.mode = 'finish_notice'
                 
