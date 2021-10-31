@@ -41,13 +41,11 @@ class Motion:
             time.sleep(self.sleep_time)
         return decorated
 
-
     def TX_data_py2(self, one_byte):  # one_byte= 0~255
         self.lock.acquire()
 
         self.serial_port.write(serial.to_bytes([one_byte]))  # python3
         time.sleep(0.02)
-
 
     def RX_data(self):
         if self.serial_port.inWaiting() > 0:
@@ -56,7 +54,6 @@ class Motion:
             return RX
         else:
             return 0
-
 
     def Receiving(self, ser):
         self.receiving_exit = 1
@@ -86,13 +83,11 @@ class Motion:
         dir_list = {'E':33, 'W':34, 'S':35, 'N':36}
         self.TX_data_py2(dir_list[dir])
 
-
     def notice_area(self,area):
         """area='GREEN' or area='BLACK'
         """
         area_list = {'GREEN':67,'BLACK':68}
         self.TX_data_py2(area_list[area])
-
 
     def notice_alpha(self, ls):
         alpha_list = {'A':85, 'B':86, 'C':87, 'D':88}
@@ -100,7 +95,6 @@ class Motion:
             if i in alpha_list:
                 self.TX_data_py2(alpha_list[i])
                 time.sleep(2)
-
 
     def set_head(self, dir, angle=0):
         """parameter 설명
@@ -137,7 +131,6 @@ class Motion:
             self.TX_data_py2(dir_list[dir][angle])
         time.sleep(0.3)
 
-
     def is_grabbed(self) -> bool :
         if self.get_IR() > 65:
             return True
@@ -159,8 +152,6 @@ class Motion:
             if self.get_IR() > 65:
                 return True
             return False
-
-
 
     def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, IR=False):
         """parameter 설명
@@ -209,7 +200,6 @@ class Motion:
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
 
-
     def grab(self, switch=True, IR=False):
         """if switch=True then grab ON, else then grab OFF
         """
@@ -221,18 +211,15 @@ class Motion:
                 return True
             return False
 
-
     def get_head(self):
         """Return vertical, horizontal head angle
         """
         return (self.head_angle1, self.head_angle2)
 
-
     def basic_form(self):
         self.TX_data_py2(46)
         self.TX_data_py2(55)
         self.TX_data_py2(10)
-
 
     def move_arm(self, dir='HIGH'):
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
@@ -245,9 +232,9 @@ class Motion:
         self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
     
 
+# **************************************************
+# **************************************************
 
-# **************************************************
-# **************************************************
 if __name__ == '__main__':
     motion = Motion()
     #motion.notice_alpha(['B', 'A', 'D', 'C'])
