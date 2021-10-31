@@ -251,4 +251,6 @@ class Motion:
 if __name__ == '__main__':
     motion = Motion()
     #motion.notice_alpha(['B', 'A', 'D', 'C'])
-    motion.open_door()
+    motion.open_door(dir='LEFT')
+    motion.open_door_walk(dir='FORWARD',loop=6)
+#motion.turn(dir='LEFT', loop=10, sleep=0.5, grab=False)

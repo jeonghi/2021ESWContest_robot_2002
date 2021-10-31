@@ -40,7 +40,9 @@ class ColorPreProcessor():
     def get_alphabet_mask(src: np.array) -> np.array:
         red_mask = ColorPreProcessor.get_color_binary_image(src=src, color=COLORS["RED_ABCD"]["SCHOOL"])
         blue_mask = ColorPreProcessor.get_color_binary_image(src=src, color=COLORS["BLUE_ABCD"]["SCHOOL"])
-        mask = cv2.bitwise_and(red_mask, blue_mask)
+        mask = cv2.bitwise_or(red_mask, blue_mask)
+        #cv2.imshow("mask", mask)
+        #cv2.waitKey(1)
         return mask
 
     @staticmethod
@@ -122,7 +124,8 @@ class ColorPreProcessor():
 
 
 if __name__ == "__main__":
-    from Sensor.ImageProcessor import ImageProcessor
+    from ImageProcessor import ImageProcessor
     imageProcessor = ImageProcessor(video_path="src/old/green_area.mp4")
     while True:
-        src = imageProcessor.get_image(visualization=True)
+        src = imageProcessor.get_image()
+        ColorChecker.get_alphabet_mask(src=src)

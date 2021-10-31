@@ -51,13 +51,13 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        #self.mode = "walk"
-        #self.direction = "LEFT"
-        #self.color = "YELLOW"
-        #self.box_pos = None
-        #self.curr_room_color = None
-        #self.alphabet_color = None
-        #self.alphabet = None
+        self.mode = "walk"
+        self.direction = "LEFT"
+        self.color = "YELLOW"
+        self.box_pos = None
+        self.curr_room_color = None
+        self.alphabet_color = None
+        self.alphabet = None
         #self.black_room = ["A", "C"]
         #self.count = 3
         
