@@ -991,8 +991,8 @@ GOSUB_RX_EXIT2:
         보행순서 = 1
         MOVE G6A,95,  76, 145,  93, 101
         MOVE G6D,101,  76, 145,  93, 98
-        MOVE G6B,100
-        MOVE G6C,100
+        MOVE G6B,101
+        MOVE G6C,101
         WAIT
 
         GOTO 후진종종걸음_1
@@ -1000,8 +1000,8 @@ GOSUB_RX_EXIT2:
         보행순서 = 0
         MOVE G6D,95,  76, 145,  93, 101
         MOVE G6A,101,  76, 145,  93, 98
-        MOVE G6B,100
-        MOVE G6C,100
+        MOVE G6B,101
+        MOVE G6C,101
         WAIT
 
         GOTO 후진종종걸음_4
@@ -1013,8 +1013,8 @@ GOSUB_RX_EXIT2:
 후진종종걸음_1:
     MOVE G6D,104,  76, 147,  93,  102
     MOVE G6A,95,  95, 120, 95, 104
-    MOVE G6B,115
-    MOVE G6C,85
+    MOVE G6B,116
+    MOVE G6C,86
     WAIT
 
 
@@ -1036,8 +1036,8 @@ GOSUB_RX_EXIT2:
 후진종종걸음_3_stop:
         MOVE G6D,95,  85, 130, 100, 104
         MOVE G6A,104,  77, 146,  93,  102
-        MOVE G6C, 100
-        MOVE G6B,100
+        MOVE G6C, 101
+        MOVE G6B,101
         WAIT
 
         'SPEED 15
@@ -1054,8 +1054,8 @@ GOSUB_RX_EXIT2:
 후진종종걸음_4:
     MOVE G6A,104,  76, 147,  93,  102
     MOVE G6D,95,  95, 120, 95, 104
-    MOVE G6C,115
-    MOVE G6B,85
+    MOVE G6C,116
+    MOVE G6B,86
     WAIT
 
 
@@ -1077,8 +1077,8 @@ GOSUB_RX_EXIT2:
 후진종종걸음_6_stop:
         MOVE G6A,95,  85, 130, 100, 104
         MOVE G6D,104,  77, 146,  93,  102
-        MOVE G6B, 100
-        MOVE G6C,100
+        MOVE G6B, 101
+        MOVE G6C,101
         WAIT
 
         'SPEED 15
@@ -1616,6 +1616,7 @@ GOSUB_RX_EXIT2:
     DELAY 200
 
     RETURN
+ 
 
 문열기동작2:
     SPEED 5
