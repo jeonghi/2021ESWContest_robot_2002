@@ -59,7 +59,7 @@ class Robot:
         self.alphabet_color = None
         self.alphabet = None
         #self.black_room = ["A", "C"]
-        #self.count = 3
+        self.count = 2
         
         #self.mode = 'start_mission'
         #self.direction = 'LEFT'
@@ -111,6 +111,7 @@ class Robot:
         """
         self.alphabet = self._image_processor.get_door_alphabet()
         if self.alphabet:
+            print("alphabet:", self.alphabet)
             self._motion.notice_direction(dir=self.alphabet)
             return True
         return False
@@ -120,15 +121,15 @@ class Robot:
             center_x = 320
             (cor_x, cor_y) = (edge_info["EDGE_DOWN_X"], edge_info["EDGE_DOWN_Y"])
             (box_x, box_y) = box_info
-            dx = 100
+            dx = 30
             if cor_x - dx <= box_x <= cor_x + dx:
-                if box_y <= cor_y:
-                    self.box_pos = "MIDDLE"
-                else:
-                    if box_x <= cor_x :
-                        self.box_pos = "RIGHT"
-                    else:
-                        self.box_pos = "LEFT"
+                
+                self.box_pos = "MIDDLE"
+                
+                #if box_x <= cor_x :
+                #    self.box_pos = "LEFT"
+                #else:
+                #    self.box_pos = "RIGHT"
             elif box_x < cor_x - dx :
                 self.box_pos = "LEFT"
             else:
@@ -216,12 +217,12 @@ class Robot:
                     if line_info["H"]:
                         self._motion.walk(dir='FORWARD', loop=1, grab=self.is_grab) # 팔뻗기
                     else:
-                        self._motion.walk(dir='FORWARD', loop=3, grab=self.is_grab)  # 팔뻗기
+                        self._motion.walk(dir='FORWARD', loop=2, grab=self.is_grab)  # 팔뻗기
                 else:
                     if line_info["V_X"][0] < 290:
-                        self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
+                        self._motion.walk(dir='LEFT', loop=1, wide=True, grab=self.is_grab) # 팔뻗기
                     elif line_info["V_X"][0] > 350:
-                        self._motion.walk(dir='RIGHT', loop=1, grab=self.is_grab) # 팔뻗기
+                        self._motion.walk(dir='RIGHT', loop=1, wide=True, grab=self.is_grab) # 팔뻗기
 
         elif 0 < line_info["DEGREE"] <= 85:
             print('MODIFY angle --LEFT')
@@ -303,13 +304,8 @@ class Robot:
             else:
                 self._motion.walk(dir='LEFT', loop=1)
         else:
-            if edge_info["EDGE_DOWN_X"] < 300:
-                self._motion.walk(dir='RIGHT', loop=1, grab=True)
-            elif edge_info["EDGE_DOWN_X"] > 340:
-                self._motion.walk(dir='LEFT', loop=1, grab=True)
-            else:
-                self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
-                self.mode = 'move_into_area'
+            self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
+            self.mode = 'move_into_area'
         time.sleep(0.5)
                 
     def move_into_area(self, line_info, edge_info):
@@ -539,9 +535,10 @@ class Robot:
             box_info = self._image_processor.get_milk_info(color=self.alphabet_color, edge_info = edge_info)
             if box_info:
                 self.mode = "track_box"
-                print(f"BOX POS -> {self.box_pos}")
                 if self.curr_room_color == "GREEN":
                     self.update_box_pos(edge_info=edge_info, box_info=box_info)
+                    print(f"BOX POS -> {self.box_pos}")
+                
             else:
                 if self.curr_head4box[0] == 35:
                     if self.curr_room_color == "GREEN":
@@ -710,9 +707,9 @@ class Robot:
 
             else: # yellow edge 감지 X
                 if line_info['DEGREE'] == 0 :
-                    print('yellow edge 감지 X --만약 edge 중앙인데', 'line_info[DEGREE]:',line_info[DEGREE], '가 0이면 노란 선이 존재하지 않음 return_head 값 높여주기')
+                    print('yellow edge 감지 X --만약 edge 중앙인데', 'line_info[DEGREE]:', '가 0이면 노란 선이 존재하지 않음 return_head 값 높여주기')
                 else:
-                    print('yellow edge 감지 X ', edge_info["EDGE_POS"][0], 'edge 중앙 값 다시 설정 필요함')
+                    print('yellow edge 감지 X ','edge 중앙 값 다시 설정 필요함')
                 self.mode = 'find_edge'# --> find_edge
                 self.find_edge()
 
