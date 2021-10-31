@@ -172,62 +172,13 @@ class ImageProcessor:
         
         return direction
 
-
-    def get_area_color(self, threshold: float = 0.15, visualization: bool = False):
-        src = self.get_image()
-        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
-        h, l, s = cv2.split(hls)
-        h = h.astype(l.dtype)
-
-        area_color = None
-        # red mask
-        red_mask = self.color_preprocessor.get_red_mask(hue=h)
-
-        # blue mask
-        blue_mask = self.color_preprocessor.get_blue_mask(hue=h)
-
-        # green mask
-        green_mask = self.color_preprocessor.get_green_mask(hue=h)
-
-        # saturation thresholding
-        _, s_mask = cv2.threshold(s, 100, 255, cv2.THRESH_BINARY)
-
-        # mask denoise
-        mask = cv2.bitwise_or(red_mask, blue_mask)
-        mask = cv2.bitwise_not(mask)
-        mask = cv2.bitwise_and(green_mask, mask)
-
-
-        mask = cv2.bitwise_and(green_mask, s_mask)
-        sz = mask.shape[:2][0] * mask.shape[:2][1]
-        rate = np.count_nonzero(mask) / sz
-        rate = round(rate, 2)
-        print(rate)
-
-        area_color = "GREEN" if rate > threshold else "BLACK"
-
-        if visualization:
-            cv2.imshow("green", mask)
-            cv2.waitKey(1)
-
-        return area_color
-
-
     def get_alphabet_info4room(self, edge_info={}, method="CONTOUR", visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
         alphabet_info = None
         candidates = []
-        blur = cv2.GaussianBlur(src, (5, 5), 0)
-        hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
-        h, l, s = cv2.split(hls)
-        #_, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        red_mask = self.color_preprocessor.get_red_mask(h)
-        blue_mask = self.color_preprocessor.get_blue_mask(h)
-        color_mask = cv2.bitwise_or(blue_mask, red_mask)
-        mask = cv2.bitwise_and(mask, color_mask)
+        mask = self.color_preprocessor.get_alphabet_mask(src=src)
 
         if method == "LABEL":
             _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
@@ -440,16 +391,16 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    #imageProcessor = ImageProcessor(video_path="src/door_test/W.h264")
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
-        alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        print(alphabet)
+        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
+        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        #print(alphabet)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #print(result)
