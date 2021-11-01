@@ -366,7 +366,7 @@ class LineDetector:
                     edge_info["EDGE_POS"] = None
 
             if color == 'GREEN':
-                line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'H': False, 'H_X': [0, 0], 'H_Y': [0, 0]}
+                line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'H': False, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
                 edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
                 if len(edge_lines) != 0:
@@ -389,6 +389,13 @@ class LineDetector:
                     #print(compact_horizontal_lines.shape)
                     size = int(compact_horizontal_lines.shape[0] * compact_horizontal_lines.shape[2] / 2)
                     compact_horizontal_line = self.get_fitline(src, compact_horizontal_lines, size, 'compact_horizontal')
+                    
+                    size_ = int(horizontal_lines.shape[0] * horizontal_lines.shape[2] / 2)
+                    horizontal_D_fit_line = self.get_fitline(src, horizontal_lines, size_, 'horizontal_D')
+                    
+                    H_degree = (np.arctan2(horizontal_D_fit_line[1] - horizontal_D_fit_line[3], horizontal_D_fit_line[0] - horizontal_D_fit_line[2]) * 180) / np.pi
+                    line_info["H_DEGREE"] = np.abs(H_degree)
+                    
                     a = compact_horizontal_line[1] - compact_horizontal_line[3]
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
@@ -439,7 +446,7 @@ if __name__ == "__main__":
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
 
-        line_info, edge_info, result = line_detector.get_all_lines(src, color='YELLOW', line_visualization=True,
+        line_info, edge_info, result = line_detector.get_all_lines(src, color='GREEN', line_visualization=True,
                                                                    edge_visualization=False)
         print(line_info)
         print(edge_info)
