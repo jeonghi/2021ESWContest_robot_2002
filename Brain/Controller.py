@@ -38,11 +38,11 @@ class Robot:
         self.out_map: int = 0
         
         # "start"("detect_room_alphabet") , "walk", "detect_direction", "start_mission",
-        #self.mode = "start"
-        #self.direction = "" # "LEFT", "RIGHT"
-        #self.color = "YELLOW" # 노란색, 검정색, 초록색
-        #self.box_pos = ""
-        #self.curr_room_color = ""
+        self.mode = "catch_box"
+        self.direction = "LEFT" # "LEFT", "RIGHT"
+        self.color = "GREEN" # 노란색, 검정색, 초록색
+        self.box_pos = "LEFT"
+        self.curr_room_color = "GREEN"
 
 
         #self.mode = "detect_direction"
@@ -51,15 +51,15 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        self.mode = "walk"
-        self.direction = "LEFT"
-        self.color = "YELLOW"
-        self.box_pos = None
-        self.curr_room_color = None
-        self.alphabet_color = None
-        self.alphabet = None
+        #self.mode = "walk"
+        #self.direction = "LEFT"
+        #self.color = "YELLOW"
+        #self.box_pos = None
+        #self.curr_room_color = None
+        #self.alphabet_color = None
+        #self.alphabet = None
         #self.black_room = ["A", "C"]
-        self.count = 2
+        #self.count = 2
         
         #self.mode = 'start_mission'
         #self.direction = 'LEFT'
@@ -256,38 +256,39 @@ class Robot:
         self._motion.grab()
         if self.curr_room_color == 'GREEN':
             if self.box_pos == 'RIGHT':
-                self._motion.turn(dir='LEFT', loop=5, grab=True)
+                self._motion.turn(dir='LEFT', loop=4, grab=True)
             elif self.box_pos == 'LEFT':
-                self._motion.turn(dir='RIGHT', loop=5, grab=True)
+                self._motion.turn(dir='RIGHT', loop=4, grab=True)
             self._motion.move_arm(dir='LOW')
             self.mode = 'check_area'
         else:
-            self._motion.turn(dir=self.direction, loop=5, grab=True)
+            self._motion.turn(dir=self.direction, loop=4, grab=True)
             self.mode = 'end_mission'
             self.color = 'YELLOW'
         time.sleep(0.5)
 
     def check_area(self, line_info, edge_info):
+        print('line_info[H]:', line_info["H"], 'line_info[H_Y]:', line_info["H_Y"])
         if self.box_pos == 'RIGHT':
-            if line_info["H"]:
+            if line_info["H"] and line_info["H_Y"] < 440:
                 self.mode = 'fit_area'
             else:
-                self._motion.turn(dir='LEFT', loop=4, grab=True)
+                self._motion.turn(dir='LEFT', loop=1, grab=True)
         elif self.box_pos == 'LEFT':
-            if line_info["H"]:
+            if line_info["H"] and line_info["H_Y"] < 440:
                 self.mode = 'fit_area'
             else:
-                self._motion.turn(dir='RIGHT', loop=4, grab=True)
+                self._motion.turn(dir='RIGHT', loop=1, grab=True)
         else:
             self.mode = 'fit_area'
         time.sleep(0.5)
 
     def fit_area(self, line_info, edge_info):
-        self._motion.set_head(dir='DOWN', angle=35)
-        time.sleep(0.3)
         if self.box_pos == 'RIGHT':
-            if line_info["ALL_X"][1] > 440:
+            if line_info["ALL_X"][1] > 385:
                 if line_info["ALL_X"][0] < 200:
+                    self._motion.set_head(dir='DOWN', angle=35)
+                    time.sleep(0.3)
                     self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     self.mode = 'move_into_area'
                 else:
@@ -297,6 +298,8 @@ class Robot:
         elif self.box_pos == 'LEFT':
             if line_info["ALL_X"][0] < 150:
                 if line_info["ALL_X"][1] > 480:
+                    self._motion.set_head(dir='DOWN', angle=35)
+                    time.sleep(0.3)
                     self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     self.mode = 'move_into_area'
                 else:
@@ -306,6 +309,7 @@ class Robot:
         else:
             self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
             self.mode = 'move_into_area'
+        print('line_info["ALL_X"][0]:', line_info["ALL_X"][0], 'line_info["ALL_X"][1]:', line_info["ALL_X"][1] )
         time.sleep(0.5)
                 
     def move_into_area(self, line_info, edge_info):
@@ -353,7 +357,7 @@ class Robot:
             if self.detect_door_alphabet():
                 self._motion.set_head(dir="DOWN", angle=10)
                 self._motion.walk(dir='FORWARD', loop=2)
-                self._motion.walk(dir='RIGHT', loop=4)
+                self._motion.walk(dir='RIGHT', wide=True,loop=2)
                 self._motion.turn(dir='SLIDING_LEFT', loop=4)
                 self.mode = "start_line"
                 time.sleep(0.3)
@@ -626,12 +630,12 @@ class Robot:
         elif self.mode in ['box_into_area']:
             self.box_into_area(line_info, edge_info)
             if self.box_pos == 'LEFT':
-                self._motion.turn(dir='RIGHT', sliding=True, loop=4)
+                self._motion.turn(dir='RIGHT', loop=4)
             elif self.box_pos == 'RIGHT':
-                self._motion.turn(dir='LEFT', sliding=True, loop=4)
+                self._motion.turn(dir='LEFT', loop=4)
                 
             if self.curr_room_color == 'BLACK':
-                self._motion.turn(dir='LEFT', sliding=True, loop=4)
+                self._motion.turn(dir='LEFT', loop=4)
 
             self.mode = 'end_mission'
             self.color = 'YELLOW'
@@ -643,7 +647,7 @@ class Robot:
             if self.curr_room_color == 'GREEN':
                 if self.box_pos == 'RIGHT':
                     if line_info["ALL_X"][1] > 340:
-                        if line_info["ALL_Y"][1] < 180 : # yellow 감지
+                        if line_info["ALL_Y"][1] < 200 : # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
                             print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
@@ -656,31 +660,31 @@ class Robot:
                         if self.curr_room_color == 'BLACK':
                             self._motion.turn(dir=self.direction, loop=1, grab=True)
                         else:
-                            self._motion.turn(dir='LEFT', sliding= True, loop=1)
+                            self._motion.turn(dir='LEFT', loop=1)
                 else:
                     if line_info["ALL_X"][0] < 300:
-                        if line_info["ALL_Y"][1] < 180 : # yellow 감지
+                        if line_info["ALL_Y"][1] < 200 : # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
-                            print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
+                            print(line_info["ALL_Y"][1], self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
                         else:
                             self._motion.set_head(dir='DOWN', angle=45)
                             self.return_head = '45'
-                            print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
+                            print(line_info["ALL_Y"][1], self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                         self.mode = 'find_edge'
 
                     else:
                         if self.curr_room_color == 'BLACK':
                             self._motion.turn(dir=self.direction, loop=1, grab=True)
                         else:
-                            self._motion.turn(dir='RIGHT', sliding= True, loop=1)
+                            self._motion.turn(dir='RIGHT', loop=1)
             else:
                 if (self.direction == 'RIGHT' and 0 < line_info["ALL_X"][0] < 300) or (self.direction == 'LEFT' and line_info["ALL_X"][1] > 340):
                     if self.direction == 'RIGHT':
                         print('영역 충분히 보이는 시점: ', self.direction, '으로 돌다가 왼쪽 끝 ', line_info["ALL_X"][0] ,' 에 닿음')
                     else:
                         print('영역 충분히 보이는 시점: ', self.direction, '으로 돌다가 오른쪽 끝 ', line_info["ALL_X"][1] ,' 에 닿음')
-                    if line_info["ALL_Y"][1] < 180 :  # yellow 감지
+                    if line_info["ALL_Y"][1] < 200 :  # yellow 감지
                         self._motion.set_head(dir='DOWN', angle=60)
                         self.return_head = '60'
                         print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
@@ -698,7 +702,7 @@ class Robot:
 
         elif self.mode in ['find_edge']:
             if edge_info["EDGE_POS"]: # yellow edge 감지
-                if 280 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O
+                if 280 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O # 360
                     print('yellow edge 중앙 O --> ', edge_info["EDGE_POS"][0])
                     self.mode = 'return_line'# --> find_corner
                 else: # yellow edge 중앙 X
@@ -715,14 +719,14 @@ class Robot:
 
         elif self.mode in ['return_line']:
             if self.return_head == '60':
-                if line_info["ALL_Y"][1] >= 180 :
+                if line_info["ALL_Y"][1] >= 200 :
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                     time.sleep(0.5)
                         
             elif self.return_head == '45':
-                if line_info["ALL_Y"][1] >= 180 :
+                if line_info["ALL_Y"][1] >= 200 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')

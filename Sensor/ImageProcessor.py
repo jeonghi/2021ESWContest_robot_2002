@@ -232,7 +232,7 @@ class ImageProcessor:
                 # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
                 area_ratio = width / height if height < width else height / width
                 area_ratio = round(area_ratio, 2)
-                if not (800 < area and area_ratio <= 1.4):
+                if not (200 < area and area_ratio <= 1.4):
                     continue
 
                 candidate = Target(contour=contour)
@@ -402,12 +402,13 @@ if __name__ == "__main__":
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
-        alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        print(alphabet)
+        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
+        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        #print(alphabet)
+        #src = imageProcessor.get_image(visualization=True)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #imageProcessor.room_test()
-        #print(result)
+        print(result)
