@@ -268,14 +268,14 @@ class Robot:
         time.sleep(0.5)
 
     def check_area(self, line_info, edge_info):
-        print(line_info, edge_info)
+        print('line_info[H]:', line_info["H"], 'line_info[H_Y]:', line_info["H_Y"])
         if self.box_pos == 'RIGHT':
-            if line_info["H"]:
+            if line_info["H"] and line_info["H_Y"] < 440:
                 self.mode = 'fit_area'
             else:
                 self._motion.turn(dir='LEFT', loop=1, grab=True)
         elif self.box_pos == 'LEFT':
-            if line_info["H"]:
+            if line_info["H"] and line_info["H_Y"] < 440:
                 self.mode = 'fit_area'
             else:
                 self._motion.turn(dir='RIGHT', loop=1, grab=True)
