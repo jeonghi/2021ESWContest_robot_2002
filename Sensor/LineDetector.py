@@ -73,7 +73,7 @@ class LineDetector:
         if color == 'GREEN':
             hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
             h, l, s = cv2.split(hls)
-            ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+            ret, mask = cv2.threshold(s, 100, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask=mask)
             match_lower = np.array([20, 20, 20])  # green_lower
             match_upper = np.array([80, 220, 220])  # green_upper
@@ -399,9 +399,10 @@ class LineDetector:
                     a = compact_horizontal_line[1] - compact_horizontal_line[3]
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
-                    #print('length:  ', c)
-                    if c >= 350:
+                    print('length:  ', c)
+                    if c >= 250:
                         line_info["H"] = True
+                    print(compact_horizontal_line[3])
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
                     line_info["H_X"] = [compact_horizontal_line[0], compact_horizontal_line[2]]  # [min_x, middle, max_x, middle]

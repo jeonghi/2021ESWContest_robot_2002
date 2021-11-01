@@ -285,7 +285,7 @@ class Robot:
 
     def fit_area(self, line_info, edge_info):
         if self.box_pos == 'RIGHT':
-            if line_info["ALL_X"][1] > 440:
+            if line_info["ALL_X"][1] > 385:
                 if line_info["ALL_X"][0] < 200:
                     self._motion.set_head(dir='DOWN', angle=35)
                     time.sleep(0.3)
@@ -647,7 +647,7 @@ class Robot:
             if self.curr_room_color == 'GREEN':
                 if self.box_pos == 'RIGHT':
                     if line_info["ALL_X"][1] > 340:
-                        if line_info["ALL_Y"][1] < 180 : # yellow 감지
+                        if line_info["ALL_Y"][1] < 200 : # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
                             print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
@@ -663,14 +663,14 @@ class Robot:
                             self._motion.turn(dir='LEFT', loop=1)
                 else:
                     if line_info["ALL_X"][0] < 300:
-                        if line_info["ALL_Y"][1] < 180 : # yellow 감지
+                        if line_info["ALL_Y"][1] < 200 : # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
-                            print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
+                            print(line_info["ALL_Y"][1], self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
                         else:
                             self._motion.set_head(dir='DOWN', angle=45)
                             self.return_head = '45'
-                            print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
+                            print(line_info["ALL_Y"][1], self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                         self.mode = 'find_edge'
 
                     else:
@@ -684,7 +684,7 @@ class Robot:
                         print('영역 충분히 보이는 시점: ', self.direction, '으로 돌다가 왼쪽 끝 ', line_info["ALL_X"][0] ,' 에 닿음')
                     else:
                         print('영역 충분히 보이는 시점: ', self.direction, '으로 돌다가 오른쪽 끝 ', line_info["ALL_X"][1] ,' 에 닿음')
-                    if line_info["ALL_Y"][1] < 180 :  # yellow 감지
+                    if line_info["ALL_Y"][1] < 200 :  # yellow 감지
                         self._motion.set_head(dir='DOWN', angle=60)
                         self.return_head = '60'
                         print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
@@ -702,7 +702,7 @@ class Robot:
 
         elif self.mode in ['find_edge']:
             if edge_info["EDGE_POS"]: # yellow edge 감지
-                if 280 < edge_info["EDGE_POS"][0] < 380 : # yellow edge x 좌표 중앙 O # 360
+                if 280 < edge_info["EDGE_POS"][0] < 360 : # yellow edge x 좌표 중앙 O # 360
                     print('yellow edge 중앙 O --> ', edge_info["EDGE_POS"][0])
                     self.mode = 'return_line'# --> find_corner
                 else: # yellow edge 중앙 X
@@ -719,14 +719,14 @@ class Robot:
 
         elif self.mode in ['return_line']:
             if self.return_head == '60':
-                if line_info["ALL_Y"][1] >= 180 :
+                if line_info["ALL_Y"][1] >= 200 :
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                     time.sleep(0.5)
                         
             elif self.return_head == '45':
-                if line_info["ALL_Y"][1] >= 180 :
+                if line_info["ALL_Y"][1] >= 200 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
