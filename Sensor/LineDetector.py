@@ -73,10 +73,10 @@ class LineDetector:
         if color == 'GREEN':
             hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
             h, l, s = cv2.split(hls)
-            ret, mask = cv2.threshold(s, 70, 255, cv2.THRESH_BINARY)
+            ret, mask = cv2.threshold(s, 100, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask=mask)
             match_lower = np.array([20, 20, 20])  # green_lower
-            match_upper = np.array([80, 220, 220])  # green_upper
+            match_upper = np.array([80, 255, 220])  # green_upper
 
         if color == 'BLACK':
             match_lower = np.array([0, 0, 0])  # black_lower
@@ -366,7 +366,7 @@ class LineDetector:
                     edge_info["EDGE_POS"] = None
 
             if color == 'GREEN':
-                line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'H': False, 'H_X': [0, 0], 'H_Y': [0, 0]}
+                line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
                 edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
                 if len(edge_lines) != 0:
@@ -383,18 +383,36 @@ class LineDetector:
                         self.draw_lines(temp, edge_lines, 'lines')
                         self.draw_lines(temp, line, 'lines', 'fit')
                         src = cv2.addWeighted(src, 1, temp, 1., 0.)
+                        
+                if len(vertical_lines) != 0:
+                    size = int(vertical_lines.shape[0] * vertical_lines.shape[2] / 2)
+                    vertical_fit_line = self.get_fitline(src, vertical_lines, size, 'vertical')
+                    line_info["V"] = True
+                    line_info["V_X"] = [vertical_fit_line[0], vertical_fit_line[2]]  # [x1,y1,x2,y2]
+                    line_info["V_Y"] = [vertical_fit_line[1], vertical_fit_line[3]]
+                    if line_visualization is True:
+                        self.draw_lines(temp, vertical_fit_line, 'vertical', 'fit')
+                        src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
                 if len(compact_horizontal_lines) != 0:
                     #print(compact_horizontal_lines)
                     #print(compact_horizontal_lines.shape)
                     size = int(compact_horizontal_lines.shape[0] * compact_horizontal_lines.shape[2] / 2)
                     compact_horizontal_line = self.get_fitline(src, compact_horizontal_lines, size, 'compact_horizontal')
+                    
+                    size_ = int(horizontal_lines.shape[0] * horizontal_lines.shape[2] / 2)
+                    horizontal_D_fit_line = self.get_fitline(src, horizontal_lines, size_, 'horizontal_D')
+                    
+                    H_degree = (np.arctan2(horizontal_D_fit_line[1] - horizontal_D_fit_line[3], horizontal_D_fit_line[0] - horizontal_D_fit_line[2]) * 180) / np.pi
+                    line_info["H_DEGREE"] = np.abs(H_degree)
+                    
                     a = compact_horizontal_line[1] - compact_horizontal_line[3]
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
-                    #print('length:  ', c)
-                    if c >= 350:
+                    print('length:  ', c)
+                    if c >= 100:
                         line_info["H"] = True
+                    print(compact_horizontal_line[3])
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
                     line_info["H_X"] = [compact_horizontal_line[0], compact_horizontal_line[2]]  # [min_x, middle, max_x, middle]
@@ -439,7 +457,7 @@ if __name__ == "__main__":
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
 
-        line_info, edge_info, result = line_detector.get_all_lines(src, color='YELLOW', line_visualization=True,
+        line_info, edge_info, result = line_detector.get_all_lines(src, color='GREEN', line_visualization=True,
                                                                    edge_visualization=False)
         print(line_info)
         print(edge_info)
