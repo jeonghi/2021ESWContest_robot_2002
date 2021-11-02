@@ -521,12 +521,14 @@ GOSUB_RX_EXIT2:
     '*************************************
 
     GOTO 라인따라걸음_1
+
+    '******************************************
 전진달리기50:
     넘어진확인 = 0
     GOSUB All_motor_mode3
     보행COUNT = 0
     DELAY 50
-    SPEED 12
+    SPEED 6
     HIGHSPEED SETON
 
 
@@ -1554,145 +1556,7 @@ GOSUB_RX_EXIT2:
     '******************************************
 
     '******************************************
-전진달리기50:
-    넘어진확인 = 0
-    GOSUB All_motor_mode3
-    보행COUNT = 0
-    DELAY 50
-    SPEED 12
-    HIGHSPEED SETON
-
-
-
-    IF 보행순서 = 0 THEN
-        보행순서 = 1
-        MOVE G6A,95,  76, 145,  93, 101
-        MOVE G6D,101,  77, 145,  93, 98
-        WAIT
-
-        MOVE G6A,95,  80, 120, 120, 104
-        MOVE G6D,104,  77, 146,  91,  102
-        MOVE G6B, 80
-        MOVE G6C,120
-        WAIT
-
-
-        GOTO 전진달리기50_2
-    ELSE
-        보행순서 = 0
-        MOVE G6D,95,  76, 145,  93, 101
-        MOVE G6A,101,  77, 145,  93, 98
-        WAIT
-
-        MOVE G6D,95,  80, 120, 120, 104
-        MOVE G6A,104,  77, 146,  91,  102
-        MOVE G6C, 80
-        MOVE G6B,120
-        WAIT
-
-
-        GOTO 전진달리기50_5
-    ENDIF
-
-
-    '**********************
-
-전진달리기50_1:
-    MOVE G6A,95,  95, 100, 120, 104
-    MOVE G6D,104,  77, 147,  93,  102
-    MOVE G6B, 80
-    MOVE G6C,120
-    WAIT
-
-
-전진달리기50_2:
-    MOVE G6A,95,  75, 122, 120, 104
-    MOVE G6D,104,  78, 147,  90,  100
-    WAIT
-
-전진달리기50_3:
-    MOVE G6A,103,  69, 145, 103,  100
-    MOVE G6D, 95, 87, 160,  68, 102
-    WAIT
-
-    GOSUB 앞뒤기울기측정
-    IF 넘어진확인 = 1 THEN
-        넘어진확인 = 0
-        GOTO RX_EXIT
-    ENDIF
-
-    '보행COUNT = 보행COUNT + 1
-    'IF 보행COUNT > 보행횟수 THEN  GOTO 전진달리기50_3_stop
-
-    ERX 4800,A, 전진달리기50_4
-    IF A <> A_old THEN
-전진달리기50_3_stop:
-
-        MOVE G6D,90,  93, 115, 100, 104
-        MOVE G6A,104,  74, 145,  91,  102
-        MOVE G6C, 100
-        MOVE G6B,100
-        WAIT
-        HIGHSPEED SETOFF
-        SPEED 15
-        GOSUB 안정화자세
-        SPEED 5
-        GOSUB 기본자세2
-
-        'DELAY 400
-        GOTO RX_EXIT
-    ENDIF
-    '*********************************
-
-전진달리기50_4:
-    MOVE G6D,95,  95, 100, 120, 104
-    MOVE G6A,104,  77, 147,  93,  102
-    MOVE G6C, 80
-    MOVE G6B,120
-    WAIT
-
-
-전진달리기50_5:
-    MOVE G6D,95,  75, 122, 120, 104
-    MOVE G6A,104,  78, 147,  90,  100
-    WAIT
-
-
-전진달리기50_6:
-    MOVE G6D,103,  69, 145, 103,  100
-    MOVE G6A, 95, 87, 160,  68, 102
-    WAIT
-
-    GOSUB 앞뒤기울기측정
-    IF 넘어진확인 = 1 THEN
-        넘어진확인 = 0
-        GOTO RX_EXIT
-    ENDIF
-    ' 보행COUNT = 보행COUNT + 1
-    'IF 보행COUNT > 보행횟수 THEN  GOTO 전진달리기50_6_stop
-    ERX 4800,A, 전진달리기50_1
-    IF A <> A_old THEN
-전진달리기50_6_stop:
-
-        MOVE G6A,90,  93, 115, 100, 104
-        MOVE G6D,104,  74, 145,  91,  102
-        MOVE G6B, 100
-        MOVE G6C,100
-        WAIT
-        HIGHSPEED SETOFF
-        SPEED 15
-        GOSUB 안정화자세
-        SPEED 5
-        GOSUB 기본자세2
-
-        'DELAY 400
-        GOTO RX_EXIT
-    ENDIF
-    GOTO 전진달리기50_1
-
-
-
-    '******************************************
+    '*************************************
 
     '******************************************
 곡선전진종종걸음:
