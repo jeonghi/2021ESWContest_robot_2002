@@ -72,6 +72,8 @@ class ImageProcessor:
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
         _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        cv2.imshow("mask",mask)
+        
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -84,7 +86,7 @@ class ImageProcessor:
             # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
-            if not (3000 < area < 10000 and area_ratio <= 1.3):
+            if not ( 3500 < area  and area_ratio <= 1.4):
                 continue
 
             target = Target(contour=cnt)
@@ -101,7 +103,7 @@ class ImageProcessor:
             area_ratio = round(area_ratio, 2)
             approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
             vertice = len(approx)
-            if not (vertice == 4 and area > 2500 and area_ratio <= 1.6):
+            if not (area > 3500 and area_ratio <= 1.6):
                 continue
             target = Target(contour=cnt)
             canny_targets.append(target)
@@ -363,7 +365,7 @@ class ImageProcessor:
         ### 시각화 ############################
         if visualization:
             cv2.imshow("src", canvas)
-            cv2.imshow("mask", mask)
+            #cv2.imshow("mask", mask)
             cv2.waitKey(1)
         #####################################
         #####################################
@@ -376,8 +378,12 @@ class ImageProcessor:
 
 
 
-    def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False):
-        src = self.get_image()
+    def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False, ROI:bool=False):
+        if ROI:
+            src = self.get_image()
+            src = src[:][200:400]
+        else:
+            src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         #print(line_info)
         #print(edge_info)
@@ -386,14 +392,6 @@ class ImageProcessor:
             cv2.waitKey(1)
             #print(line_info["H_Y"])
         return result
-    
-    def room_test(self):
-        src = self.get_image()
-        mask = self.color_preprocessor.get_alphabet_mask(src)
-        cv2.imshow("mask",mask)
-        cv2.waitKey(1)
-
-
 
 if __name__ == "__main__":
 
@@ -403,12 +401,12 @@ if __name__ == "__main__":
     while True:
         #imageProcessor.get_arrow_direction()
         _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
-        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        #print(alphabet)
+        alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        print(alphabet)
         #src = imageProcessor.get_image(visualization=True)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #imageProcessor.room_test()
-        print(result)
+        #print(result)
