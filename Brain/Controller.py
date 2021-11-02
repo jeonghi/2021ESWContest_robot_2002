@@ -377,7 +377,7 @@ class Robot:
                 self.curr_head4door_alphabet.rotate(-1)
                 
         elif self.mode in ['start_line']:
-            if line_info['H']:
+            if line_info['compact_H']:
                 self._motion.open_door(loop = 1)
                 self.mode = "entrance"
             else:
@@ -393,7 +393,7 @@ class Robot:
                     #self._motion.turn(dir='SLIDING_RIGHT', loop=2)
                     #self.mode = 'direction_line'
                 else:
-                    if line_info['H']:
+                    if line_info['compact_H']:
                         if 170 <= line_info['H_Y'][1] < 250:
                             print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
                             self._motion.open_door(loop = 1)
@@ -425,7 +425,7 @@ class Robot:
                 #self.mode = 'direction_line'
                 
         elif self.mode in ['direction_line']:
-            if line_info['H_DEGREE'] > 172.5:
+            if line_info['compact_H']:
                 self._motion.basic_form()
                 
                 if line_info['H_Y'][1] < 100:
@@ -797,7 +797,7 @@ class Robot:
 
         elif self.mode in ['find_corner']:
             if self.count < 3:
-                if line_info["H"]:
+                if line_info["compact_H"]:
                     self._motion.walk(dir=self.direction, wide= True, loop =2)
                     self.mode = 'mission_line'
                 else:
@@ -819,7 +819,7 @@ class Robot:
                     self._motion.turn(self.direction, 1)
                     
         elif self.mode in ['mission_line']:
-            if line_info['H']:
+            if line_info['compact_H']:
                 if 170 <= line_info['H_Y'][1] < 250:
                     print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
             
