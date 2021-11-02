@@ -227,9 +227,10 @@ class Robot:
         elif 0 < line_info["DEGREE"] <= 85:
             print('MODIFY angle --LEFT')
             self._motion.turn(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
-        #elif (line_info["DEGREE"] == 0) or ( line_info["H"] is False and line_info["V"] is False):
-        #    self._motion.walk(dir='BACKWARD')
-        #    time.sleep(1) #뒤로 걷는 거 휘청거려서 sleep 넣음
+       
+        elif line_info["DEGREE"] == 0 :
+            self._motion.walk(dir='BACKWARD')
+            time.sleep(1) #뒤로 걷는 거 휘청거려서 sleep 넣음
 
         else:
             print('MODIFY angle --RIGHT')
