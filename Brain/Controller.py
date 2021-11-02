@@ -9,7 +9,6 @@ from collections import deque
 
 
 class Robot:
-
     def __init__(self, video_path ="", mode="start", DEBUG=False):
         # 모듈들 객체 생성
         self._motion = Motion()
@@ -51,15 +50,15 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        self.mode = "walk"
-        self.direction = "LEFT"
-        self.color = "YELLOW"
-        self.box_pos = None
-        self.curr_room_color = None
-        self.alphabet_color = None
-        self.alphabet = None
+        #self.mode = "walk"
+        #self.direction = "LEFT"
+        #self.color = "YELLOW"
+        #self.box_pos = None
+        #self.curr_room_color = None
+        #self.alphabet_color = None
+        #self.alphabet = None
         #self.black_room = ["A", "C"]
-        self.count = 2
+        #self.count = 2
         
         #self.mode = 'start_mission'
         #self.direction = 'LEFT'
@@ -179,16 +178,16 @@ class Robot:
     def turn_to_green_area_after_box_tracking(self) -> None:
 
         if self.box_pos == 'RIGHT':
-            self._motion.turn(dir='LEFT', loop=7, grab=True)
-
+                self._motion.turn(dir='LEFT', loop=3, wide=True, sliding = True, grab=True)
         elif self.box_pos == 'LEFT':
-            self._motion.turn(dir='RIGHT', loop=7, grab=True)
+            self._motion.turn(dir='RIGHT', loop=3, wide=True, sliding = True, grab=True)
+
 
         self._motion.move_arm(dir='LOW')
         self.mode = 'check_area'
 
     def turn_to_black_area_after_box_tracking(self) -> None:
-        self._motion.turn(dir=self.direction, loop=7, grab=True)
+        self._motion.turn(dir=self.direction, loop=6, wide=True, sliding = True, grab=True)
         # time.sleep(1)
         self.mode = 'end_mission'
         self.color = 'YELLOW'
@@ -229,6 +228,7 @@ class Robot:
             self._motion.turn(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
        
         elif line_info["DEGREE"] == 0 :
+            print(self.mode, 'mode walk no line')
             self._motion.walk(dir='BACKWARD')
             time.sleep(1) #뒤로 걷는 거 휘청거려서 sleep 넣음
 
@@ -328,6 +328,8 @@ class Robot:
         self._motion.grab(switch=False)
         self.color = 'YELLOW'
         self.count += 1
+        
+    
 
     def run(self):
 
@@ -343,7 +345,7 @@ class Robot:
             if self.DEBUG:
                 print(self.mode, self.walk_info)
                 if self.color == 'YELLOW':
-                    line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=False)
+                    line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
                 elif self.color == 'GREEN':
                     line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=False)
                 else:
@@ -395,6 +397,7 @@ class Robot:
                         else: # H가 너무 가깝다는 것, H 업다는 것
                             print('입구 빠져 나가는 중 - H 가까워서 한발자국 뒤로', line_info['H'], line_info['H_Y'][1])
                             self._motion.open_door_walk(dir='BACKWARD') # 수정 완료
+                            print('entrance :: H is so closed')
                             time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
                     else:
                         print('H:', line_info['H'], ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
@@ -404,6 +407,7 @@ class Robot:
                             self._motion.open_door_turn(dir='RIGHT')
                         else:
                             self._motion.open_door_walk(dir='BACKWARD')
+                            print('No H')
             else:
                 print('입구 빠져 나옴', 'V:', line_info['V'], line_info["V_X"])
                 #if line_info["V_X"][1] > 550:
@@ -448,6 +452,7 @@ class Robot:
                 self.walk_info = '│'
             else:
                 self._motion.walk("BACKWARD", 1)
+                print('detect direction is failed')
                 time.sleep(0.5)
                 
 
@@ -634,13 +639,13 @@ class Robot:
         elif self.mode in ['box_into_area']:
             self.box_into_area(line_info, edge_info)
             if self.box_pos == 'LEFT':
-                self._motion.turn(dir='SLIDING_RIGHT', loop=3)
+                self._motion.turn(dir='RIGHT', sliding= True, wide=True, loop=5)
             elif self.box_pos == 'RIGHT':
-                self._motion.turn(dir='SLIDING_LEFT', loop=3)
+                self._motion.turn(dir='LEFT', sliding= True, wide=True, loop=5)
                 
             if self.curr_room_color == 'BLACK':
-                self._motion.turn(dir='LEFT', loop=4)
-
+                self._motion.turn(dir=self.direction, sliding= True, wide=True, loop=6)
+                
             self.mode = 'end_mission'
             self.color = 'YELLOW'
 

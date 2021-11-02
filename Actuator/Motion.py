@@ -170,6 +170,7 @@ class Motion:
                 if wide:
                     dir_list[dir]+=45
         for _ in range(loop):
+            #print(dir_list[dir])
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
         
