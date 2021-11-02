@@ -51,21 +51,21 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        #self.mode = "walk"
-        #self.direction = "LEFT"
-        #self.color = "YELLOW"
-        #self.box_pos = None
-        #self.curr_room_color = None
-        #self.alphabet_color = None
-        #self.alphabet = None
+        self.mode = "walk"
+        self.direction = "LEFT"
+        self.color = "YELLOW"
+        self.box_pos = None
+        self.curr_room_color = None
+        self.alphabet_color = None
+        self.alphabet = None
         #self.black_room = ["A", "C"]
-        #self.count = 2
+        self.count = 2
         
         #self.mode = 'start_mission'
         #self.direction = 'LEFT'
-        #self.color = "GREEN"
+        #self.color = "YELLOW"
         #self.box_pos = None
-        #self.curr_room_color = "GREEN"
+        #self.curr_room_color = ""
 
         # 박스 앞에 놓고 테스트 하고 싶을 때
         #self.direction = 'RIGHT'
