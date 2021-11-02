@@ -522,6 +522,144 @@ GOSUB_RX_EXIT2:
 
     GOTO 라인따라걸음_1
 
+    '******************************************
+전진달리기50:
+    넘어진확인 = 0
+    GOSUB All_motor_mode3
+    보행COUNT = 0
+    DELAY 50
+    SPEED 6
+    HIGHSPEED SETON
+
+
+
+    IF 보행순서 = 0 THEN
+        보행순서 = 1
+        MOVE G6A,95,  76, 145,  93, 101
+        MOVE G6D,101,  77, 145,  93, 98
+        WAIT
+
+        MOVE G6A,95,  80, 120, 120, 104
+        MOVE G6D,104,  77, 146,  91,  102
+        MOVE G6B, 80
+        MOVE G6C,120
+        WAIT
+
+
+        GOTO 전진달리기50_2
+    ELSE
+        보행순서 = 0
+        MOVE G6D,95,  76, 145,  93, 101
+        MOVE G6A,101,  77, 145,  93, 98
+        WAIT
+
+        MOVE G6D,95,  80, 120, 120, 104
+        MOVE G6A,104,  77, 146,  91,  102
+        MOVE G6C, 80
+        MOVE G6B,120
+        WAIT
+
+
+        GOTO 전진달리기50_5
+    ENDIF
+
+
+    '**********************
+
+전진달리기50_1:
+    MOVE G6A,95,  95, 100, 120, 104
+    MOVE G6D,104,  77, 147,  93,  102
+    MOVE G6B, 80
+    MOVE G6C,120
+    WAIT
+
+
+전진달리기50_2:
+    MOVE G6A,95,  75, 122, 120, 104
+    MOVE G6D,104,  78, 147,  90,  100
+    WAIT
+
+전진달리기50_3:
+    MOVE G6A,103,  69, 145, 103,  100
+    MOVE G6D, 95, 87, 160,  68, 102
+    WAIT
+
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+        GOTO RX_EXIT
+    ENDIF
+
+    보행COUNT = 보행COUNT + 1
+    IF 보행COUNT > 보행횟수 THEN  GOTO 전진달리기50_3_stop
+
+    ERX 4800,A, 전진달리기50_4
+    IF A <> A_old THEN
+전진달리기50_3_stop:
+
+        MOVE G6D,90,  93, 115, 100, 104
+        MOVE G6A,104,  74, 145,  91,  102
+        MOVE G6C, 100
+        MOVE G6B,100
+        WAIT
+        HIGHSPEED SETOFF
+        SPEED 15
+        GOSUB 안정화자세
+        SPEED 5
+        GOSUB 기본자세2
+
+        DELAY 400
+        GOTO RX_EXIT
+    ENDIF
+    '*********************************
+
+전진달리기50_4:
+    MOVE G6D,95,  95, 100, 120, 104
+    MOVE G6A,104,  77, 147,  93,  102
+    MOVE G6C, 80
+    MOVE G6B,120
+    WAIT
+
+
+전진달리기50_5:
+    MOVE G6D,95,  75, 122, 120, 104
+    MOVE G6A,104,  78, 147,  90,  100
+    WAIT
+
+
+전진달리기50_6:
+    MOVE G6D,103,  69, 145, 103,  100
+    MOVE G6A, 95, 87, 160,  68, 102
+    WAIT
+
+    GOSUB 앞뒤기울기측정
+    IF 넘어진확인 = 1 THEN
+        넘어진확인 = 0
+        GOTO RX_EXIT
+    ENDIF
+    보행COUNT = 보행COUNT + 1
+    IF 보행COUNT > 보행횟수 THEN  GOTO 전진달리기50_6_stop
+    ERX 4800,A, 전진달리기50_1
+    IF A <> A_old THEN
+전진달리기50_6_stop:
+
+        MOVE G6A,90,  93, 115, 100, 104
+        MOVE G6D,104,  74, 145,  91,  102
+        MOVE G6B, 100
+        MOVE G6C,100
+        WAIT
+        HIGHSPEED SETOFF
+        SPEED 15
+        GOSUB 안정화자세
+        SPEED 5
+        GOSUB 기본자세2
+
+        DELAY 400
+        GOTO RX_EXIT
+    ENDIF
+    GOTO 전진달리기50_1
+
+
 연속전진:
     보행COUNT = 0
     보행속도 = 13
@@ -1418,145 +1556,7 @@ GOSUB_RX_EXIT2:
     '******************************************
 
     '******************************************
-전진달리기50:
-    넘어진확인 = 0
-    GOSUB All_motor_mode3
-    보행COUNT = 0
-    DELAY 50
-    SPEED 12
-    HIGHSPEED SETON
-
-
-
-    IF 보행순서 = 0 THEN
-        보행순서 = 1
-        MOVE G6A,95,  76, 145,  93, 101
-        MOVE G6D,101,  77, 145,  93, 98
-        WAIT
-
-        MOVE G6A,95,  80, 120, 120, 104
-        MOVE G6D,104,  77, 146,  91,  102
-        MOVE G6B, 80
-        MOVE G6C,120
-        WAIT
-
-
-        GOTO 전진달리기50_2
-    ELSE
-        보행순서 = 0
-        MOVE G6D,95,  76, 145,  93, 101
-        MOVE G6A,101,  77, 145,  93, 98
-        WAIT
-
-        MOVE G6D,95,  80, 120, 120, 104
-        MOVE G6A,104,  77, 146,  91,  102
-        MOVE G6C, 80
-        MOVE G6B,120
-        WAIT
-
-
-        GOTO 전진달리기50_5
-    ENDIF
-
-
-    '**********************
-
-전진달리기50_1:
-    MOVE G6A,95,  95, 100, 120, 104
-    MOVE G6D,104,  77, 147,  93,  102
-    MOVE G6B, 80
-    MOVE G6C,120
-    WAIT
-
-
-전진달리기50_2:
-    MOVE G6A,95,  75, 122, 120, 104
-    MOVE G6D,104,  78, 147,  90,  100
-    WAIT
-
-전진달리기50_3:
-    MOVE G6A,103,  69, 145, 103,  100
-    MOVE G6D, 95, 87, 160,  68, 102
-    WAIT
-
-    GOSUB 앞뒤기울기측정
-    IF 넘어진확인 = 1 THEN
-        넘어진확인 = 0
-        GOTO RX_EXIT
-    ENDIF
-
-    '보행COUNT = 보행COUNT + 1
-    'IF 보행COUNT > 보행횟수 THEN  GOTO 전진달리기50_3_stop
-
-    ERX 4800,A, 전진달리기50_4
-    IF A <> A_old THEN
-전진달리기50_3_stop:
-
-        MOVE G6D,90,  93, 115, 100, 104
-        MOVE G6A,104,  74, 145,  91,  102
-        MOVE G6C, 100
-        MOVE G6B,100
-        WAIT
-        HIGHSPEED SETOFF
-        SPEED 15
-        GOSUB 안정화자세
-        SPEED 5
-        GOSUB 기본자세2
-
-        'DELAY 400
-        GOTO RX_EXIT
-    ENDIF
-    '*********************************
-
-전진달리기50_4:
-    MOVE G6D,95,  95, 100, 120, 104
-    MOVE G6A,104,  77, 147,  93,  102
-    MOVE G6C, 80
-    MOVE G6B,120
-    WAIT
-
-
-전진달리기50_5:
-    MOVE G6D,95,  75, 122, 120, 104
-    MOVE G6A,104,  78, 147,  90,  100
-    WAIT
-
-
-전진달리기50_6:
-    MOVE G6D,103,  69, 145, 103,  100
-    MOVE G6A, 95, 87, 160,  68, 102
-    WAIT
-
-    GOSUB 앞뒤기울기측정
-    IF 넘어진확인 = 1 THEN
-        넘어진확인 = 0
-        GOTO RX_EXIT
-    ENDIF
-    ' 보행COUNT = 보행COUNT + 1
-    'IF 보행COUNT > 보행횟수 THEN  GOTO 전진달리기50_6_stop
-    ERX 4800,A, 전진달리기50_1
-    IF A <> A_old THEN
-전진달리기50_6_stop:
-
-        MOVE G6A,90,  93, 115, 100, 104
-        MOVE G6D,104,  74, 145,  91,  102
-        MOVE G6B, 100
-        MOVE G6C,100
-        WAIT
-        HIGHSPEED SETOFF
-        SPEED 15
-        GOSUB 안정화자세
-        SPEED 5
-        GOSUB 기본자세2
-
-        'DELAY 400
-        GOTO RX_EXIT
-    ENDIF
-    GOTO 전진달리기50_1
-
-
-
-    '******************************************
+    '*************************************
 
     '******************************************
 곡선전진종종걸음:
@@ -2646,8 +2646,8 @@ GOSUB_RX_EXIT2:
     SPEED 8
     MOVE G6A,95,  56, 145,  113, 105, 100
     MOVE G6D,95,  96, 145,  73, 105, 100
-  '  MOVE G6B,90
-   ' MOVE G6C,110
+    '  MOVE G6B,90
+    ' MOVE G6C,110
     WAIT
 
     SPEED 12
@@ -2661,13 +2661,13 @@ GOSUB_RX_EXIT2:
 
     WAIT
 
-  '  GOSUB 기본자세2
-  	MOVE G6A,100,  76, 145,  93, 100, 100
+    '  GOSUB 기본자세2
+    MOVE G6A,100,  76, 145,  93, 100, 100
     MOVE G6D,100,  76, 145,  93, 100, 100
 
     GOTO RX_EXIT
     '**********************************************	
-    
+
 문열고왼쪽턴20:
     MOTORMODE G6A,3,3,3,3,2
     MOTORMODE G6D,3,3,3,3,2
@@ -4443,7 +4443,7 @@ MAIN_2:
 
     '**** 입력된 A값이 0 이면 MAIN 라벨로 가고
     '**** 1이면 	 라벨, 2이면 key2로... 가는문
-    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65,KEY66,KEY67,KEY68,KEY69,KEY70,KEY71,KEY72,KEY73,KEY74,KEY75,KEY76,KEY77,KEY78,KEY79,KEY80,KEY81,KEY82,KEY83,KEY84,KEY85,KEY86,KEY87,KEY88,KEY89,KEY90,KEY91,KEY92,KEY93,KEY94,KEY95,KEY96,KEY97,KEY98,KEY99,KEY100
+    ON A GOTO MAIN,KEY1,KEY2,KEY3,KEY4,KEY5,KEY6,KEY7,KEY8,KEY9,KEY10,KEY11,KEY12,KEY13,KEY14,KEY15,KEY16,KEY17,KEY18 ,KEY19,KEY20,KEY21,KEY22,KEY23,KEY24,KEY25,KEY26,KEY27,KEY28 ,KEY29,KEY30,KEY31,KEY32,KEY33,KEY34,KEY35,KEY36,KEY37,KEY38,KEY39,KEY40,KEY41,KEY42,KEY43,KEY44,KEY45,KEY46,KEY47,KEY48,KEY49,KEY50,KEY51,KEY52,KEY53,KEY54,KEY55,KEY56,KEY57,KEY58,KEY59,KEY60,KEY61,KEY62,KEY63,KEY64,KEY65,KEY66,KEY67,KEY68,KEY69,KEY70,KEY71,KEY72,KEY73,KEY74,KEY75,KEY76,KEY77,KEY78,KEY79,KEY80,KEY81,KEY82,KEY83,KEY84,KEY85,KEY86,KEY87,KEY88,KEY89,KEY90,KEY91,KEY92,KEY93,KEY94,KEY95,KEY96,KEY97,KEY98,KEY99,KEY100,KEY101,KEY102
 
     IF A > 100 AND A < 110 THEN
         BUTTON_NO = A - 100
@@ -4550,12 +4550,12 @@ KEY11: ' ▲
     '***************
 KEY12: ' ▼
     ETX  4800,12
-    GOSUB 한걸음걷기2
+    GOTO 전진달리기50
     GOTO RX_EXIT
     '***************
 KEY13: '▶
     ETX  4800,13
-    GOTO 문열고왼쪽턴20
+    GOTO 집고왼쪽턴20
 
 
     GOTO RX_EXIT
@@ -5032,16 +5032,27 @@ KEY98:
     ETX  4800,98
     GOSUB 한걸음걷기
     GOTO RX_EXIT
-KEY99: 
+KEY99:
     ETX  4800,99
     GOTO 문열고왼쪽턴20
 
 
     GOTO RX_EXIT
     '***************
-KEY100: 
+KEY100:
     ETX  4800,100
     GOTO 문열고오른쪽턴20
 
     GOTO RX_EXIT
+KEY101:
+    ETX  4800,101
+    GOTO 집고왼쪽턴20
 
+
+    GOTO RX_EXIT
+KEY102:
+    ETX  4800,102
+    GOTO 집고오른쪽턴20
+
+
+    GOTO RX_EXIT
