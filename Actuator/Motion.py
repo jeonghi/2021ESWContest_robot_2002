@@ -161,7 +161,7 @@ class Motion:
         if grab:
             dir_list[dir] += 11# if grab is true, change walk motion with grab
             if sliding:
-                dir_list[dir]+=9
+                dir_list[dir]+=28
         else:
             if sliding:
                 dir_list[dir] -= 2
@@ -190,8 +190,10 @@ class Motion:
             self.TX_data_py2(n)
 
     #문 열 때 도는 함수
-    def open_door_turn(self, dir,loop=1, sleep=0.5):
-        dir_list={'RIGHT':93, 'LEFT':92}
+    def open_door_turn(self, dir,loop=1, sliding=false, sleep=0.5):
+        dir_list={'LEFT':92,'RIGHT':93}
+        if sliding:
+            dir_list[dir]+=7
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
