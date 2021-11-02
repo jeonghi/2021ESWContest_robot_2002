@@ -566,45 +566,45 @@ class Robot:
                 if dy > 10:  # 기준선 보다 위에 있다면
                     if -40 <= dx <= 40:
                         print("기준점에서 적정범위. 전진 전진")
-                        if self.curr_head4box == 75:
-                            self._motion.walk(dir='FORWARD', loop=4)
+                        if self.curr_head4box[0] == 75:
+                            self._motion.walk(dir='FORWARD', loop=2)
                         else:
                             self._motion.walk(dir='FORWARD', loop=1)
                     elif dx <= -90:
-                        if self.curr_head4box == 75:
-                            self._motion.turn(dir='RIGHT', loop=2)
+                        if self.curr_head4box[0] == 75:
+                            self._motion.turn(dir='RIGHT', sleep=0.1, loop=2)
                         else:
-                            self._motion.turn(dir='RIGHT', loop=1)
+                            self._motion.walk(dir='RIGHT', wide=True, loop=1)
                     elif -90 < dx <= -50:  # 오른쪽
                         print("기준점에서 오른쪽으로 많이 치우침. 조정한다")
-                        if self.curr_head4box == 75:
+                        if self.curr_head4box[0] == 75:
                             self._motion.walk(dir='RIGHT', wide=True, loop=2)
                         else:
                             self._motion.walk(dir='RIGHT', loop=2)
                     elif -50 < dx < -40:
-                        if self.curr_head4box == 75:
+                        if self.curr_head4box[0] == 75:
                             self._motion.walk(dir='RIGHT', wide=True, loop=1)
                         else:
                             self._motion.walk(dir='RIGHT', loop=1)
                         print("기준점에서 오른쪽으로 치우침. 조정한다")
                     elif 90 > dx >= 50:  # 왼쪽
                         print("기준점에서 왼쪽으로 많이 치우침. 조정한다")
-                        if self.curr_head4box == 75:
+                        if self.curr_head4box[0] == 75:
                             self._motion.walk(dir='LEFT', wide=True, loop=2)
                         else:
                             self._motion.walk(dir='LEFT', loop=2)
                     elif 50 > dx > 40:  # 왼쪽
                         print("기준점에서 왼쪽으로 치우침. 조정한다")
-                        if self.curr_head4box == 75:
+                        if self.curr_head4box[0] == 75:
                             self._motion.walk(dir='LEFT', wide=True, loop=1)
                         else:
                             self._motion.walk(dir='LEFT', loop=2)
 
                     elif dx >= 90:
-                        if self.curr_head4box == 75:
-                            self._motion.turn(dir='LEFT', loop=2)
+                        if self.curr_head4box[0] == 75:
+                            self._motion.turn(dir='LEFT', sleep=0.1, loop=2)
                         else:
-                            self._motion.turn(dir='LEFT', loop=1)
+                            self._motion.walk(dir='LEFT', wide=True, loop=1)
 
                 else:
                     if self.curr_head4box[0] == 35:
