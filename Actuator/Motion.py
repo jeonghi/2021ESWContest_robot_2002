@@ -136,7 +136,7 @@ class Motion:
             return True
         return False
 
-    def walk(self, dir, loop=1, wide=False, grab=False, IR=False):
+    def walk(self, dir, loop=1, sleep=0.1, wide=False, grab=False, IR=False):
         """
         dir_list = ['FORWARD', 'BACKWARD', 'LEFT', 'RIGHT', 'LEFT2', 'RIGHT2']
         """
@@ -146,14 +146,14 @@ class Motion:
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             if dir in ['LEFT', 'RIGHT']:
-                time.sleep(0.1)
+                time.sleep(sleep)
 
         if IR:
             if self.get_IR() > 65:
                 return True
             return False
 
-    def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, IR=False):
+    def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, wide=False,  IR=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """
@@ -161,10 +161,14 @@ class Motion:
         if grab:
             dir_list[dir] += 11# if grab is true, change walk motion with grab
             if sliding:
-                dir_list[dir]+=9
+                dir_list[dir]+=28
+                if wide:
+                    dir_list[dir]+=2
         else:
             if sliding:
                 dir_list[dir] -= 2
+                if wide:
+                    dir_list[dir]+=45
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
@@ -190,8 +194,13 @@ class Motion:
             self.TX_data_py2(n)
 
     #문 열 때 도는 함수
-    def open_door_turn(self, dir,loop=1, sleep=0.5):
-        dir_list={'RIGHT':93, 'LEFT':92}
+    def open_door_turn(self, dir,loop=1, sliding=False, wide=False, sleep=0.5):
+        dir_list={'LEFT':92,'RIGHT':93}
+        if sliding:
+            dir_list[dir]+=7
+            if wide:
+                dir_list[dir]+=8
+
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)

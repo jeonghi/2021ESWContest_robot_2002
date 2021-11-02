@@ -95,8 +95,8 @@ class LineDetector:
             return contours
         else:
             edges = cv2.Canny(mask, 75, 150)
-            cv2.imshow('mask', mask)
-            cv2.imshow('edges', edges)
+            #cv2.imshow('mask', mask)
+            #cv2.imshow('edges', edges)
             lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=50, maxLineGap=150)
             lines = np.squeeze(lines)
             #print(lines)
@@ -317,8 +317,8 @@ class LineDetector:
                     a = compact_horizontal_line[1] - compact_horizontal_line[3]
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
-                    #print(c)
-                    if c >= 200:
+                    print(c)
+                    if c >= 350:
                         line_info["H"] = True
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
@@ -457,7 +457,7 @@ if __name__ == "__main__":
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
 
-        line_info, edge_info, result = line_detector.get_all_lines(src, color='GREEN', line_visualization=True,
+        line_info, edge_info, result = line_detector.get_all_lines(src, color='YELLOW', line_visualization=True,
                                                                    edge_visualization=False)
         print(line_info)
         print(edge_info)

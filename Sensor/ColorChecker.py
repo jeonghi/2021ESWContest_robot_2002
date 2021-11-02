@@ -7,14 +7,14 @@ import numpy as np
 COLORS = {
     "RED_ABCD": {
         "SCHOOL": {
-            "lower": [[0, 51, 56], [165, 51, 56]],
-            "upper": [[42, 159, 138], [180, 159, 138]]
+            "lower": [[0, 51, 43], [165, 51, 43]],
+            "upper": [[42, 184, 138], [180, 184, 138]]
         }
     },
     "BLUE_ABCD": {
         "SCHOOL": {
-            "lower": [[75, 73, 87], [75, 73, 87]],
-            "upper": [[143, 202, 176], [143, 202, 176]]
+            "lower": [[75, 73, 0], [75, 73, 0]],
+            "upper": [[143, 202, 155], [143, 202, 155]]
         }
     }
 }
@@ -100,6 +100,12 @@ class ColorPreProcessor():
         cv2.imshow("blue", blue_mask)
         answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
         return answer
+    
+    @staticmethod
+    def get_red_box_mask(src: np.array) -> np.array:
+        mask = ColorPreProcessor.get_color_binary_image(src=src, color=COLORS["RED_ABCD"]["SCHOOL"])
+        return mask
+        
 
     @staticmethod
     def get_yellow_mask4hue(hue: np.array) -> np.array:
