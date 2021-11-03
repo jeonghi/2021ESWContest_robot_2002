@@ -50,9 +50,9 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        #self.mode = "walk"
-        #self.direction = "LEFT"
-        #self.color = "YELLOW"
+        self.mode = "walk"
+        self.direction = "LEFT"
+        self.color = "YELLOW"
         #self.box_pos = None
         #self.curr_room_color = None
         #self.alphabet_color = None
@@ -81,7 +81,7 @@ class Robot:
         #self._motion.set_head("DOWN", 10)
         #self.curr_room_color = None
     def test(self):
-        self._motion.turn(dir='LEFT', loop=4, grab=True)
+        self._motion.walk(dir='RIGHT', loop=1, wide=True)
     
     def reset_room_var(self):
         self.curr_room_color = None
@@ -178,9 +178,11 @@ class Robot:
     def turn_to_green_area_after_box_tracking(self) -> None:
 
         if self.box_pos == 'RIGHT':
-                self._motion.turn(dir='LEFT', loop=3, wide=True, sliding = True, grab=True)
+            print('turn 3')
+            self._motion.turn(dir='LEFT', loop=4, wide=True, sliding = True, grab=True)
         elif self.box_pos == 'LEFT':
-            self._motion.turn(dir='RIGHT', loop=3, wide=True, sliding = True, grab=True)
+            print('turn 3')
+            self._motion.turn(dir='RIGHT', loop=4, wide=True, sliding = True, grab=True)
 
 
         self._motion.move_arm(dir='LOW')
@@ -219,9 +221,9 @@ class Robot:
                         self._motion.walk(dir='FORWARD', loop=2, grab=self.is_grab)  # 팔뻗기
                 else:
                     if line_info["V_X"][0] < 290:
-                        self._motion.walk(dir='LEFT', loop=1, wide=True, grab=self.is_grab) # 팔뻗기
+                        self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
                     elif line_info["V_X"][0] > 350:
-                        self._motion.walk(dir='RIGHT', loop=1, wide=True, grab=self.is_grab) # 팔뻗기
+                        self._motion.walk(dir='RIGHT', loop=1, grab=self.is_grab) # 팔뻗기
 
         elif 0 < line_info["DEGREE"] <= 85:
             print('MODIFY angle --LEFT')
@@ -288,7 +290,7 @@ class Robot:
                 self._motion.turn(dir='RIGHT', loop=1, grab=True)
         else:
             self.mode = 'fit_area'
-        time.sleep(0.5)
+
 
     def fit_area(self, line_info, edge_info):
         if self.box_pos == 'RIGHT':
@@ -299,9 +301,9 @@ class Robot:
                     self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     self.mode = 'move_into_area'
                 else:
-                    self._motion.walk(dir='RIGHT', loop=1, grab=True)
+                    self._motion.walk(dir='RIGHT', loop=1, wide=True, grab=True)
             else:
-                self._motion.walk(dir='RIGHT', loop=1, grab=True)
+                self._motion.walk(dir='RIGHT', loop=1, wide=True, grab=True)
         elif self.box_pos == 'LEFT':
             if line_info["ALL_X"][0] < 150:
                 if line_info["ALL_X"][1] > 480:
@@ -310,9 +312,9 @@ class Robot:
                     self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
                     self.mode = 'move_into_area'
                 else:
-                    self._motion.walk(dir='LEFT', loop=1)
+                    self._motion.walk(dir='LEFT', wide=True, loop=1)
             else:
-                self._motion.walk(dir='LEFT', loop=1)
+                self._motion.walk(dir='LEFT', wide=True, loop=1)
         else:
             self._motion.move_arm(dir='HIGH')  # 잡은 상태로 팔 앞으로 뻗고 고개 내림
             self.mode = 'move_into_area'
@@ -369,8 +371,8 @@ class Robot:
             if self.detect_door_alphabet():
                 self._motion.set_head(dir="DOWN", angle=10)
                 self._motion.walk(dir='FORWARD', loop=2)
-                self._motion.walk(dir='RIGHT', wide=True,loop=2)
-                self._motion.turn(dir='SLIDING_LEFT', loop=4)
+                self._motion.walk(dir='RIGHT', wide=True,loop=1)
+                self._motion.turn(dir='SLIDING_LEFT', loop=3)
                 self.mode = "start_line"
                 time.sleep(0.3)
             else:
@@ -387,17 +389,19 @@ class Robot:
             if not line_info['V']:
                 if (edge_info['L_Y'][0]< 5 and edge_info['L_Y'][0] > 200) or (edge_info['R_Y'][0]< 5 and edge_info['R_Y'][0] > 200):
                     print('입구 빠져 나옴 -- 조정 필요', ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
+                    self._motion.open_door(loop = 1)
+                    self._motion.basic_form()
                     self._motion.open_door_turn(dir='RIGHT', loop=3)
                     self.mode = 'direction_line'
                     #self._motion.basic_form()
                     #self._motion.turn(dir='SLIDING_RIGHT', loop=2)
                     #self.mode = 'direction_line'
                 else:
-                    if line_info['compact_H']:
-                        if 170 <= line_info['H_Y'][1] < 250:
+                    if line_info['H_DEGREE'] > 174 :
+                        if 160 <= line_info['H_Y'][1] < 250:
                             print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
                             self._motion.open_door(loop = 1)
-                        elif line_info['H_Y'][1] < 170:
+                        elif line_info['H_Y'][1] < 160:
                             print('입구 빠져 나가는 중 - H 멀어서 가까이 다가감', line_info['H'], line_info['H_Y'][1])
                             self._motion.open_door_walk(dir='FORWARD') # 수정 완료
                         else: # H가 너무 가깝다는 것, H 업다는 것
@@ -406,7 +410,7 @@ class Robot:
                             print('entrance :: H is so closed')
                             time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
                     else:
-                        print('H:', line_info['H'], ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
+                        print('H:', line_info['H_DEGREE'], ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
                         if edge_info['EDGE_R']:
                             self._motion.open_door_turn(dir='LEFT')
                         elif edge_info['EDGE_L']:
@@ -417,8 +421,9 @@ class Robot:
             else:
                 print('입구 빠져 나옴', 'V:', line_info['V'], line_info["V_X"])
                 #if line_info["V_X"][1] > 550:
-                    #self._motion.open_door(loop = 1)
-                self._motion.open_door_turn(dir='RIGHT', loop=5)
+                self._motion.open_door(loop = 1)
+                self._motion.open_door_turn(dir='RIGHT', loop=4)
+                self._motion.basic_form()
                 self.mode = 'direction_line'
                 #self._motion.basic_form()
                 #self._motion.turn(dir='SLIDING_RIGHT', loop=4)
@@ -426,7 +431,7 @@ class Robot:
                 
         elif self.mode in ['direction_line']:
             if line_info['compact_H']:
-                self._motion.basic_form()
+                #self._motion.basic_form()
                 
                 if line_info['H_Y'][1] < 100:
                     print('H랑 멀어서 가까이 다가감', line_info['H_Y'][1])
@@ -440,7 +445,7 @@ class Robot:
                 self.mode = 'detect_direction'
             else:
                 print('H 찾는 중', line_info['H_DEGREE'])
-                self._motion.open_door_turn(dir='RIGHT')
+                self._motion.turn(dir='RIGHT')
                 
         # 3) 화살표 방향 인식
         elif self.mode in ['detect_direction']:
@@ -585,29 +590,29 @@ class Robot:
                         if self.curr_head4box[0] == 75:
                             self._motion.turn(dir='RIGHT', sleep=0.1, loop=2)
                         else:
-                            self._motion.walk(dir='RIGHT', wide=True, loop=1)
+                            self._motion.walk(dir='RIGHT', loop=1)
                     elif -90 < dx <= -50:  # 오른쪽
                         print("기준점에서 오른쪽으로 많이 치우침. 조정한다")
                         if self.curr_head4box[0] == 75:
-                            self._motion.walk(dir='RIGHT', wide=True, loop=2)
+                            self._motion.walk(dir='RIGHT', loop=2)
                         else:
                             self._motion.walk(dir='RIGHT', loop=2)
                     elif -50 < dx < -40:
                         if self.curr_head4box[0] == 75:
-                            self._motion.walk(dir='RIGHT', wide=True, loop=1)
+                            self._motion.walk(dir='RIGHT', loop=1)
                         else:
                             self._motion.walk(dir='RIGHT', loop=1)
                         print("기준점에서 오른쪽으로 치우침. 조정한다")
                     elif 90 > dx >= 50:  # 왼쪽
                         print("기준점에서 왼쪽으로 많이 치우침. 조정한다")
                         if self.curr_head4box[0] == 75:
-                            self._motion.walk(dir='LEFT', wide=True, loop=2)
+                            self._motion.walk(dir='LEFT', loop=2)
                         else:
                             self._motion.walk(dir='LEFT', loop=2)
                     elif 50 > dx > 40:  # 왼쪽
                         print("기준점에서 왼쪽으로 치우침. 조정한다")
                         if self.curr_head4box[0] == 75:
-                            self._motion.walk(dir='LEFT', wide=True, loop=1)
+                            self._motion.walk(dir='LEFT', loop=1)
                         else:
                             self._motion.walk(dir='LEFT', loop=2)
 
@@ -615,7 +620,7 @@ class Robot:
                         if self.curr_head4box[0] == 75:
                             self._motion.turn(dir='LEFT', sleep=0.1, loop=2)
                         else:
-                            self._motion.walk(dir='LEFT', wide=True, loop=1)
+                            self._motion.walk(dir='LEFT',loop=1)
 
                 else:
                     if self.curr_head4box[0] == 35:
@@ -645,9 +650,9 @@ class Robot:
         elif self.mode in ['box_into_area']:
             self.box_into_area(line_info, edge_info)
             if self.box_pos == 'LEFT':
-                self._motion.turn(dir='RIGHT', sliding= True, wide=True, loop=5)
+                self._motion.turn(dir='RIGHT', sliding= True, wide=True, loop=4)
             elif self.box_pos == 'RIGHT':
-                self._motion.turn(dir='LEFT', sliding= True, wide=True, loop=5)
+                self._motion.turn(dir='LEFT', sliding= True, wide=True, loop=4)
                 
             if self.curr_room_color == 'BLACK':
                 self._motion.turn(dir=self.direction, sliding= True, wide=True, loop=6)
@@ -749,14 +754,17 @@ class Robot:
             
             if self.curr_room_color == 'BLACK':
                 if edge_info["EDGE_POS"]:
+                    print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
                     if self.count < 3 :
-                        if edge_info["EDGE_POS"][1] > 430:
+                        if line_info["ALL_Y"][1] > 340:
                             self._motion.grab(switch=False)
                             self.count += 1
                             if self.direction == 'LEFT':
                                 self._motion.turn(dir='RIGHT', sliding=True, loop=1)
                             else:
                                 self._motion.turn(dir='LEFT', sliding=True, loop=1)
+                            self._motion.set_head(dir='DOWN', angle=10)
+                            time.sleep(0.5)
                             self.mode = 'find_corner' 
                         else:  
                             self._motion.walk(dir='FORWARD', loop=1, grab=True)
@@ -772,13 +780,16 @@ class Robot:
 
             elif self.curr_room_color == 'GREEN':
                 if edge_info["EDGE_POS"]:
+                    print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
                     if self.count < 3 :
-                        if edge_info["EDGE_POS"][1] > 430:  
+                        if line_info["ALL_Y"][1] > 340:  
                             self._motion.walk(dir='FORWARD', loop=1)
                             if self.direction == 'LEFT':
                                 self._motion.turn(dir='RIGHT', sliding=True, loop=1)
                             else:
                                 self._motion.turn(dir='LEFT', sliding=True, loop=1)
+                            self._motion.set_head(dir='DOWN', angle=10)
+                            time.sleep(0.5)
                             self.mode = 'find_corner' 
                         else: 
                             self._motion.walk(dir='FORWARD', loop=1)
