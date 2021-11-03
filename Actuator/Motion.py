@@ -136,13 +136,15 @@ class Motion:
             return True
         return False
 
-    def walk(self, dir, loop=1, sleep=0.1, wide=False, grab=False, IR=False):
+    def walk(self, dir, loop=1, sleep=0.1, wide=False, grab=False, open_door=False, IR=False):
         """
         dir_list = ['FORWARD', 'BACKWARD', 'LEFT', 'RIGHT', 'LEFT2', 'RIGHT2']
         """
         dir_list = {'FORWARD':56, 'BACKWARD':57, 'LEFT':58, 'RIGHT':59, 'LEFT2':96, 'RIGHT2':97}
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         if wide: dir_list[dir] += 38
+        if open_door and dir == 'FORWARD': dir_list[dir] += 33
+        elif open_door and dir in ['LEFT', 'RIGHT']: dir_list[dir] = 53
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             if dir in ['LEFT', 'RIGHT']:
@@ -153,12 +155,16 @@ class Motion:
                 return True
             return False
 
-    def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, wide=False,  IR=False):
+    def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, wide=False, open_door=False, IR=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
         """
         dir_list = {'SLIDING_LEFT':60, 'SLIDING_RIGHT':61, 'LEFT':62, 'RIGHT':63}
-        if grab:
+
+        if open_door:
+            dir_list[dir] += 39
+
+        elif grab:
             dir_list[dir] += 11# if grab is true, change walk motion with grab
             if sliding:
                 dir_list[dir]+=28
