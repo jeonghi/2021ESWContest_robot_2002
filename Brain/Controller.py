@@ -50,7 +50,7 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        self.mode = "walk"
+        self.mode = "find_corner"
         self.direction = "LEFT"
         self.color = "YELLOW"
         #self.box_pos = None
@@ -683,7 +683,7 @@ class Robot:
                             self._motion.turn(dir='LEFT', loop=1)
                 else:
                     if line_info["ALL_X"][0] < 300:
-                        if line_info["ALL_Y"][1] < 200 : # yellow 감지
+                        if line_info["ALL_Y"][1] < 215 : # yellow 감지
                             self._motion.set_head(dir='DOWN', angle=60)
                             self.return_head = '60'
                             print(line_info["ALL_Y"][1], self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
@@ -704,7 +704,7 @@ class Robot:
                         print('영역 충분히 보이는 시점: ', self.direction, '으로 돌다가 왼쪽 끝 ', line_info["ALL_X"][0] ,' 에 닿음')
                     else:
                         print('영역 충분히 보이는 시점: ', self.direction, '으로 돌다가 오른쪽 끝 ', line_info["ALL_X"][1] ,' 에 닿음')
-                    if line_info["ALL_Y"][1] < 200 :  # yellow 감지
+                    if line_info["ALL_Y"][1] < 215 :  # yellow 감지
                         self._motion.set_head(dir='DOWN', angle=60)
                         self.return_head = '60'
                         print(self.mode, ': 노란 색 영역 적음 -> 고개 ', self.return_head, '로 진행')
@@ -739,14 +739,14 @@ class Robot:
 
         elif self.mode in ['return_line']:
             if self.return_head == '60':
-                if line_info["ALL_Y"][1] >= 200 :
+                if line_info["ALL_Y"][1] >= 215 :
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
                     time.sleep(0.3)
                         
             elif self.return_head == '45':
-                if line_info["ALL_Y"][1] >= 200 :
+                if line_info["ALL_Y"][1] >= 215 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
@@ -756,16 +756,19 @@ class Robot:
                 if edge_info["EDGE_POS"]:
                     print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
                     if self.count < 3 :
-                        if line_info["ALL_Y"][1] > 340:
+                        if line_info["ALL_Y"][1] > 320:
                             self._motion.grab(switch=False)
                             self.count += 1
-                            if self.direction == 'LEFT':
-                                self._motion.turn(dir='RIGHT', sliding=True, loop=1)
-                            else:
-                                self._motion.turn(dir='LEFT', sliding=True, loop=1)
+                            self._motion.walk(dir='FORWARD', loop=1)
+                            self._motion.walk(dir=self.direction, wide= True, loop=2)
+                            #if self.direction == 'LEFT':
+                                #self._motion.turn(dir='RIGHT', sliding=True, loop=1)
+                            #else:
+                                #self._motion.turn(dir='LEFT', sliding=True, loop=1)
                             self._motion.set_head(dir='DOWN', angle=10)
                             time.sleep(0.5)
-                            self.mode = 'find_corner' 
+                            self.mode = 'find_corner'
+                            time.sleep(0.3)
                         else:  
                             self._motion.walk(dir='FORWARD', loop=1, grab=True)
                         
@@ -775,6 +778,7 @@ class Robot:
                             self.count += 1
                             self._motion.turn(dir=self.direction, loop=1)
                             self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
+                            time.sleep(0.3)
                         else:  # yellow edge y 좌표 가까이 X
                             self._motion.walk(dir='FORWARD', loop=1, grab=True)
 
@@ -782,15 +786,17 @@ class Robot:
                 if edge_info["EDGE_POS"]:
                     print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
                     if self.count < 3 :
-                        if line_info["ALL_Y"][1] > 340:  
+                        if line_info["ALL_Y"][1] > 320:
                             self._motion.walk(dir='FORWARD', loop=1)
-                            if self.direction == 'LEFT':
-                                self._motion.turn(dir='RIGHT', sliding=True, loop=1)
-                            else:
-                                self._motion.turn(dir='LEFT', sliding=True, loop=1)
+                            self._motion.walk(dir=self.direction, wide= True, loop=2)
+                            #if self.direction == 'LEFT':
+                                #self._motion.turn(dir='RIGHT', sliding=True, loop=1)
+                            #else:
+                                #self._motion.turn(dir='LEFT', sliding=True, loop=1)
                             self._motion.set_head(dir='DOWN', angle=10)
                             time.sleep(0.5)
-                            self.mode = 'find_corner' 
+                            self.mode = 'find_corner'
+                            time.sleep(0.3)
                         else: 
                             self._motion.walk(dir='FORWARD', loop=1)
                         
@@ -799,6 +805,7 @@ class Robot:
                             self._motion.walk(dir='FORWARD', loop=1)
                             self._motion.turn(dir=self.direction, loop=1)
                             self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
+                            time.sleep(0.3)
                         else: # yellow edge y 좌표 가까이 X
                             self._motion.walk(dir='FORWARD', loop=1)
 
@@ -809,13 +816,14 @@ class Robot:
         elif self.mode in ['find_corner']:
             if self.count < 3:
                 if line_info["compact_H"]:
-                    self._motion.walk(dir=self.direction, wide= True, loop =2)
+                    self._motion.walk(dir=self.direction, wide= True, loop =4)
                     self.mode = 'mission_line'
                 else:
                     if self.direction == 'LEFT':
                         self._motion.turn(dir='RIGHT', loop=1)
                     else:
                         self._motion.turn(dir='LEFT', loop=1)
+                    time.sleep(0.3)
             else:
                 if line_info["V"]:
                     if 300 < line_info["V_X"][0] < 340:

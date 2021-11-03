@@ -102,9 +102,9 @@ class LineDetector:
             #print(lines)
 
             if len(lines.shape) == 0:
-                return [], [], [], [], [], [], [], []
+                return [], [], [], [], [], [], [], 0
             elif len(lines.shape) == 1:
-                return [], [], [], [], [], [], [], []
+                return [], [], [], [], [], [], [], 0
             else:
                 slope_degree = (np.arctan2(lines[:, 1] - lines[:, 3], lines[:, 0] - lines[:, 2]) * 180) / np.pi
 
