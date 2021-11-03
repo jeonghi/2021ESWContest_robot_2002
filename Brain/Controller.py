@@ -237,7 +237,7 @@ class Robot:
         else:
             print('MODIFY angle --RIGHT')
             self._motion.turn(dir='RIGHT', loop=1, grab=self.is_grab) # 팔뻗기
-        time.sleep(0.3)
+        
 
     def find_edge(self): #find_corner_for_outroom
         if self.curr_room_color == 'BLACK':
@@ -339,8 +339,9 @@ class Robot:
         
     
 
-    def run(self):
-
+    def run(self, in_method = 2):
+        # in_method == 1 : 옆으로 걷기
+        # in_method == 2 : 앞으로 걷기
         if self.mode_history != self.mode:
             if self.mode != 'walk':
                 self.progress_of_robot.append(self.mode_history)
@@ -369,14 +370,33 @@ class Robot:
         elif self.mode in ['detect_door_alphabet']:
             self._motion.set_head(dir="DOWN", angle=self.curr_head4door_alphabet[0])
             if self.detect_door_alphabet():
-                self._motion.set_head(dir="DOWN", angle=10)
-                self._motion.walk(dir='FORWARD', loop=2)
-                self._motion.walk(dir='RIGHT', wide=True,loop=1)
-                self._motion.turn(dir='SLIDING_LEFT', loop=3)
-                self.mode = "start_line"
+                if in_method == 1 :
+                    self._motion.set_head(dir="DOWN", angle=10)
+                    self._motion.walk(dir='FORWARD', loop=2)
+                    self._motion.walk(dir='RIGHT', wide=True,loop=1)
+                    self._motion.turn(dir='SLIDING_LEFT', loop=3)
+                    self.mode = "start_line"
+                elif in_method = 2 :
+                    self._motion.set_head(dir="DOWN", angle=10)
+                    time.sleep(0.3)
+                    self.mode = 'close_to_direction_line'
+                else:
+                    print('please check in_method')
                 time.sleep(0.3)
             else:
                 self.curr_head4door_alphabet.rotate(-1)
+                
+        elif self.mode in ['close_to_direction_line']:
+            if line_info['H']:
+                self._motion.basic_form()
+                if line_info['H_Y'][1] < 100:
+                    print('H랑 멀어서 가까이 다가감', line_info['H_Y'][1])
+                    self._motion.walk(dir='FORWARD')
+                self._motion.set_head(dir='DOWN', angle=90)
+                time.sleep(1.0)
+                self.mode = 'detect_direction'
+            else:
+                self.walk(line_info, True)
                 
         elif self.mode in ['start_line']:
             if line_info['compact_H']:
