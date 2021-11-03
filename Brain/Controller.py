@@ -50,7 +50,7 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        self.mode = "find_corner"
+        self.mode = "walk"
         self.direction = "LEFT"
         self.color = "YELLOW"
         #self.box_pos = None
@@ -756,7 +756,7 @@ class Robot:
                 if edge_info["EDGE_POS"]:
                     print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
                     if self.count < 3 :
-                        if line_info["ALL_Y"][1] > 320:
+                        if line_info["ALL_Y"][1] > 300:
                             self._motion.grab(switch=False)
                             self.count += 1
                             self._motion.walk(dir='FORWARD', loop=1)
@@ -786,7 +786,7 @@ class Robot:
                 if edge_info["EDGE_POS"]:
                     print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
                     if self.count < 3 :
-                        if line_info["ALL_Y"][1] > 320:
+                        if line_info["ALL_Y"][1] > 300:
                             self._motion.walk(dir='FORWARD', loop=1)
                             self._motion.walk(dir=self.direction, wide= True, loop=2)
                             #if self.direction == 'LEFT':
@@ -815,7 +815,7 @@ class Robot:
 
         elif self.mode in ['find_corner']:
             if self.count < 3:
-                if line_info["compact_H"]:
+                if line_info["H"]:
                     self._motion.walk(dir=self.direction, wide= True, loop =4)
                     self.mode = 'mission_line'
                 else:
@@ -842,12 +842,12 @@ class Robot:
                 if 170 <= line_info['H_Y'][1] < 250:
                     print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
             
-                    if not line_info['V']:
-                        self._motion.walk(self.direction, wide= True, loop = 4)
-                    else:
-                        self._motion.turn(self.direction, sliding= True, loop = 4)
+                    if line_info['V'] and line_info['H_X'][0] > 50:
+                        self._motion.turn(self.direction, sliding= True, wide = True, loop = 3)
                         self.mode = 'walk'
                         self.walk_info = '│'
+                    else:
+                        self._motion.walk(self.direction, wide= True, loop = 4)
                         
                 elif line_info['H_Y'][1] < 170:
                     print('입구 빠져 나가는 중 - H 멀어서 가까이 다가감', line_info['H'], line_info['H_Y'][1])
