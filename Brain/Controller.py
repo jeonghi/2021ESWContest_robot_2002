@@ -194,7 +194,7 @@ class Robot:
         self.mode = 'end_mission'
         self.color = 'YELLOW'
 
-    def walk(self, line_info, go: bool):
+    def walk(self, line_info, go: bool, open_door=False):
         """
          line_info = {
         "DEGREE" : 0,
@@ -216,18 +216,18 @@ class Robot:
             if go:
                 if 290 < line_info["V_X"][0] < 350:
                     if line_info["H"]:
-                        self._motion.walk(dir='FORWARD', loop=1, grab=self.is_grab) # 팔뻗기
+                        self._motion.walk(dir='FORWARD', loop=1, grab=self.is_grab, open_door = open_door) # 팔뻗기
                     else:
-                        self._motion.walk(dir='FORWARD', loop=2, grab=self.is_grab)  # 팔뻗기
+                        self._motion.walk(dir='FORWARD', loop=2, grab=self.is_grab, open_door = open_door)  # 팔뻗기
                 else:
                     if line_info["V_X"][0] < 290:
-                        self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
+                        self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab, open_door = open_door) # 팔뻗기
                     elif line_info["V_X"][0] > 350:
-                        self._motion.walk(dir='RIGHT', loop=1, grab=self.is_grab) # 팔뻗기
+                        self._motion.walk(dir='RIGHT', loop=1, grab=self.is_grab, open_door = open_door) # 팔뻗기
 
         elif 0 < line_info["DEGREE"] <= 85:
             print('MODIFY angle --LEFT')
-            self._motion.turn(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
+            self._motion.turn(dir='LEFT', loop=1, grab=self.is_grab, open_door = open_door) # 팔뻗기
        
         elif line_info["DEGREE"] == 0 :
             print(self.mode, 'mode walk no line')
@@ -236,7 +236,7 @@ class Robot:
 
         else:
             print('MODIFY angle --RIGHT')
-            self._motion.turn(dir='RIGHT', loop=1, grab=self.is_grab) # 팔뻗기
+            self._motion.turn(dir='RIGHT', loop=1, grab=self.is_grab, open_door = open_door) # 팔뻗기
         
 
     def find_edge(self): #find_corner_for_outroom
@@ -396,7 +396,7 @@ class Robot:
                 time.sleep(1.0)
                 self.mode = 'detect_direction'
             else:
-                self.walk(line_info, True)
+                self.walk(line_info, True, open_door =True)
                 
         elif self.mode in ['start_line']:
             if line_info['compact_H']:
