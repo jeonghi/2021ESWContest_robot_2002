@@ -9,7 +9,6 @@ from collections import deque
 
 
 class Robot:
-
     def __init__(self, video_path ="", mode="start", DEBUG=False):
         # 모듈들 객체 생성
         self._motion = Motion()
@@ -51,15 +50,15 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        self.mode = "walk"
-        self.direction = "LEFT"
-        self.color = "YELLOW"
-        self.box_pos = None
-        self.curr_room_color = None
-        self.alphabet_color = None
-        self.alphabet = None
+        #self.mode = "walk"
+        #self.direction = "LEFT"
+        #self.color = "YELLOW"
+        #self.box_pos = None
+        #self.curr_room_color = None
+        #self.alphabet_color = None
+        #self.alphabet = None
         #self.black_room = ["A", "C"]
-        self.count = 2
+        #self.count = 2
         
         #self.mode = 'start_mission'
         #self.direction = 'LEFT'
@@ -179,16 +178,16 @@ class Robot:
     def turn_to_green_area_after_box_tracking(self) -> None:
 
         if self.box_pos == 'RIGHT':
-            self._motion.turn(dir='LEFT', loop=7, grab=True)
-
+                self._motion.turn(dir='LEFT', loop=3, wide=True, sliding = True, grab=True)
         elif self.box_pos == 'LEFT':
-            self._motion.turn(dir='RIGHT', loop=7, grab=True)
+            self._motion.turn(dir='RIGHT', loop=3, wide=True, sliding = True, grab=True)
+
 
         self._motion.move_arm(dir='LOW')
         self.mode = 'check_area'
 
     def turn_to_black_area_after_box_tracking(self) -> None:
-        self._motion.turn(dir=self.direction, loop=7, grab=True)
+        self._motion.turn(dir=self.direction, loop=6, wide=True, sliding = True, grab=True)
         # time.sleep(1)
         self.mode = 'end_mission'
         self.color = 'YELLOW'
@@ -229,6 +228,7 @@ class Robot:
             self._motion.turn(dir='LEFT', loop=1, grab=self.is_grab) # 팔뻗기
        
         elif line_info["DEGREE"] == 0 :
+            print(self.mode, 'mode walk no line')
             self._motion.walk(dir='BACKWARD')
             time.sleep(1) #뒤로 걷는 거 휘청거려서 sleep 넣음
 
@@ -271,13 +271,19 @@ class Robot:
     def check_area(self, line_info, edge_info):
         print('line_info[H]:', line_info["H"], 'line_info[H_Y]:', line_info["H_Y"])
         if self.box_pos == 'RIGHT':
-            if line_info["H"] and line_info["H_Y"][1] < 350:
-                self.mode = 'fit_area'
+            if line_info["H"]:
+                if line_info["len(H)"] >= 300:
+                    self.mode = 'fit_area'
+                else:
+                    self._motion.walk(dir='RIGHT', loop=1, wide= True, grab=True)
             else:
                 self._motion.turn(dir='LEFT', loop=1, grab=True)
         elif self.box_pos == 'LEFT':
-            if line_info["H"] and line_info["H_Y"][1] < 350:
-                self.mode = 'fit_area'
+            if line_info["H"]:
+                if line_info["len(H)"] >= 300:
+                    self.mode = 'fit_area'
+                else:
+                    self._motion.walk(dir='LEFT', loop=1, wide= True, grab=True)
             else:
                 self._motion.turn(dir='RIGHT', loop=1, grab=True)
         else:
@@ -328,6 +334,8 @@ class Robot:
         self._motion.grab(switch=False)
         self.color = 'YELLOW'
         self.count += 1
+        
+    
 
     def run(self):
 
@@ -343,7 +351,7 @@ class Robot:
             if self.DEBUG:
                 print(self.mode, self.walk_info)
                 if self.color == 'YELLOW':
-                    line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=False)
+                    line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
                 elif self.color == 'GREEN':
                     line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=False)
                 else:
@@ -369,7 +377,7 @@ class Robot:
                 self.curr_head4door_alphabet.rotate(-1)
                 
         elif self.mode in ['start_line']:
-            if line_info['H']:
+            if line_info['compact_H']:
                 self._motion.open_door(loop = 1)
                 self.mode = "entrance"
             else:
@@ -385,16 +393,17 @@ class Robot:
                     #self._motion.turn(dir='SLIDING_RIGHT', loop=2)
                     #self.mode = 'direction_line'
                 else:
-                    if line_info['H']:
-                        if 80 <= line_info['H_Y'][1] < 250:
+                    if line_info['compact_H']:
+                        if 170 <= line_info['H_Y'][1] < 250:
                             print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
                             self._motion.open_door(loop = 1)
-                        elif line_info['H_Y'][1] < 80:
+                        elif line_info['H_Y'][1] < 170:
                             print('입구 빠져 나가는 중 - H 멀어서 가까이 다가감', line_info['H'], line_info['H_Y'][1])
                             self._motion.open_door_walk(dir='FORWARD') # 수정 완료
                         else: # H가 너무 가깝다는 것, H 업다는 것
                             print('입구 빠져 나가는 중 - H 가까워서 한발자국 뒤로', line_info['H'], line_info['H_Y'][1])
                             self._motion.open_door_walk(dir='BACKWARD') # 수정 완료
+                            print('entrance :: H is so closed')
                             time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
                     else:
                         print('H:', line_info['H'], ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
@@ -404,6 +413,7 @@ class Robot:
                             self._motion.open_door_turn(dir='RIGHT')
                         else:
                             self._motion.open_door_walk(dir='BACKWARD')
+                            print('No H')
             else:
                 print('입구 빠져 나옴', 'V:', line_info['V'], line_info["V_X"])
                 #if line_info["V_X"][1] > 550:
@@ -415,7 +425,7 @@ class Robot:
                 #self.mode = 'direction_line'
                 
         elif self.mode in ['direction_line']:
-            if line_info['H_DEGREE'] > 172.5:
+            if line_info['compact_H']:
                 self._motion.basic_form()
                 
                 if line_info['H_Y'][1] < 100:
@@ -448,6 +458,7 @@ class Robot:
                 self.walk_info = '│'
             else:
                 self._motion.walk("BACKWARD", 1)
+                print('detect direction is failed')
                 time.sleep(0.5)
                 
 
@@ -634,13 +645,13 @@ class Robot:
         elif self.mode in ['box_into_area']:
             self.box_into_area(line_info, edge_info)
             if self.box_pos == 'LEFT':
-                self._motion.turn(dir='SLIDING_RIGHT', loop=3)
+                self._motion.turn(dir='RIGHT', sliding= True, wide=True, loop=5)
             elif self.box_pos == 'RIGHT':
-                self._motion.turn(dir='SLIDING_LEFT', loop=3)
+                self._motion.turn(dir='LEFT', sliding= True, wide=True, loop=5)
                 
             if self.curr_room_color == 'BLACK':
-                self._motion.turn(dir='LEFT', loop=4)
-
+                self._motion.turn(dir=self.direction, sliding= True, wide=True, loop=6)
+                
             self.mode = 'end_mission'
             self.color = 'YELLOW'
 
@@ -727,57 +738,118 @@ class Robot:
                     self._motion.set_head(dir='DOWN', angle=45)
                     self.return_head = '45'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
-                    time.sleep(0.5)
+                    time.sleep(0.3)
                         
             elif self.return_head == '45':
                 if line_info["ALL_Y"][1] >= 200 :
                     self._motion.set_head(dir='DOWN', angle=35)
                     self.return_head = '35'
                     print(self.mode, ': 노란 색 영역 넓음 -> 고개 ', self.return_head, '로 진행')
-                    time.sleep(0.5)
+                    time.sleep(0.3)
             
             if self.curr_room_color == 'BLACK':
-                self._motion.walk(dir='FORWARD', loop=1, grab=True)
                 if edge_info["EDGE_POS"]:
-                    if edge_info["EDGE_POS"][1] > 450:  # yellow edge y 좌표 가까이 O
-                        self._motion.grab(switch=False)
-                        self.count += 1
-                        self._motion.turn(dir=self.direction, loop=1)
-                        self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
-                    else:  # yellow edge y 좌표 가까이 X
-                        self.mode = 'return_line'  # --> find_V
-                time.sleep(0.5)
+                    if self.count < 3 :
+                        if edge_info["EDGE_POS"][1] > 430:
+                            self._motion.grab(switch=False)
+                            self.count += 1
+                            if self.direction == 'LEFT':
+                                self._motion.turn(dir='RIGHT', sliding=True, loop=1)
+                            else:
+                                self._motion.turn(dir='LEFT', sliding=True, loop=1)
+                            self.mode = 'find_corner' 
+                        else:  
+                            self._motion.walk(dir='FORWARD', loop=1, grab=True)
+                        
+                    else:
+                        if edge_info["EDGE_POS"][1] > 450:  # yellow edge y 좌표 가까이 O
+                            self._motion.grab(switch=False)
+                            self.count += 1
+                            self._motion.turn(dir=self.direction, loop=1)
+                            self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
+                        else:  # yellow edge y 좌표 가까이 X
+                            self._motion.walk(dir='FORWARD', loop=1, grab=True)
 
             elif self.curr_room_color == 'GREEN':
                 if edge_info["EDGE_POS"]:
-                    if edge_info["EDGE_POS"][1] > 450:  # yellow edge y 좌표 가까이 O
-                        self._motion.walk(dir='FORWARD', loop=1)
-                        self._motion.turn(dir=self.direction, loop=1)
-                        self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
-
-                    else: # yellow edge y 좌표 가까이 X
-                        self.mode = 'return_line'  # --> find_V
-                        # self.return_line()
-                        self._motion.walk(dir='FORWARD', loop=1)
-                    time.sleep(0.5)
+                    if self.count < 3 :
+                        if edge_info["EDGE_POS"][1] > 430:  
+                            self._motion.walk(dir='FORWARD', loop=1)
+                            if self.direction == 'LEFT':
+                                self._motion.turn(dir='RIGHT', sliding=True, loop=1)
+                            else:
+                                self._motion.turn(dir='LEFT', sliding=True, loop=1)
+                            self.mode = 'find_corner' 
+                        else: 
+                            self._motion.walk(dir='FORWARD', loop=1)
+                        
+                    else:
+                        if edge_info["EDGE_POS"][1] > 450:  # yellow edge y 좌표 가까이 O
+                            self._motion.walk(dir='FORWARD', loop=1)
+                            self._motion.turn(dir=self.direction, loop=1)
+                            self.mode = 'find_corner'  # --> 걸을 직선 찾고 walk
+                        else: # yellow edge y 좌표 가까이 X
+                            self._motion.walk(dir='FORWARD', loop=1)
 
                 else: # yellow edge 감지 X 
                     self.mode = 'find_edge'  # --> return_line
                     self.find_edge()
 
         elif self.mode in ['find_corner']:
-            if line_info["V"]:
-                if 300 < line_info["V_X"][0] < 340:
-                    self._motion.walk(dir='FORWARD', loop=2)
-                    self.mode = 'walk'
-                    self.walk_info = '│'
-                elif line_info["V_X"][0] <= 300:
-                    self._motion.walk(dir='LEFT', loop=1)
+            if self.count < 3:
+                if line_info["compact_H"]:
+                    self._motion.walk(dir=self.direction, wide= True, loop =2)
+                    self.mode = 'mission_line'
                 else:
-                    self._motion.walk(dir='RIGHT', loop=1)
+                    if self.direction == 'LEFT':
+                        self._motion.turn(dir='RIGHT', loop=1)
+                    else:
+                        self._motion.turn(dir='LEFT', loop=1)
             else:
-                self._motion.turn(self.direction, 1)
-            time.sleep(0.5)
+                if line_info["V"]:
+                    if 300 < line_info["V_X"][0] < 340:
+                        self._motion.walk(dir='FORWARD', loop=2)
+                        self.mode = 'walk'
+                        self.walk_info = '│'
+                    elif line_info["V_X"][0] <= 300:
+                        self._motion.walk(dir='LEFT', loop=1)
+                    else:
+                        self._motion.walk(dir='RIGHT', loop=1)
+                else:
+                    self._motion.turn(self.direction, 1)
+                    
+        elif self.mode in ['mission_line']:
+            if line_info['compact_H']:
+                if 170 <= line_info['H_Y'][1] < 250:
+                    print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
+            
+                    if not line_info['V']:
+                        self._motion.walk(self.direction, wide= True, loop = 4)
+                    else:
+                        self._motion.turn(self.direction, sliding= True, loop = 4)
+                        self.mode = 'walk'
+                        self.walk_info = '│'
+                        
+                elif line_info['H_Y'][1] < 170:
+                    print('입구 빠져 나가는 중 - H 멀어서 가까이 다가감', line_info['H'], line_info['H_Y'][1])
+                    self._motion.open_door_walk(dir='FORWARD') # 수정 완료
+                else: # H가 너무 가깝다는 것, H 업다는 것
+                    print('입구 빠져 나가는 중 - H 가까워서 한발자국 뒤로', line_info['H'], line_info['H_Y'][1])
+                    self._motion.open_door_walk(dir='BACKWARD') # 수정 완료
+                    print('entrance :: H is so closed')
+                    time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
+            else:
+                print('H:', line_info['H'], ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
+                if edge_info['EDGE_R']:
+                    self._motion.open_door_turn(dir='LEFT')
+                elif edge_info['EDGE_L']:
+                    self._motion.open_door_turn(dir='RIGHT')
+                else:
+                    self._motion.open_door_walk(dir='BACKWARD')
+                    print('No H')
+
+                
+            
 
         # 나가기
         elif self.mode in ['is_finish_line']:

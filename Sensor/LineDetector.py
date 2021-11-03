@@ -366,7 +366,7 @@ class LineDetector:
                     edge_info["EDGE_POS"] = None
 
             if color == 'GREEN':
-                line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
+                line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, "len(H)":0, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
                 edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
                 if len(edge_lines) != 0:
@@ -412,6 +412,7 @@ class LineDetector:
                     print('length:  ', c)
                     if c >= 100:
                         line_info["H"] = True
+                        line_info["len(H)"] = c
                     print(compact_horizontal_line[3])
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
