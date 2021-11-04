@@ -7,6 +7,7 @@ import time
 import sys
 from collections import deque
 
+SAFETY = True
 
 class Robot:
     def __init__(self, video_path ="", mode="start", DEBUG=False):
@@ -346,20 +347,18 @@ class Robot:
                 self.progress_of_robot.append(self.mode_history)
             self.mode_history = self.mode
             cv2.destroyAllWindows()
-            
-        if self.mode == 'walk' and self.count < 3:
-            line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=False, ROI= False)
-        else:
-            if self.DEBUG:
-                print(self.mode, self.walk_info)
-                if self.color == 'YELLOW':
-                    line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
-                elif self.color == 'GREEN':
-                    line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=False)
-                else:
-                    line_info, edge_info = self.line_tracing()
+
+
+        if self.DEBUG:
+            print(self.mode, self.walk_info)
+            if self.color == 'YELLOW':
+                line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=True)
+            elif self.color == 'GREEN':
+                line_info, edge_info = self.line_tracing(line_visualization=False, edge_visualization=False)
             else:
                 line_info, edge_info = self.line_tracing()
+        else:
+            line_info, edge_info = self.line_tracing()
 
         # 0) 시작
         if self.mode in ['start'] :
@@ -798,7 +797,7 @@ class Robot:
             if self.curr_room_color == 'BLACK':
                 if edge_info["EDGE_POS"]:
                     print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
-                    if self.count < 3 :
+                    if self.count < 3 and SAFETY :
                         if line_info["ALL_Y"][1] > 300:
                             self._motion.grab(switch=False)
                             self.count += 1
@@ -828,7 +827,7 @@ class Robot:
             elif self.curr_room_color == 'GREEN':
                 if edge_info["EDGE_POS"]:
                     print('edge_info[EDGE_POS][1]', edge_info["EDGE_POS"][1])
-                    if self.count < 3 :
+                    if self.count < 3 and SAFETY :
                         if line_info["ALL_Y"][1] > 300:
                             self._motion.walk(dir='FORWARD', loop=1)
                             self._motion.walk(dir=self.direction, wide= True, loop=2)
@@ -857,7 +856,7 @@ class Robot:
                     self.find_edge()
 
         elif self.mode in ['find_corner']:
-            if self.count < 3:
+            if self.count < 3 and SAFETY :
                 if line_info["H"]:
                     self._motion.walk(dir=self.direction, wide= True, loop =4)
                     self.mode = 'mission_line'
@@ -915,7 +914,7 @@ class Robot:
 
         # 나가기
         elif self.mode in ['is_finish_line']:
-            if self.count < 3:
+            if self.count < 3 and SAFETY:
                 if line_info["H"]:
                     self._motion.walk(dir='FORWARD')
                 else:
