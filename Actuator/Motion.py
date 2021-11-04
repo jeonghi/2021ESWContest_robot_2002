@@ -144,7 +144,7 @@ class Motion:
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         if wide: dir_list[dir] += 38
         if open_door and dir == 'FORWARD': dir_list[dir] += 33
-        elif open_door and dir in ['LEFT', 'RIGHT']: dir_list[dir] = 53
+        elif open_door and dir in ['LEFT', 'RIGHT']: dir_list[dir] += 53
         for _ in range(loop):
             self.TX_data_py2(dir_list[dir])
             if dir in ['LEFT', 'RIGHT']:
