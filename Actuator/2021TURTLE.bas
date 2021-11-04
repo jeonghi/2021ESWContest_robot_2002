@@ -1190,7 +1190,7 @@ GOSUB_RX_EXIT2:
     IF 보행순서 = 0 THEN
         보행순서 = 1
         MOVE G6A,95,  76, 147,  93, 101
-        MOVE G6D,101,  76, 147,  93, 98
+        MOVE G6D,101,  76, 148,  93, 98
         MOVE G6B,100
         MOVE G6C,100
         WAIT
@@ -1198,7 +1198,7 @@ GOSUB_RX_EXIT2:
         GOTO 횟수_전진종종걸음_1
     ELSE
         보행순서 = 0
-        MOVE G6D,95,  76, 147,  93, 101
+        MOVE G6D,95,  76, 148,  93, 101
         MOVE G6A,101,  76, 147,  93, 98
         MOVE G6B,100
         MOVE G6C,100
@@ -1212,7 +1212,7 @@ GOSUB_RX_EXIT2:
 
 횟수_전진종종걸음_1:
     MOVE G6A,95,  90, 125, 100, 104
-    MOVE G6D,104,  77, 147,  93,  102
+    MOVE G6D,104,  77, 148,  93,  102
     MOVE G6B, 85
     MOVE G6C,115
     WAIT
@@ -1221,7 +1221,7 @@ GOSUB_RX_EXIT2:
 횟수_전진종종걸음_2:
 
     MOVE G6A,103,   73, 140, 103,  100
-    MOVE G6D, 95,  85, 147,  85, 102
+    MOVE G6D, 95,  85, 148,  85, 102
     WAIT
 
     GOSUB 앞뒤기울기측정
@@ -1237,7 +1237,7 @@ GOSUB_RX_EXIT2:
     ERX 4800,A, 횟수_전진종종걸음_4
     IF A <> A_old THEN
 횟수_전진종종걸음_2_stop:
-        MOVE G6D,95,  90, 125, 95, 104
+        MOVE G6D,95,  90, 126, 95, 104
         MOVE G6A,104,  76, 145,  91,  102
         MOVE G6C, 100
         MOVE G6B,100
@@ -1255,7 +1255,7 @@ GOSUB_RX_EXIT2:
     '*********************************
 
 횟수_전진종종걸음_4:
-    MOVE G6D,95,  95, 120, 100, 104
+    MOVE G6D,95,  95, 121, 100, 104
     MOVE G6A,104,  77, 147,  93,  102
     MOVE G6C, 85
     MOVE G6B,115
@@ -1263,7 +1263,7 @@ GOSUB_RX_EXIT2:
 
 
 횟수_전진종종걸음_5:
-    MOVE G6D,103,    73, 140, 103,  100
+    MOVE G6D,103,    73, 141, 103,  100
     MOVE G6A, 95,  85, 147,  85, 102
     WAIT
 
@@ -1281,7 +1281,7 @@ GOSUB_RX_EXIT2:
     IF A <> A_old THEN
 횟수_전진종종걸음_5_stop:
         MOVE G6A,95,  90, 125, 95, 104
-        MOVE G6D,104,  76, 145,  91,  102
+        MOVE G6D,104,  76, 146,  91,  102
         MOVE G6B, 100
         MOVE G6C,100
         WAIT
