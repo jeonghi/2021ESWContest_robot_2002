@@ -50,7 +50,7 @@ class Robot:
         #self.box_pos = ""
         #self.curr_room_color =""
     
-        self.mode = "walk"
+        self.mode = "start"
         self.direction = "LEFT"
         self.color = "YELLOW"
         #self.box_pos = None
@@ -81,8 +81,7 @@ class Robot:
         #self._motion.set_head("DOWN", 10)
         #self.curr_room_color = None
     def test(self):
-        self._motion.walk(dir='RIGHT', loop=1, wide=True)
-    
+        self._motion.turn(dir='RIGHT', loop=1, grab=False, open_door = True) 
     def reset_room_var(self):
         self.curr_room_color = None
         self.alphabet = None
@@ -194,7 +193,7 @@ class Robot:
         self.mode = 'end_mission'
         self.color = 'YELLOW'
 
-    def walk(self, line_info, go: bool):
+    def walk(self, line_info, go: bool, open_door=False):
         """
          line_info = {
         "DEGREE" : 0,
@@ -376,9 +375,9 @@ class Robot:
                     self._motion.walk(dir='RIGHT', wide=True,loop=1)
                     self._motion.turn(dir='SLIDING_LEFT', loop=3)
                     self.mode = "start_line"
-                elif in_method = 2 :
+                elif in_method == 2 :
                     self._motion.set_head(dir="DOWN", angle=10)
-                    time.sleep(0.3)
+                    time.sleep(1)
                     self.mode = 'close_to_direction_line'
                 else:
                     print('please check in_method')
@@ -387,16 +386,40 @@ class Robot:
                 self.curr_head4door_alphabet.rotate(-1)
                 
         elif self.mode in ['close_to_direction_line']:
-            if line_info['H']:
-                self._motion.basic_form()
-                if line_info['H_Y'][1] < 100:
-                    print('H랑 멀어서 가까이 다가감', line_info['H_Y'][1])
-                    self._motion.walk(dir='FORWARD')
-                self._motion.set_head(dir='DOWN', angle=90)
-                time.sleep(1.0)
-                self.mode = 'detect_direction'
+            if line_info['V']:
+                if 85 < line_info["DEGREE"] < 95:
+                    if 290 < line_info["V_X"][0] < 350:
+                        if line_info["H"]:
+                            self._motion.basic_form()
+                            if line_info['H_Y'][1] < 100:
+                                print('H랑 멀어서 가까이 다가감', line_info['H_Y'][1])
+                                self._motion.walk(dir='FORWARD')
+                            self._motion.set_head(dir='DOWN', angle=90)
+                            time.sleep(1.0)
+                            self.mode = 'detect_direction'
+                        else:
+                            self._motion.walk(dir='FORWARD', loop=2, grab=self.is_grab, open_door = True)  # 팔뻗기
+                    else:
+                        if line_info["V_X"][0] < 290:
+                            self._motion.walk(dir='LEFT', loop=1, grab=self.is_grab, open_door = True) # 팔뻗기
+                        elif line_info["V_X"][0] > 350:
+                            self._motion.walk(dir='RIGHT', loop=1, grab=self.is_grab, open_door = True) # 팔뻗기
+
+                elif 0 < line_info["DEGREE"] <= 85:
+                    print('MODIFY angle --LEFT')
+                    self._motion.turn(dir='LEFT', loop=1, grab=self.is_grab, open_door = True) # 팔뻗기
+
+                else:
+                    print('MODIFY angle --RIGHT')
+                    self._motion.turn(dir='RIGHT', loop=1, grab=self.is_grab, open_door = True) # 팔뻗기
+
+            elif 0 < line_info["DEGREE"] <= 85:
+                    print('MODIFY angle --LEFT')
+                    self._motion.turn(dir='LEFT', loop=1, grab=self.is_grab, open_door = True) # 팔뻗기
             else:
-                self.walk(line_info, True)
+                print('MODIFY angle --RIGHT')
+                self._motion.turn(dir='RIGHT', loop=1, grab=self.is_grab, open_door = True) # 팔뻗기
+            
                 
         elif self.mode in ['start_line']:
             if line_info['compact_H']:
