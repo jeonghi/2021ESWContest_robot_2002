@@ -162,7 +162,7 @@ class Motion:
         dir_list = {'SLIDING_LEFT':60, 'SLIDING_RIGHT':61, 'LEFT':62, 'RIGHT':63}
 
         if open_door:
-            dir_list[dir] += 39
+            dir_list[dir] += 37
 
         elif grab:
             dir_list[dir] += 11# if grab is true, change walk motion with grab
