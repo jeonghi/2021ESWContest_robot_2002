@@ -5,7 +5,7 @@ import glob
 
 class HashDetector:
 
-    dim = (64, 64)
+    dim = (512, 512)
 
     def __init__(self, file_path) -> None:
         self.directions_hash = []

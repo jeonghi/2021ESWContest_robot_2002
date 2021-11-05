@@ -72,7 +72,7 @@ class ImageProcessor:
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
         _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-        cv2.imshow("mask",mask)
+        #cv2.imshow("mask",mask)
         
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -82,11 +82,13 @@ class ImageProcessor:
 
             (_, _, width, height) = cv2.boundingRect(cnt)
             area = cv2.contourArea(cnt)
-
+            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
+            vertice = len(approx)
             # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
-            if not ( 3500 < area  and area_ratio <= 1.4):
+
+            if not ( 3500 < area  and area_ratio <= 1.4 and vertice == 4):
                 continue
 
             target = Target(contour=cnt)
@@ -97,13 +99,13 @@ class ImageProcessor:
         for cnt in cnts2:
             (_, _, width, height) = cv2.boundingRect(cnt)
             area = cv2.contourArea(cnt)
-
+            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
+            vertice = len(approx)
             # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
-            approx = cv2.approxPolyDP(cnt, cv2.arcLength(cnt, True) * 0.02, True)
-            vertice = len(approx)
-            if not (area > 3500 and area_ratio <= 1.6):
+
+            if not (3500 < area and area_ratio <= 1.4 and vertice == 4):
                 continue
             target = Target(contour=cnt)
             canny_targets.append(target)
@@ -128,9 +130,11 @@ class ImageProcessor:
         if visualization:
             pos = target.get_pts()
             setLabel(roi_canvas, target.get_pts(), label="roi", color=(255,0,0))
-            #roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
+            mask = HashDetector.image_resize_with_pad(img=roi_mask, size=HashDetector.dim)
+            roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("src", cv2.hconcat(
                 [canvas, roi_canvas]))
+            cv2.imshow('mask', mask)
             cv2.waitKey(1)
         answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask, threshold=0.6)
         return answer
