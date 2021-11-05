@@ -82,9 +82,9 @@ class ColorPreProcessor():
 
     @staticmethod
     def get_mean_value_for_non_zero(src: np.array) -> int:
-        print(src)
+        #print(src)
         src_mean = np.true_divide(src.sum(), (src != 0).sum())
-        print(src_mean)
+        #print(src_mean)
         return int(np.mean(src_mean))
 
     @staticmethod
