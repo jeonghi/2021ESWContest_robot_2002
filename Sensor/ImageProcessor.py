@@ -403,18 +403,18 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="src/door_test/E.h264")
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
         #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
-        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        #print(alphabet)
+        alphabet = imageProcessor.get_door_alphabet(visualization=True)
+        print(alphabet)
         #src = imageProcessor.get_image(visualization=True)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
         #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
-        imageProcessor.room_test()
+        #imageProcessor.room_test()
         #print(result)
