@@ -12,13 +12,17 @@ class Mode(Enum):
     ROOM_MISSION = auto()
     GO_TO_NEXT_ROOM = auto()
     OUT = auto()
-    
+
+class Direction(Enum):
+    LEFT = auto()
+    RIGHT = auto()
 
 class Controller:
     robot = Robot()
     line_info: tuple
     edge_info: tuple
     mode: Mode
+    direction: Direction
     mission_done: int = 0
     
     @classmethod

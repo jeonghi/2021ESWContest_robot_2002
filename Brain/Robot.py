@@ -11,6 +11,8 @@ class Robot:
     def __init__(self, video_path =""):
         self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
+        self.curr_head4room_alphabet: deque = deque([85, 80])
+        self.curr_head4box: deque = deque([75, 60, 35])
 
     def set_basic_form(self):
         self._motion.basic_form()
