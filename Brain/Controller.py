@@ -1,5 +1,5 @@
 from Brain.Robot import Robot
-from enum import Enum
+from enum import Enum, auto
 from Brain.DoorMission import DoorMission
 from Brain.RoomMission import GreenRoomMission, BlackRoomMission
 import time
@@ -8,10 +8,10 @@ import time
 CLEAR_LIMIT: int = 3
 
 class Mode(Enum):
-    IN = 1
-    ROOM_MISSION = 2
-    GO_TO_NEXT_ROOM = 3
-    OUT = 4
+    IN = auto()
+    ROOM_MISSION = auto()
+    GO_TO_NEXT_ROOM = auto()
+    OUT = auto()
     
 
 class Controller:
@@ -27,7 +27,7 @@ class Controller:
     
     @classmethod
     def get_ling_info(cls) -> tuple:
-        cls.line_info, cls.edge_info = cls.robot.line_tracing
+        cls.line_info, cls.edge_info = cls.robot.line_tracing()
         
     @classmethod
     def check_area_color(cls):
@@ -43,23 +43,19 @@ class Controller:
     
     @classmethod
     def run(cls):
-        cls.get_line_info()
+        cls.get_ling_info()
         if cls.mode == Mode.IN :
             DoorMission.run()
         elif cls.mode == Mode.ROOM_MISSION :
-            if cls.curr_room_color == "GREEN":
-                if GreenRoomMission.run():
-                    if cls.check_go_to_next_room():
-                        cls.mode = Mode.GO_TO_NEXT_ROOM
-                    else:
-                        cls.mode = Mode.OUT
-            else:
-                if BlackRoomMission.run():
-                    if cls.check_go_to_next_room():
-                        cls.mode = Mode.GO_TO_NEXT_ROOM
-                    else:
-                        cls.mode = Mode.OUT
+
+            Mission = GreenRoomMission if cls.curr_room_color == "GREEN" else BlackRoomMission
+            if Mission.run():
+                if cls.check_go_to_next_room():
+                    cls.mode = Mode.GO_TO_NEXT_ROOM
+                else:
+                    cls.mode = Mode.OUT
+                    
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             pass
         elif cls.mode == Mode.OUT:
-            pass 
+            DoorMission.run()
