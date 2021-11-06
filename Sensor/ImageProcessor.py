@@ -178,7 +178,7 @@ class ImageProcessor:
         
         return direction
 
-    def get_alphabet_info4room(self, edge_info={}, method="CONTOUR", visualization=False) -> tuple:
+    def get_alphabet_info4room(self, edge_info={}, visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -186,82 +186,41 @@ class ImageProcessor:
         candidates = []
         mask = self.color_preprocessor.get_alphabet_mask(src=src)
 
-        if method == "LABEL":
-            _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
-            for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
-                if stats[idx][0] == 0 and stats[idx][1] == 0:
-                    continue
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for contour in contours:  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
 
-                if np.any(np.isnan(centroid)): # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
-                    continue
-                _, _, width, height, area = stats[idx]
+            (_, _, width, height) = cv2.boundingRect(contour)
+            area = cv2.contourArea(contour)
 
-                # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
-                area_ratio = width / height if height < width else height / width
-                area_ratio = round(area_ratio, 2)
-                if not (1000 < area < 8000 and area_ratio <= 1.7):
-                    continue
+            # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            if not (1000 < area and area_ratio <= 1.4):
+                continue
 
-                candidate = Target(stats=stats[idx], centroid=centroid)
-                roi = candidate.get_target_roi(src, pad=15)
-                candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
-                ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
-                y, cr, cb = cv2.split(ycrcb)
+            candidate = Target(contour=contour)
+            roi = candidate.get_target_roi(src, pad=10)
+            candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
+            ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
+            y, cr, cb = cv2.split(ycrcb)
+            normalizing = cr if candidate.get_color() == "RED" else cb
+            normalized = cv2.normalize(normalizing, None, 0, 255, cv2.NORM_MINMAX)
+            _, roi_mask = cv2.threshold(normalized, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
 
-                normalizing = cr if candidate.get_color() == "RED" else cb
-                normalized = cv2.normalize(normalizing, None, 0, 255, cv2.NORM_MINMAX)
-                _, roi_mask = cv2.threshold(normalized, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+            ### 정확도 향상을 위해 아래 함수 수정 요망 ###
+            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.8)
+            ####################################
 
-                ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
-                ####################################
+            # if visualization:
+            #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
 
-                #if visualization:
-                #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
+            if candidate_alphabet is None:
+                continue
+            candidate.set_name(candidate_alphabet)
+            if visualization:
+                setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
 
-                if candidate_alphabet is None:
-                    continue
-                candidate.set_name(candidate_alphabet)
-                if visualization:
-
-                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
-                candidates.append(candidate)
-        else:
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            for contour in contours:  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
-
-                (_, _, width, height) = cv2.boundingRect(contour)
-                area = cv2.contourArea(contour)
-
-                # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
-                area_ratio = width / height if height < width else height / width
-                area_ratio = round(area_ratio, 2)
-                if not (1000 < area and area_ratio <= 1.4):
-                    continue
-
-                candidate = Target(contour=contour)
-                roi = candidate.get_target_roi(src, pad=10)
-                candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
-                ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
-                y, cr, cb = cv2.split(ycrcb)
-                normalizing = cr if candidate.get_color() == "RED" else cb
-                normalized = cv2.normalize(normalizing, None, 0, 255, cv2.NORM_MINMAX)
-                _, roi_mask = cv2.threshold(normalized, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-                ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.8)
-                ####################################
-
-                # if visualization:
-                #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
-
-                if candidate_alphabet is None:
-                    continue
-                candidate.set_name(candidate_alphabet)
-                if visualization:
-                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
-
-                candidates.append(candidate)
+            candidates.append(candidate)
 
         if candidates:
             if edge_info:

@@ -8,29 +8,19 @@ import sys
 from collections import deque
 
 class Robot:    
-    def __init__(self, video_path ="", mode="start", DEBUG=False):
-        # 모듈들 객체 생성
+    def __init__(self, video_path =""):
         self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
-        self._line_detector = LineDetector()
-        self.DEBUG = DEBUG
-        # 멤버 변수 셋팅
-        self.mode: str = mode
-        self.color: str = "YELLOW"
-        self.direction: str = ''
-        self.alphabet: str = None
-        self.alphabet_color: str = None
-        self.curr_room_color: str = None
-        self.cube_grabbed: bool = False
-        self.count: int = 0
-        self.progress_of_robot: list = [None]
-        self.is_grab: bool = False
-        self.walk_info: str = None
-        self.curr_head4box: deque = deque([75, 60, 35])
-        self.curr_head4room_alphabet: deque = deque([85, 80])
-        self.curr_head4door_alphabet: deque = deque([80, 75])
-        self.black_room: list = []
-        self.return_head: str = "" 
-        self.mode_history: str = self.mode
-        self.box_pos: str = ""
-        self.out_map: int = 0
+
+    def set_basic_form(self):
+        self._motion.basic_form()
+        self.is_grab = False
+        self.cube_grabbed = False
+    
+    def line_tracing(self, line_visualization=False, edge_visualization=False, ROI= False):
+        line_info, edge_info = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
+        return line_info, edge_info
+
+
+    def walk(self):
+        pass

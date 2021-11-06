@@ -1,5 +1,21 @@
-from Brain.Robot import Robot
+from Brain.Controller import Controller
+from enum import Enum
 
+robot = Controller.robot
 class DoorMission:
-    def __init__(self, robot : Robot):
-        self.robot = Robot
+    
+    @staticmethod
+    def detect_alphabet():
+        pass
+    
+    @staticmethod
+    def detect_arrow_direction(self):
+        pass
+    
+    @staticmethod
+    def open_door(self):
+        pass
+    
+    @staticmethod
+    def run(self):
+        pass
