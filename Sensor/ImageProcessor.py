@@ -23,6 +23,11 @@ else:
 
 class ImageProcessor:
 
+    def __new__(cls, *args, **kwargs):
+        if not hasattr(cls, "_instance"):
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self, video_path : str = ""):
         if video_path and os.path.exists(video_path):
             self._cam = FileVideoStream(path=video_path).start()
@@ -34,7 +39,6 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
-            self.hash_detector4door = HashDetector(file_path='EWSN/')
             self.hash_detector4room = HashDetector(file_path='ABCD/')
             self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
 
@@ -199,7 +203,7 @@ class ImageProcessor:
                 # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
                 area_ratio = width / height if height < width else height / width
                 area_ratio = round(area_ratio, 2)
-                if not (1000 < area < 8000 and area_ratio <= 1.7):
+                if not (1500 < area < 8000 and area_ratio <= 1.4):
                     continue
 
                 candidate = Target(stats=stats[idx], centroid=centroid)
@@ -284,8 +288,9 @@ class ImageProcessor:
                 normalizing = cr if selected.get_color() == "RED" else cb
                 normalized = cv2.normalize(normalizing, None, 0, 255, cv2.NORM_MINMAX)
                 _, roi_mask = cv2.threshold(normalized, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
+                resized_mask = HashDetector.image_resize_with_pad(img=roi_mask, size=HashDetector.dim)
                 canvas[pos[1]:pos[1] + pos[3], pos[0]:pos[0] + pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
+                cv2.imshow("resized", resized_mask)
 
         if visualization:
             mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
@@ -413,9 +418,10 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="src/old/green_area.mp4")
+    #imageProcessor = ImageProcessor("")
     #imageProcessor = ImageProcessor(video_path="")
-    imageProcessor.fps.start()
+    # imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
         _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)

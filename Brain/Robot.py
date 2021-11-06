@@ -21,6 +21,5 @@ class Robot:
         line_info, edge_info = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
         return line_info, edge_info
 
-
     def walk(self):
         pass
