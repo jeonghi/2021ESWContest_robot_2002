@@ -23,8 +23,9 @@ class Controller:
     RoomMission.set_robot(robot)
     edge_info: dict
     mode: Mode = Mode.START
-    direction: Direction.LEFT
+    direction: Direction
     mission_done: int = 0
+
 
     @classmethod
     def check_go_to_next_room(cls) -> bool:
@@ -48,8 +49,8 @@ class Controller:
         elif cls.mode == Mode.IN:
             if DoorMission.run():
                 cls.mode = Mode.GO_TO_NEXT_ROOM
-
-
+                cls.direction = Direction.LEFT
+                RoomMission.set_direction(direction=cls.direction)
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
                 cls.mode = Mode.CHECK_AREA_COLOR

@@ -58,7 +58,7 @@ class RoomMission:
 
     @classmethod
     def check_area_color(cls):
-        cls.robot._motion.set_head(dir=cls.direction, angle=45)
+        cls.robot._motion.set_head(dir=cls.direction.name, angle=45)
         cls.robot._motion.set_head(dir="DOWN", angle=45)
         time.sleep(0.5)
         cls.robot.color = "GREEN"
