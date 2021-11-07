@@ -20,6 +20,7 @@ class Mode(Enum):
 class Controller:
     robot = Robot()
     line_info: dict
+    RoomMission.set_robot(robot)
     edge_info: dict
     mode: Mode = Mode.START
     direction: Direction.LEFT
