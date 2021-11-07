@@ -52,7 +52,7 @@ class RoomMission:
         cls.area_color = AreaColor.GREEN if cls.robot.edge_info["EDGE_DOWN"] else AreaColor.BLACK
         cls.robot._motion.notice_area(area=cls.area_color.name)
         cls.robot._motion.set_head(dir="LEFTRIGHT_CENTER")
-        cls.robot.color = cls.area_color.name
+        cls.robot.color = LineColor.GREEN if cls.area_color == AreaColor.GREEN else LineColor.BLACK
         return True
     
     @classmethod
