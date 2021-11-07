@@ -1,5 +1,5 @@
 from Brain.Robot import Robot
-from Brain.Constant import Direction, AreaColor
+from Brain.Constant import Direction, AreaColor, LineColor
 from enum import Enum, auto
 import time
 
@@ -142,7 +142,7 @@ class RoomMission:
     def drop_box(cls) -> bool:
         cls.robot._motion.walk(dir='FORWARD', loop=2, grab=True)
         cls.robot._motion.grab(switch=False)
-        cls.robot.color = 'YELLOW'
+        cls.robot.color = LineColor.YELLOW
         time.sleep(0.5)
         return True
 
