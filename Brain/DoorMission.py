@@ -4,18 +4,18 @@ from enum import Enum
 robot = Controller.robot
 class DoorMission:
     
-    @staticmethod
-    def detect_alphabet():
+    @classmethod
+    def detect_alphabet(cls) -> bool:
         pass
     
-    @staticmethod
-    def detect_arrow_direction(self):
+    @classmethod
+    def detect_arrow_direction(cls) -> bool:
         pass
     
-    @staticmethod
-    def open_door(self):
+    @classmethod
+    def open_door(cls) -> bool:
         pass
     
-    @staticmethod
-    def run(self):
-        pass
+    @classmethod
+    def run(cls) -> bool:
+        return True

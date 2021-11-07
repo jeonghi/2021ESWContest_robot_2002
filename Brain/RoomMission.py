@@ -1,5 +1,6 @@
-from Brain.Controller import Controller
+from Brain.Controller import Controller, Direction, AreaColor
 from enum import Enum, auto
+import time
 
 robot = Controller.robot
 
@@ -9,6 +10,7 @@ class Mode(Enum):
     FIND_BOX = auto()
     TRACK_BOX = auto()
     TURN_TO_AREA = auto()
+    DROP_BOX = auto()
     GO_TO_AREA = auto()
     FIND_CONRER = auto()
     GO_TO_CORNER = auto()
@@ -19,26 +21,45 @@ class BoxPos(Enum):
     MIDDLE = auto()
     LEFT = auto()
 
-def get_distance_from_baseline(box_info: tuple, baseline: tuple = (320, 370)):
+def get_distance_from_baseline(pos: tuple, baseline: tuple = (320, 370)):
     """
     :param box_info: 우유팩 위치 정보를 tuple 형태로 받아온다. 우유팩 영역 중심 x좌표와 y좌표 순서
     :param baseline: 우유팩 위치 정보와 비교할 기준점이다.
     :return: 우유팩이 지정한 기준점으로부터 떨어진 상대적 거리를 tuple로 반환한다.
     """
     bx, by = baseline
-    cx, cy = box_info
+    cx, cy = pos
     return bx - cx, by - cy
 
 class RoomMission:
 
     mode: Mode = Mode.START
     
-    line_info: dict = {}
-    edge_info: dict = {}
+    line_info: dict
+    edge_info: dict
 
     alphabet_color: str
     alphabet: str
-    box_pos: BoxPos.LEFT
+    box_pos: BoxPos
+    area_color: AreaColor
+
+    @classmethod
+    def set_line_ang_edge_info(cls, line_info: dict, edge_info: dict):
+        cls.line_info = line_info
+        cls.edge_info = edge_info
+
+    @classmethod
+    def check_area_color(cls):
+        robot._motion.set_head(dir=robot.direction, angle=45)
+        robot._motion.set_head(dir="DOWN", angle=45)
+        time.sleep(0.5)
+        robot.color = "GREEN"
+        robot.line_tracing()
+        cls.area_color = AreaColor.GREEN if cls.edge_info["EDGE_DOWN"] else AreaColor.BLACK
+        robot._motion.notice_area(area=cls.area_color.name)
+        robot._motion.set_head(dir="LEFTRIGHT_CENTER")
+        robot.color = cls.area_color.name
+        return True
     
     @classmethod
     def detect_alphabet(cls) -> bool:
@@ -75,7 +96,7 @@ class RoomMission:
         robot._motion.set_head("DOWN", angle=head_angle)
         box_info = robot._image_processor.get_milk_info(color=cls.alphabet_color, edge_info=cls.edge_info)
         if box_info:
-            (dx, dy) = get_distance_from_baseline(box_info=box_info)
+            (dx, dy) = get_distance_from_baseline(pos=box_info)
 
             if dy > 10:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
@@ -132,7 +153,10 @@ class RoomMission:
 
         return False
 
-    
+    @classmethod
+    def drop_box(cls) -> bool:
+        pass
+
     @classmethod
     def turn_to_area(cls) -> bool:
         pass
@@ -159,24 +183,80 @@ class GreenRoomMission(RoomMission):
     @classmethod
     def turn_to_area(cls) -> bool:
 
-        if cls.line_info["H"] and cls.line_info["len(H)"] >= 300:
+        found_area: bool = cls.line_info["H"] and cls.line_info["len(H)"] >= 300
+
+        if found_area :
+            robot._motion.move_arm(dir='HIGH')
             return True
 
         if cls.box_pos == BoxPos.RIGHT:
             robot._motion.turn(dir="LEFT", loop=1, grab=True)
         else:
             robot._motion.turn(dir="RIGHT", loop=1, grab=True)
-
         return False
 
     @classmethod
     def go_to_area(cls) -> bool:
-        pass
-
-
+        in_area: bool = cls.line_info['ALL_Y'][1] > 460
+        if in_area:
+            return True
+        robot.motion.walk(dir="FORWARD", loop=1, grab=True)
+        return False
 
     @classmethod
-    def go_to_corner(cls):
+    def drop_box(cls) -> bool:
+        robot._motion.walk(dir='FORWARD', loop=2, grab=True)
+        robot._motion.grab(switch=False)
+        robot.color = 'YELLOW'
+        Controller.mission_done += 1
+        robot._motion.set_head(dir="DOWN", angle=60)
+        time.sleep(0.5)
+        return True
+
+    @classmethod
+    def find_corner(cls) -> bool:
+        head_angle = robot.curr_head4find_corner[0]
+        robot.motion.set_head("DOWN", angle=head_angle)
+        corner = robot._image_processor.get_yellow_line_corner()
+        if corner:
+            return True
+        else:
+            if head_angle == 35:
+                if cls.box_pos == BoxPos.RIGHT:
+                    robot._motion.turn(dir=Direction.LEFT.name, loop=2)
+                else:
+                    robot._motion.turn(dir=Direction.RIGHT.name, loop=2)
+            robot.curr_head4find_corner.rotate(-1)
+
+    @classmethod
+    def go_to_corner(cls) -> bool:
+        head_angle = robot.curr_head4find_corner[0]
+        robot.motion.set_head("DOWN", angle=head_angle)
+        corner = robot._image_processor.get_yellow_line_corner()
+        if corner:
+            (dx, dy) = get_distance_from_baseline(pos=corner)
+            if dy > 10:  # 기준선 보다 위에 있다면
+                if -40 <= dx <= 40:
+                    robot._motion.walk(dir='FORWARD', loop=1)
+                elif dx <= -90:
+                    robot._motion.walk(dir='RIGHT', loop=1)
+                elif -90 < dx <= -50:  # 오른쪽
+                    robot._motion.walk(dir='RIGHT', loop=2)
+                elif -50 < dx < -40:
+                    robot._motion.walk(dir='RIGHT', loop=1)
+                elif 90 > dx >= 50:  # 왼쪽
+                    robot._motion.walk(dir='LEFT', loop=2)
+                elif 50 > dx > 40:  # 왼쪽
+                    robot._motion.walk(dir='LEFT', loop=2)
+                elif dx >= 90:
+                    robot._motion.walk(dir='LEFT', loop=1)
+            else:
+                if head_angle == 35:
+                    return True
+                else:
+                    robot.curr_head4box.rotate(-1)
+        else:
+            cls.mode = Mode.FIND_CONRER
         pass
 
 
@@ -194,7 +274,7 @@ class GreenRoomMission(RoomMission):
             if cls.find_box():
                 cls.mode = Mode.TRACK_BOX
 
-        elif mode == Mode.TRACK_BOX :
+        elif mode == Mode.TRACK_BOX:
             if cls.track_box():
                 cls.mode = Mode.TURN_TO_AREA
 
@@ -202,13 +282,22 @@ class GreenRoomMission(RoomMission):
             if cls.turn_to_area():
                 cls.mode = Mode.GO_TO_AREA
 
-
         elif mode == Mode.GO_TO_AREA:
-            pass
+            if cls.go_to_area():
+                cls.mode = Mode.DROP_BOX
+
+        elif mode == Mode.DROP_BOX:
+            if cls.drop_box():
+                cls.mode = Mode.FIND_CONRER
+
         elif mode == Mode.FIND_CONRER:
-            pass
+            if cls.find_corner():
+                cls.mode = Mode.GO_TO_CORNER
+
         elif mode == Mode.GO_TO_CORNER:
-            pass
+            if cls.go_to_corner():
+                cls.mode = Mode.END
+
         elif mode == Mode.END:
             return True
         

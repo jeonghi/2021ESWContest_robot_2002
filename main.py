@@ -1,10 +1,9 @@
 from Brain.Controller import Controller
 
 def main():
-    controller = Controller()
 
-    while True:
-        controller.run()
+    while not Controller.run():
+        continue
     
 if __name__ == "__main__":
     main()

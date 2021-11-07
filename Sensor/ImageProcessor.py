@@ -14,11 +14,13 @@ if __name__ == "__main__":
     from Target import Target, setLabel
     from LineDetector import LineDetector
     from ColorChecker import ColorPreProcessor
+    from CornerFinder import CornerFinder
 else:
     from Sensor.HashDetector import HashDetector
     from Sensor.Target import Target, setLabel
     from Sensor.LineDetector import LineDetector
     from Sensor.ColorChecker import ColorPreProcessor
+    from Sensor.CornerFinder import CornerFinder
 
 
 class ImageProcessor:
@@ -408,12 +410,17 @@ class ImageProcessor:
             #print(line_info["H_Y"])
         return result
     
-    def room_test(self):
+    def get_yellow_line_corner(self, visualization=False):
+        """
+
+        :return: if corner exist return (cx, cy) else return None
+        """
         src = self.get_image()
-        h, s, v = cv2.split(src)
-        mask = self.color_preprocessor.get_blue_mask(h)
-        cv2.imshow("mask", mask)
-        cv2.waitKey(1)
+        corner = CornerFinder.get_yellow_line_corner_pos(src=src, visualization=visualization)
+
+        return corner
+
+
         
 
 if __name__ == "__main__":
@@ -424,13 +431,13 @@ if __name__ == "__main__":
     # imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        _, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
+        #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #src = imageProcessor.get_image(visualization=True)
         #imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
-        result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
+        #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #imageProcessor.room_test()
-        print(result)
+        imageProcessor.get_yellow_line_corner(visualization=True)
