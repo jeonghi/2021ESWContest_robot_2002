@@ -37,7 +37,6 @@ class RoomMission:
 
     alphabet_color: str
     alphabet: str
-    box_pos: BoxPos
     area_color: AreaColor
 
     @classmethod
@@ -70,16 +69,7 @@ class RoomMission:
 
     @classmethod
     def find_box(cls) -> bool:
-        head_angle = cls.robot.curr_head4box[0]
-        cls.robot._motion.set_head("DOWN", angle=head_angle)
-        box_info = cls.robot._image_processor.get_milk_info(color=cls.alphabet_color, edge_info=cls.robot.edge_info)
-        if box_info:
-            return True
-        else:
-            if head_angle == 35:
-                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=7)
-            cls.robot.curr_head4box.rotate(-1)
-            return False
+        pass
     
     @classmethod
     def track_box(cls) -> bool:
@@ -178,6 +168,40 @@ class RoomMission:
         
 
 class GreenRoomMission(RoomMission):
+
+    box_pos: BoxPos
+
+    @classmethod
+    def find_box(cls) -> bool:
+
+        head_angle = cls.robot.curr_head4box[0]
+        cls.robot._motion.set_head("DOWN", angle=head_angle)
+        box_info = cls.robot._image_processor.get_milk_info(color=cls.alphabet_color, edge_info=cls.robot.edge_info)
+
+        if box_info:
+            cls.update_box_pos(box_info=box_info)
+            return True
+        else:
+            if head_angle == 35:
+                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=8)
+            cls.robot.curr_head4box.rotate(-1)
+            return False
+
+    @classmethod
+    def update_box_pos(cls, box_info: tuple):
+
+        if cls.robot.edge_info["EDGE_DOWN"]:
+            cor_x, cor_y = cls.robot.edge_info["EDGE_DOWN_X"], cls.robot.edge_info["EDGE_DOWN_Y"]
+            (box_x, box_y) = box_info
+            dx = 30
+            if cor_x - dx <= box_x <= cor_x + dx:
+                cls.box_pos = BoxPos.MIDDLE
+            elif box_x < cor_x - dx:
+                cls.box_pos = BoxPos.LEFT
+            else:
+                cls.box_pos = BoxPos.RIGHT
+        else:
+            cls.box_pos = BoxPos.RIGHT if cls.robot.direction == Direction.LEFT else BoxPos.LEFT
 
     @classmethod
     def turn_to_area(cls) -> bool:
@@ -294,6 +318,20 @@ class GreenRoomMission(RoomMission):
         return False
 
 class BlackRoomMission(RoomMission):
+    @classmethod
+    def find_box(cls) -> bool:
+
+        head_angle = cls.robot.curr_head4box[0]
+        cls.robot._motion.set_head("DOWN", angle=head_angle)
+        box_info = cls.robot._image_processor.get_milk_info(color=cls.alphabet_color, edge_info=cls.robot.edge_info)
+
+        if box_info:
+            return True
+        else:
+            if head_angle == 35:
+                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=2)
+            cls.robot.curr_head4box.rotate(-1)
+            return False
 
     @classmethod
     def turn_to_area(cls) -> bool:
