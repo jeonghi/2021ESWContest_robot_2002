@@ -230,7 +230,7 @@ class GreenRoomMission(RoomMission):
     @classmethod
     def find_corner(cls) -> bool:
         head_angle = cls.robot.curr_head4find_corner[0]
-        cls.robot.motion.set_head("DOWN", angle=head_angle)
+        cls.robot._motion.set_head("DOWN", angle=head_angle)
         corner = cls.robot._image_processor.get_yellow_line_corner()
         if corner:
             return True
@@ -245,7 +245,7 @@ class GreenRoomMission(RoomMission):
     @classmethod
     def go_to_corner(cls) -> bool:
         head_angle = cls.robot.curr_head4find_corner[0]
-        cls.robot.motion.set_head("DOWN", angle=head_angle)
+        cls.robot._motion.set_head("DOWN", angle=head_angle)
         corner = cls.robot._image_processor.get_yellow_line_corner()
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
