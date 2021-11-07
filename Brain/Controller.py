@@ -28,8 +28,8 @@ class Controller:
     robot = Robot()
     line_info: dict
     edge_info: dict
-    mode: Mode
-    direction: Direction
+    mode: Mode = Mode.START
+    direction: Direction.LEFT
     mission_done: int = 0
 
     @classmethod
@@ -37,7 +37,7 @@ class Controller:
         return False if cls.mission_done > CLEAR_LIMIT else True
 
     @classmethod
-    def get_ling_info(cls) -> None:
+    def set_line_and_edge_info(cls) -> None:
         cls.line_info, cls.edge_info = cls.robot.line_tracing()
 
     @classmethod
@@ -46,7 +46,7 @@ class Controller:
 
     @classmethod
     def run(cls):
-        cls.get_ling_info()
+        cls.set_line_and_edge_info()
 
         if cls.mode == Mode.START:
             cls.mode = Mode.IN
@@ -72,7 +72,6 @@ class Controller:
                     cls.mode = Mode.GO_TO_NEXT_ROOM
                 else:
                     cls.mode = Mode.OUT
-
 
         elif cls.mode == Mode.OUT:
             DoorMission.run()
