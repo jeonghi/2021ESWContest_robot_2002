@@ -1,6 +1,7 @@
 from Sensor.ImageProcessor import ImageProcessor
 from Sensor.LineDetector import LineDetector
 from Actuator.Motion import Motion
+from Brain.Constant import LineColor, Direction
 import numpy as np
 import cv2
 import time
@@ -14,15 +15,19 @@ class Robot:
         self.curr_head4room_alphabet: deque = deque([85, 80])
         self.curr_head4box: deque = deque([75, 60, 35])
         self.curr_head4find_corner: deque = deque([60, 35])
-        self.color = 'YELLOW'
+        self.curr_arm_pos: deque = deque(['LOW', 'MIDDLE'])
+        self.color: LineColor = LineColor.YELLOW
+        self.line_info: tuple
+        self.edge_info: tuple
+        self.direction: Direction
+
     def set_basic_form(self):
         self._motion.basic_form()
         self.is_grab = False
         self.cube_grabbed = False
 
-    def line_tracing(self, line_visualization=False, edge_visualization=False, ROI= False):
-        line_info, edge_info, _ = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
-        return line_info, edge_info
+    def set_line_and_edge_info(self, line_visualization=False, edge_visualization=False, ROI= False):
+        self.line_info, self.edge_info, _ = self.robot._image_processor.line_tracing(color=self.robot.color.name, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
 
     def walk(self):
         pass

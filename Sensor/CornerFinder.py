@@ -6,7 +6,7 @@ import cv2
 import os
 import math
 from imutils import auto_canny
-from Sensor.ColorChecker import ColorPreProcessor
+from ColorChecker import ColorPreProcessor
 
 
 class CornerFinder():
@@ -200,7 +200,7 @@ class CornerFinder():
 if __name__ == "__main__" :
 
     from imutils.video import FileVideoStream
-    cam = FileVideoStream(path="src/old/out_room.mp4")
+    cam = FileVideoStream(path="Sensor\src\old\out_room.mp4")
     cam.start()
 
     while(True):
