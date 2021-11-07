@@ -7,21 +7,21 @@ import time
 import sys
 from collections import deque
 
-class Robot:    
+class Robot:
     def __init__(self, video_path =""):
         self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
         self.curr_head4room_alphabet: deque = deque([85, 80])
         self.curr_head4box: deque = deque([75, 60, 35])
         self.curr_head4find_corner: deque = deque([60, 35])
-
+        self.color = 'YELLOW'
     def set_basic_form(self):
         self._motion.basic_form()
         self.is_grab = False
         self.cube_grabbed = False
-    
+
     def line_tracing(self, line_visualization=False, edge_visualization=False, ROI= False):
-        line_info, edge_info = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
+        line_info, edge_info, _ = self._image_processor.line_tracing(color=self.color, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
         return line_info, edge_info
 
     def walk(self):

@@ -25,12 +25,6 @@ else:
 
 class ImageProcessor:
 
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not hasattr(cls, "_instance"):
-            cls._instance = super().__new__(cls)
-        return cls._instance
 
     def __init__(self, video_path : str = ""):
         if video_path and os.path.exists(video_path):
@@ -81,7 +75,7 @@ class ImageProcessor:
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
         _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         #cv2.imshow("mask",mask)
-        
+
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
         cnts2, _ = cv2.findContours(canny, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -165,7 +159,7 @@ class ImageProcessor:
         rightmost = tuple(contour[contour[:,:,0].argmax()][0])
         topmost = tuple(contour[contour[:,:,1].argmin()][0])
         bottommost = tuple(contour[contour[:,:,1].argmax()][0])
-        
+
         result = [leftmost[0], topmost[1], rightmost[0]-leftmost[0], bottommost[1]-topmost[1]]
         if result[2] < 10 or result[3] < 10:
             roi_mask = src
@@ -180,10 +174,10 @@ class ImageProcessor:
             #cv2.imshow("dst", dst)
             cv2.imshow("roi_mask", roi_mask)
             cv2.waitKey(10)
-            
+
         direction = self.hash_detector4arrow.detect_arrow(roi_mask)
         print(direction)
-        
+
         return direction
 
     def get_alphabet_info4room(self, edge_info={}, method="CONTOUR", visualization=False) -> tuple:
@@ -411,7 +405,7 @@ class ImageProcessor:
             cv2.waitKey(1)
             #print(line_info["H_Y"])
         return result
-    
+
     def get_yellow_line_corner(self, visualization=False):
         """
 
@@ -423,7 +417,7 @@ class ImageProcessor:
         return corner
 
 
-        
+
 
 if __name__ == "__main__":
 
