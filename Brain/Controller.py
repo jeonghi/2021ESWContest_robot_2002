@@ -54,6 +54,7 @@ class Controller:
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
                 cls.mode = Mode.CHECK_AREA_COLOR
+                cls.robot.color = "GREEN"
 
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             RoomMission.set_line_ang_edge_info(cls.line_info, cls.edge_info)

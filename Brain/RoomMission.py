@@ -61,8 +61,6 @@ class RoomMission:
         cls.robot._motion.set_head(dir=cls.direction.name, angle=45)
         cls.robot._motion.set_head(dir="DOWN", angle=45)
         time.sleep(0.5)
-        cls.robot.color = "GREEN"
-        cls.robot.line_tracing()
         cls.area_color = AreaColor.GREEN if cls.edge_info["EDGE_DOWN"] else AreaColor.BLACK
         cls.robot._motion.notice_area(area=cls.area_color.name)
         cls.robot._motion.set_head(dir="LEFTRIGHT_CENTER")
@@ -314,7 +312,7 @@ class BlackRoomMission(RoomMission):
 
     @classmethod
     def turn_to_area(cls) -> bool:
-        cls.robot._motion.turn()
+        cls.robot._motion.turn(dir=cls.direction.name, loop=4)
         return True
 
     @classmethod
@@ -358,6 +356,10 @@ class BlackRoomMission(RoomMission):
                 
         elif mode == Mode.GO_TO_CORNER:
             if cls.go_to_corner():
+                cls.mode = Mode.DROP_BOX
+
+        elif mode == Mode.DROP_BOX:
+            if cls.drop_box():
                 cls.mode = Mode.END
                 
         elif mode == Mode.END:
