@@ -45,7 +45,7 @@ class Controller:
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
                 cls.mode = Mode.CHECK_AREA_COLOR
-                cls.robot.color = "GREEN"
+                cls.robot.color = LineColor.GREEN
 
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             if RoomMission.check_area_color():
