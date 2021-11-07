@@ -1,8 +1,11 @@
-from Brain.Controller import Controller
+from Brain.Robot import Robot
 from enum import Enum
 
-robot = Controller.robot
 class DoorMission:
+
+    @classmethod
+    def set_robot(cls, robot: Robot):
+        cls.robot = robot
     
     @classmethod
     def detect_alphabet(cls) -> bool:

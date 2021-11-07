@@ -2,6 +2,7 @@ from Brain.Robot import Robot
 from enum import Enum, auto
 from Brain.DoorMission import DoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
+from Brain.Constant import Direction, AreaColor
 import time
 
 
@@ -15,14 +16,6 @@ class Mode(Enum):
     GO_TO_NEXT_ROOM = auto()
     OUT = auto()
     END = auto()
-
-class Direction(Enum):
-    LEFT = auto()
-    RIGHT = auto()
-
-class AreaColor(Enum):
-    GREEN = auto()
-    BLACK = auto()
 
 class Controller:
     robot = Robot()
@@ -68,6 +61,7 @@ class Controller:
         elif cls.mode == Mode.ROOM_MISSION:
             Mission = GreenRoomMission if RoomMission.area_color == AreaColor.GREEN else BlackRoomMission
             if Mission.run():
+                cls.mission_done += 1
                 if cls.check_go_to_next_room():
                     cls.mode = Mode.GO_TO_NEXT_ROOM
                 else:
