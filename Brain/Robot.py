@@ -15,7 +15,7 @@ class Robot:
         self.curr_head4room_alphabet: deque = deque([85, 80])
         self.curr_head4box: deque = deque([75, 60, 35])
         self.curr_head4find_corner: deque = deque([60, 35])
-        self.curr_arm_pos: deque = deque(['LOW', 'MIDDLE'])
+        self.curr_arm_pos: deque = deque(['LOW', 'HIGH'])
         self.color: LineColor = LineColor.YELLOW
         self.line_info: tuple
         self.edge_info: tuple

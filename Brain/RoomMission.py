@@ -271,7 +271,6 @@ class GreenRoomMission(RoomMission):
                     cls.robot.curr_head4find_corner.rotate(-1)
         else:
             cls.mode = Mode.FIND_CONRER
-        pass
 
 
     @classmethod
@@ -354,7 +353,33 @@ class BlackRoomMission(RoomMission):
 
     @classmethod
     def go_to_corner(cls):
-        cls.go_to_corner()
+        arm_pos = cls.robot.curr_arm_pos[0]
+        cls.robot._motion.move_arm(dir=arm_pos)
+        corner = cls.robot._image_processor.get_yellow_line_corner()
+        if corner:
+            (dx, dy) = get_distance_from_baseline(pos=corner)
+            if dy > 10:  # 기준선 보다 위에 있다면
+                if -40 <= dx <= 40:
+                    pass
+                elif dx <= -90:
+                    pass
+                elif -90 < dx <= -50:  # 오른쪽
+                    pass
+                elif -50 < dx < -40:
+                    pass
+                elif 90 > dx >= 50:  # 왼쪽
+                    pass
+                elif 50 > dx > 40:  # 왼쪽
+                    pass
+                elif dx >= 90:
+                    pass
+            else:
+                if arm_pos == 'HIGH':
+                    return True
+                else:
+                    cls.robot.curr_arm_pos.rotate(-1)
+        else:
+            cls.mode = Mode.FIND_CONRER
     
     @classmethod
     def run(cls):

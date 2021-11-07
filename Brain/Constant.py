@@ -13,3 +13,8 @@ class LineColor(Enum):
     BLACK = auto()
     YELLOW = auto()
 
+class LineColor(Enum):
+    GREEN = auto()
+    BLACK = auto()
+    YELLOW = auto()
+
