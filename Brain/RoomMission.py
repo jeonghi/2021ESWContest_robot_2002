@@ -303,6 +303,7 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.DROP_BOX:
             if cls.drop_box():
                 cls.mode = Mode.FIND_CONRER
+                cls.robot.color = LineColor.YELLOW
 
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
@@ -377,6 +378,7 @@ class BlackRoomMission(RoomMission):
         elif mode == Mode.TRACK_BOX:
             if cls.track_box():
                 cls.mode = Mode.FIND_CONRER
+                cls.robot.color = LineColor.YELLOW
         
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
