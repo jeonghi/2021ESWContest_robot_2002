@@ -48,8 +48,8 @@ class RoomMission:
         cls.robot = robot
 
     @classmethod
-    def set_direction(cls, direction:Direction):
-        cls.direction = Direction
+    def set_direction(cls, direction: Direction):
+        cls.direction = direction
 
     @classmethod
     def set_line_ang_edge_info(cls, line_info: dict, edge_info: dict):
@@ -90,7 +90,7 @@ class RoomMission:
             return True
         else:
             if head_angle == 35:
-                cls.robot._motion.turn(dir=cls.direction, loop=7)
+                cls.robot._motion.turn(dir=cls.direction.name, loop=7)
             cls.robot.curr_head4box.rotate(-1)
             return False
     
