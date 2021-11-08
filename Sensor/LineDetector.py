@@ -67,8 +67,8 @@ class LineDetector:
             h, l, s = cv2.split(hls)
             ret, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask=mask)
-            match_lower = np.array([10, 40, 110])  # yellow_lower
-            match_upper = np.array([45, 225, 220])  # yellow_upper
+            match_lower = np.array([13, 70, 70]) # yellow_lower
+            match_upper = np.array([55, 230, 230])  # yellow_upper
 
         if color == 'GREEN':
             hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
@@ -97,7 +97,7 @@ class LineDetector:
             edges = cv2.Canny(mask, 75, 150)
             #cv2.imshow('mask', mask)
             #cv2.imshow('edges', edges)
-            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=30, maxLineGap=150)
+            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=70, maxLineGap=150)
             lines = np.squeeze(lines)
             #print(lines)
 
@@ -463,8 +463,8 @@ if __name__ == "__main__":
         val_add_image = cv2.add(hsv_image, array)
         src = cv2.cvtColor(val_add_image, cv2.COLOR_HSV2BGR)
 
-        line_info, edge_info, result = line_detector.get_all_lines(src, color='GREEN', line_visualization=False,
-                                                                   edge_visualization=True)
+        line_info, edge_info, result = line_detector.get_all_lines(src, color='YELLOW', line_visualization=True,
+                                                                   edge_visualization=False)
         print(line_info)
         print(edge_info)
         cv2.imshow('result', result)

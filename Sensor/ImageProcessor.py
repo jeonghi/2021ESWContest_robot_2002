@@ -394,7 +394,7 @@ class ImageProcessor:
     def line_tracing(self, color: str = "YELLOW", line_visualization:bool=False, edge_visualization:bool=False, ROI:bool=False):
         if ROI:
             src = self.get_image()
-            src = src[:][200:400]
+            src = src[0:200][:]
         else:
             src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
@@ -445,13 +445,15 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/old/green_area.mp4")
+    imageProcessor = ImageProcessor()
     #imageProcessor = ImageProcessor("")
     #imageProcessor = ImageProcessor(video_path="")
     # imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        #_, info, _ = imageProcessor.line_tracing(color ="GREEN", line_visualization=False, edge_visualization=True)
+        line, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=True, edge_visualization=False, ROI=True)
+        result = imageProcessor.line_checker(line)
+        print(result)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #src = imageProcessor.get_image(visualization=True)
@@ -460,4 +462,4 @@ if __name__ == "__main__":
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
         #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #imageProcessor.room_test()
-        imageProcessor.get_yellow_line_corner(visualization=True)
+        #imageProcessor.get_yellow_line_corner(visualization=True)
