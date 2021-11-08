@@ -432,20 +432,6 @@ class ImageProcessor:
                     walk_info = 'modify_RIGHT'
             
         return walk_info
-    
-    def line_checker(self, line_info):
-        if line_info["DEGREE"] != 0: 
-            if line_info["H"]:
-                if np.mean(line_info["H_X"]) < 320:
-                    walk_info = 'LEFT'
-                else:
-                    walk_info = 'RIGHT'
-            else:
-                if line_info["V"]:
-                    walk_info = 'straight'
-                else:
-                    walk_info = None
-
 
     def get_yellow_line_corner(self, visualization=False):
         """
