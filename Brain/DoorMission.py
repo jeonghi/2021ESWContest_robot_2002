@@ -17,7 +17,7 @@ class DoorMission:
     def set_robot(cls, robot: Robot):
         cls.robot = robot
     
-    @classmethod
+    @classmethod 
     def detect_alphabet(cls) -> bool:
         cls.robot._motion.set_head(dir="DOWN", angle=cls.robot.curr_head4door_alphabet[0])
         
