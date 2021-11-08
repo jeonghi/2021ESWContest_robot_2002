@@ -200,7 +200,7 @@ class CornerFinder():
 if __name__ == "__main__" :
 
     from imutils.video import FileVideoStream
-    cam = FileVideoStream(path="src/old/out_room.mp4")
+    cam = FileVideoStream(path="Sensor\src\old\out_room.mp4")
     cam.start()
 
     while(True):

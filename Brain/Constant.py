@@ -7,3 +7,14 @@ class Direction(Enum):
 class AreaColor(Enum):
     GREEN = auto()
     BLACK = auto()
+
+class LineColor(Enum):
+    GREEN = auto()
+    BLACK = auto()
+    YELLOW = auto()
+
+class LineColor(Enum):
+    GREEN = auto()
+    BLACK = auto()
+    YELLOW = auto()
+

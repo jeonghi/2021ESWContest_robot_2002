@@ -256,7 +256,10 @@ class Motion:
         if walk:
             for _ in range(loop):
                 self.TX_data_py2(112 + level[dir])
+<<<<<<< HEAD
                 if
+=======
+>>>>>>> 7769d513a115aa0bbc97c8f08e3a7325b02ffd7d
 
 
 # **************************************************

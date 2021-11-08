@@ -2,12 +2,10 @@ from Brain.Robot import Robot
 from enum import Enum, auto
 from Brain.DoorMission import DoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
-from Brain.Constant import Direction, AreaColor
+from Brain.Constant import Direction, AreaColor, LineColor
 import time
 
-
 CLEAR_LIMIT: int = 3
-
 class Mode(Enum):
     START = auto()
     IN = auto()
@@ -18,22 +16,15 @@ class Mode(Enum):
     END = auto()
 
 class Controller:
-    robot = Robot()
-    line_info: dict
-    RoomMission.set_robot(robot)
-    edge_info: dict
+    robot: Robot = Robot()
     mode: Mode = Mode.START
-    direction: Direction
     mission_done: int = 0
-
+    DoorMission.set_robot(robot)
+    RoomMission.set_robot(robot)
 
     @classmethod
     def check_go_to_next_room(cls) -> bool:
         return False if cls.mission_done > CLEAR_LIMIT else True
-
-    @classmethod
-    def set_line_and_edge_info(cls) -> None:
-        cls.line_info, cls.edge_info = cls.robot.line_tracing()
 
     @classmethod
     def go_to_next_room(cls) -> bool :
@@ -41,23 +32,22 @@ class Controller:
 
     @classmethod
     def run(cls):
-        cls.set_line_and_edge_info()
 
+        cls.robot.set_line_and_edge_info()
         if cls.mode == Mode.START:
             cls.mode = Mode.IN
 
         elif cls.mode == Mode.IN:
-            if DoorMission.run():
-                cls.mode = Mode.GO_TO_NEXT_ROOM
-                cls.direction = Direction.LEFT
-                RoomMission.set_direction(direction=cls.direction)
+            #if DoorMission.run():
+            cls.mode = Mode.GO_TO_NEXT_ROOM
+            cls.robot.direction = Direction.LEFT # 임시임
+        
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
                 cls.mode = Mode.CHECK_AREA_COLOR
-                cls.robot.color = "GREEN"
+                cls.robot.color = LineColor.GREEN
 
         elif cls.mode == Mode.CHECK_AREA_COLOR:
-            RoomMission.set_line_ang_edge_info(cls.line_info, cls.edge_info)
             if RoomMission.check_area_color():
                 cls.mode = Mode.ROOM_MISSION
 
@@ -72,6 +62,7 @@ class Controller:
 
         elif cls.mode == Mode.OUT:
             DoorMission.run()
+        
         elif cls.mode == Mode.END:
             return True
 
