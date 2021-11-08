@@ -4784,6 +4784,7 @@ D지역:
     'DELAY 10
     'GOSUB 기본자세2
     RETURN
+    'GOTO RX_EXIT
 
 우유깍잡기_2:
     SPEED 4
@@ -4794,6 +4795,7 @@ D지역:
     'DELAY 10
     'GOSUB 기본자세2
     RETURN
+   ' GOTO RX_EXIT
 
 우유깍잡기_3:
     SPEED 4
@@ -4804,6 +4806,7 @@ D지역:
     'DELAY 10
     'GOSUB 기본자세2
     RETURN
+    'GOTO RX_EXIT
     '*****************************************************
 우유깍잡기오른쪽돌기1:
     MOTORMODE G6A,3,3,3,3,2
@@ -5291,8 +5294,7 @@ KEY2:
 KEY3:
     ETX 4800, 3
    ' GOTO 왼쪽옆으로20
-    GOSUB 우유깍잡기_1
-    GOSUB 전방하향30도    
+    GOTO 집고왼쪽턴3 
     GOTO RX_EXIT
 KEY4:
     ETX 4800, 4
@@ -5713,6 +5715,7 @@ KEY76:
 KEY77:
     ETX  4800,77
     GOSUB 우유깍잡기_1
+    DELAY 2000
     GOSUB 전방하향30도 
     GOTO RX_EXIT
     '***************
