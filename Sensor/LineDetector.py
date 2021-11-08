@@ -447,12 +447,12 @@ class LineDetector:
 
 
 if __name__ == "__main__":
-    video = cv2.VideoCapture(-1)
+    video = cv2.VideoCapture(0)
     line_detector = LineDetector()
     while True:
         ret, src = video.read()
         if not ret:
-            video = cv2.VideoCapture(-1)
+            video = cv2.VideoCapture(0)
             continue
         src = cv2.resize(src, dsize=(640, 480))
 

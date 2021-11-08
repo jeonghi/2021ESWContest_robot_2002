@@ -34,9 +34,9 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
-            self.hash_detector4door = HashDetector(file_path='EWSN/')
-            self.hash_detector4room = HashDetector(file_path='ABCD/')
-            self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
+            self.hash_detector4door = HashDetector(file_path='Sensor/EWSN/')
+            self.hash_detector4room = HashDetector(file_path='Sensor/ABCD/')
+            self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
 
         else:
 
@@ -401,7 +401,7 @@ class ImageProcessor:
             cv2.imshow("line", dst)
             cv2.waitKey(1)
             #print(line_info["H_Y"])
-        return 
+        return result
     
     def line_checker(self, line_info):
         if line_info["DEGREE"]: 
@@ -417,6 +417,7 @@ class ImageProcessor:
                     walk_info = None
         else:
             walk_info = 'modify'
+        return walk_info
     
     def room_test(self):
         src = self.get_image()
@@ -428,12 +429,12 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/green_room_test/green_area2.h264")
+    imageProcessor = ImageProcessor(video_path="Sensor/src/green_room_test/green_area2.h264")
     #imageProcessor = ImageProcessor(video_path="")
     imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        _, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=True, edge_visualization=False)
+        info , _, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=True, edge_visualization=False)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #src = imageProcessor.get_image(visualization=True)
@@ -441,6 +442,6 @@ if __name__ == "__main__":
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
         #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
-        result = imageprocessor.line_checker(line_info = info)
+        result = imageProcessor.line_checker(line_info = info)
         #imageProcessor.room_test()
         print(result)
