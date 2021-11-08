@@ -75,8 +75,8 @@ class LineDetector:
             h, l, s = cv2.split(hls)
             ret, mask = cv2.threshold(s, 100, 255, cv2.THRESH_BINARY)
             src = cv2.bitwise_and(src, src, mask=mask)
-            match_lower = np.array([20, 20, 20])  # green_lower
-            match_upper = np.array([80, 255, 220])  # green_upper
+            match_lower = np.array([49, 74, 76])  # green_lower
+            match_upper = np.array([98, 223, 242])  # green_upper
 
         if color == 'BLACK':
             match_lower = np.array([0, 0, 0])  # black_lower
@@ -97,7 +97,7 @@ class LineDetector:
             edges = cv2.Canny(mask, 75, 150)
             #cv2.imshow('mask', mask)
             #cv2.imshow('edges', edges)
-            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=70, maxLineGap=150)
+            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=30, maxLineGap=150)
             lines = np.squeeze(lines)
             #print(lines)
 
@@ -277,7 +277,7 @@ class LineDetector:
                     size = int(lines.shape[0] * 2)
                     fit_line = self.get_fitline__(src, lines)
                     line_degree = (np.arctan2(fit_line[1] - fit_line[3], fit_line[0] - fit_line[2]) * 180) / np.pi
-                    line_info["DEGREE"] = line_degree
+                    line_info["DEGREE"] = np.abs(np.abs(line_degree)-180)
                     if line_visualization is True:
                         self.draw_lines(temp, fit_line, 'lines', 'fit')
                         src = cv2.addWeighted(src, 1, temp, 1., 0.)

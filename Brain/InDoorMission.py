@@ -28,7 +28,7 @@ class InDoorMission:
             print("alphabet:", alphabet)
             cls.robot._motion.notice_direction(dir=alphabet)   
             cls.robot._motion.set_head(dir="DOWN", angle=10)
-            time.sleep(0.5)
+            time.sleep(1)
             return True
         
         cls.robot.curr_head4door_alphabet.rotate(-1)    
@@ -53,15 +53,28 @@ class InDoorMission:
                         cls.robot._motion.walk(dir='RIGHT', loop=1, open_door = True) 
 
             elif 0 < cls.robot.line_info["DEGREE"] <= 85:
-                cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True) 
+                print(cls.robot.line_info["DEGREE"], 'turn LEFT')
+                cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True)
+                
+            elif cls.robot.line_info["DEGREE"] == 0:
+                print(cls.robot.line_info["DEGREE"], 'no line')
+        
 
             else:
+                print(cls.robot.line_info["DEGREE"], 'turn RIGHT')
                 cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True) 
 
         elif 0 < cls.robot.line_info["DEGREE"] <= 85:
-                cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True) 
+            print(cls.robot.line_info["DEGREE"], 'turn LEFT')
+            cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True)
+            
+        elif cls.robot.line_info["DEGREE"] == 0:
+            print(cls.robot.line_info["DEGREE"], 'no line')
+        
         else:
-            cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True) 
+            print(cls.robot.line_info["DEGREE"],'turn RIGHT')
+            cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True)
+        time.sleep(0.3)
         return False
             
     @classmethod
@@ -69,10 +82,12 @@ class InDoorMission:
         direction = cls.robot._image_processor.get_arrow_direction()
         if direction:
             cls.robot._motion.set_head(dir='DOWN', angle=10)
+            time.sleep(0.5)
             cls.robot.direction = Direction.LEFT if direction == "LEFT" else Direction.RIGHT
             return True
         
         cls.robot._motion.walk("BACKWARD", 1)
+        time.sleep(0.5)
         return False
     
     @classmethod
