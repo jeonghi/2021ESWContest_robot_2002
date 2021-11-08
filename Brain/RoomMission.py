@@ -145,6 +145,15 @@ class RoomMission:
         cls.robot.color = LineColor.YELLOW
         time.sleep(0.5)
         return True
+    
+    @classmethod
+    def find_line(cls) -> bool:
+        if not cls.robot.line_info['V']:
+            cls.robot._motion.turn(dir=cls.robot.direction)
+        else:
+            cls.robot._motion.walk('FORWARD', 2)
+            return True
+        return False
 
     @classmethod
     def turn_to_area(cls) -> bool:
@@ -311,6 +320,10 @@ class GreenRoomMission(RoomMission):
 
         elif mode == Mode.GO_TO_CORNER:
             if cls.go_to_corner():
+                cls.mode = cls.mode = Mode.FIND_LINE
+                
+        elif mode == Mode.FIND_LINE:
+            if cls.find_line():
                 cls.mode = Mode.END
 
         elif mode == Mode.END:
@@ -417,6 +430,10 @@ class BlackRoomMission(RoomMission):
 
         elif mode == Mode.DROP_BOX:
             if cls.drop_box():
+                cls.mode = Mode.FIND_LINE
+                
+        elif mode == Mode.FIND_LINE:
+            if cls.find_line():
                 cls.mode = Mode.END
                 
         elif mode == Mode.END:

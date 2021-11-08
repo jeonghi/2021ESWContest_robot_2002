@@ -1,6 +1,7 @@
 from Brain.Robot import Robot
 from enum import Enum, auto
-from Brain.DoorMission import DoorMission
+from Brain.InDoorMission import InDoorMission
+from Brain.OutDoorMission import OutDoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
 from Brain.Constant import Direction, AreaColor, LineColor
 import time
@@ -19,7 +20,8 @@ class Controller:
     robot: Robot = Robot()
     mode: Mode = Mode.START
     mission_done: int = 0
-    DoorMission.set_robot(robot)
+    InDoorMission.set_robot(robot)
+    OutDoorMission.set_robot(robot)
     RoomMission.set_robot(robot)
 
     @classmethod
@@ -28,7 +30,32 @@ class Controller:
 
     @classmethod
     def go_to_next_room(cls) -> bool :
-        return True
+        if cls.robot.walk_info == 'straight':
+            cls._motion.walk('FORWARD', 2)
+        elif cls.robot.walk_info == 'V_LEFT':
+            cls._motion.walk('LEFT', 1)
+        elif cls.robot.walk_info == 'V_RIGHT':
+            cls._motion.walk('RIGHT', 1)
+        elif cls.robot.walk_info == 'modify_LEFT':
+            cls._motion.turn('LEFT', 1)
+        elif cls.robot.walk_info == 'modify_RIGHT':
+            cls._motion.turn('RIGHT', 1)
+        
+        elif cls.robot.walk_info == 'corner_LEFT':
+            if cls.robot.direction =='RIGHT':
+                return True
+            else:
+                if cls.mission_done >= CLEAR_LIMIT:
+                    return True
+                
+        elif cls.robot.walk_info == 'corner_RIGHT':
+            if cls.robot.direction =='LEFT':
+                return True
+            else:
+                if cls.mission_done >= CLEAR_LIMIT:
+                    return True
+                
+        return False
 
     @classmethod
     def run(cls):
@@ -39,14 +66,21 @@ class Controller:
             cls.mode = Mode.IN
 
         elif mode == Mode.IN:
-            #if DoorMission.run():
-            cls.mode = Mode.GO_TO_NEXT_ROOM
-            cls.robot.direction = Direction.LEFT # 임시임
+            #in_Door = InDoorMission # 재훈
+            if InDoorMission.run():
+                cls.mode = Mode.GO_TO_NEXT_ROOM
+            #cls.mode = Mode.GO_TO_NEXT_ROOM
+            #cls.robot.direction = Direction.LEFT # 임시임
         
         elif mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
-                cls.mode = Mode.CHECK_AREA_COLOR
-                cls.robot.color = LineColor.GREEN
+                if cls.mission_done < CLEAR_LIMIT:
+                    cls.mode = Mode.CHECK_AREA_COLOR # 미션
+                    cls.robot.color = LineColor.GREEN
+                else:
+                    out_Door = OutDoorMission # 재훈 - 시작은 H 안보일때까지 걷기 - develop Controller 확인하기
+                    if out_Door.run():
+                        return True # 퇴장
 
         elif mode == Mode.CHECK_AREA_COLOR:
             if RoomMission.check_area_color():
@@ -61,10 +95,10 @@ class Controller:
                 else:
                     cls.mode = Mode.OUT
 
-        elif mode == Mode.OUT:
-            DoorMission.run()
+        #elif mode == Mode.OUT:
+            #DoorMission.run()
         
-        elif mode == Mode.END:
-            return True
+        #elif mode == Mode.END:
+            #return True
 
         return False
