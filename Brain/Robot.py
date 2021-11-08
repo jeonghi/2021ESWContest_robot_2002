@@ -18,10 +18,12 @@ class Robot:
         self.curr_head4find_corner: deque = deque([60, 35])
         self.curr_arm_pos: deque = deque(['LOW', 'HIGH'])
         self.color: LineColor = LineColor.YELLOW
+        self.black_room: list = list()
         self.line_info: tuple
         self.edge_info: tuple
-        self.walk_info : str
+        self.walk_info: str
         self.direction: Direction
+
 
     def set_basic_form(self):
         self._motion.basic_form()

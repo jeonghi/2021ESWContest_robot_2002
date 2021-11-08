@@ -405,6 +405,7 @@ class BlackRoomMission(RoomMission):
             
         elif mode == Mode.DETECT_ALPHABET:
             if cls.detect_alphabet():
+                cls.robot.black_room.append(cls.alphabet)
                 cls.mode = Mode.TURN_TO_AREA
 
         elif mode == Mode.TURN_TO_AREA:
