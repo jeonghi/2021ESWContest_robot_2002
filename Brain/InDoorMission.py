@@ -45,7 +45,7 @@ class InDoorMission:
                             cls.robot._motion.walk(dir='FORWARD')
                         return True
                     else:
-                        cls.robot._motion.walk(dir='FORWARD', loop=2, open_door = True) 
+                        cls.robot._motion.walk(dir='FORWARD', loop=4, open_door = True) 
                 else:
                     if cls.robot.line_info["V_X"][0] < 290:
                         cls.robot._motion.walk(dir='LEFT', loop=1, open_door = True) 
@@ -54,7 +54,7 @@ class InDoorMission:
 
             elif 0 < cls.robot.line_info["DEGREE"] <= 85:
                 print(cls.robot.line_info["DEGREE"], 'turn LEFT')
-                cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True)
+                cls.robot._motion.open_door_turn(dir='LEFT', loop=1)
                 
             elif cls.robot.line_info["DEGREE"] == 0:
                 print(cls.robot.line_info["DEGREE"], 'no line')
@@ -62,18 +62,18 @@ class InDoorMission:
 
             else:
                 print(cls.robot.line_info["DEGREE"], 'turn RIGHT')
-                cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True) 
+                cls.robot._motion.open_door_turn(dir='RIGHT', loop=1) 
 
         elif 0 < cls.robot.line_info["DEGREE"] <= 85:
             print(cls.robot.line_info["DEGREE"], 'turn LEFT')
-            cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True)
+            cls.robot._motion.open_door_turn(dir='LEFT', loop=1)
             
         elif cls.robot.line_info["DEGREE"] == 0:
             print(cls.robot.line_info["DEGREE"], 'no line')
         
         else:
             print(cls.robot.line_info["DEGREE"],'turn RIGHT')
-            cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True)
+            cls.robot._motion.open_door_turn(dir='RIGHT', loop=1)
         time.sleep(0.3)
         return False
             
@@ -87,7 +87,7 @@ class InDoorMission:
             return True
         
         cls.robot._motion.walk("BACKWARD", 1)
-        time.sleep(0.5)
+        time.sleep(1)
         return False
     
     @classmethod
@@ -104,7 +104,7 @@ class InDoorMission:
         elif mode == Mode.IN_DOOR:
             if cls.in_door():
                 cls.robot._motion.set_head(dir='DOWN', angle=90)
-                time.sleep(0.3)
+                time.sleep(1)
                 cls.mode = Mode.DETECT_DIRECTION
             pass
         
