@@ -4144,12 +4144,12 @@ D지역:
 
     GOTO RX_EXIT
 
-'******************************************
+    '******************************************
 우유깍잡기왼쪽옆으로:
     MOTORMODE G6A,3,3,3,3,2
     MOTORMODE G6D,3,3,3,3,2
- '   MOVE G6B, 175, 10, 60,	  ,	  ,
-  '  MOVE G6C, 175, 10, 60,	  ,   ,
+    '   MOVE G6B, 175, 10, 60,	  ,	  ,
+    '  MOVE G6C, 175, 10, 60,	  ,   ,
     WAIT
 
     DELAY 3
@@ -4181,8 +4181,8 @@ D지역:
 우유깍잡기오른쪽옆으로:
     MOTORMODE G6A,3,3,3,3,2
     MOTORMODE G6D,3,3,3,3,2
- '   MOVE G6B, 175, 10, 60,	  ,	  ,
-  '  MOVE G6C, 175, 10, 60,	  ,   ,
+    '   MOVE G6B, 175, 10, 60,	  ,	  ,
+    '  MOVE G6C, 175, 10, 60,	  ,   ,
     WAIT
 
     DELAY 3
@@ -5287,13 +5287,18 @@ KEY2:
 
     GOTO RX_EXIT
     '***************
+
 KEY3:
     ETX 4800, 3
-    GOTO 왼쪽옆으로20
+   ' GOTO 왼쪽옆으로20
+    GOSUB 우유깍잡기_1
+    GOSUB 전방하향30도    
     GOTO RX_EXIT
 KEY4:
     ETX 4800, 4
-    GOTO 오른쪽옆으로20
+ '   GOTO 오른쪽옆으로20
+    GOSUB 우유깍잡기_3
+    GOSUB 전방하향60도
     GOTO RX_EXIT
     '***************
 KEY5:
@@ -5350,6 +5355,7 @@ KEY12: ' ▼
 KEY13: '▶
     ETX  4800,13
     GOSUB 우유깍잡기_2
+    GOSUB 전방하향90도
 
 
     GOTO RX_EXIT
@@ -5707,16 +5713,19 @@ KEY76:
 KEY77:
     ETX  4800,77
     GOSUB 우유깍잡기_1
+    GOSUB 전방하향30도 
     GOTO RX_EXIT
     '***************
 KEY78:
     ETX  4800,78
     GOSUB 우유깍잡기_2
+    GOSUB 전방하향90도
     GOTO RX_EXIT
     '***************
 KEY79:
     ETX 4800, 79
     GOSUB 우유깍잡기_3
+    GOSUB 전방하향60도
     GOTO RX_EXIT
 
 KEY80:
