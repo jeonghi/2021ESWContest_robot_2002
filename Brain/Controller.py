@@ -32,26 +32,27 @@ class Controller:
 
     @classmethod
     def run(cls):
-
+        mode = cls.mode
         cls.robot.set_line_and_edge_info()
-        if cls.mode == Mode.START:
+        print()
+        if mode == Mode.START:
             cls.mode = Mode.IN
 
-        elif cls.mode == Mode.IN:
+        elif mode == Mode.IN:
             #if DoorMission.run():
             cls.mode = Mode.GO_TO_NEXT_ROOM
             cls.robot.direction = Direction.LEFT # 임시임
         
-        elif cls.mode == Mode.GO_TO_NEXT_ROOM:
+        elif mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
                 cls.mode = Mode.CHECK_AREA_COLOR
                 cls.robot.color = LineColor.GREEN
 
-        elif cls.mode == Mode.CHECK_AREA_COLOR:
+        elif mode == Mode.CHECK_AREA_COLOR:
             if RoomMission.check_area_color():
                 cls.mode = Mode.ROOM_MISSION
 
-        elif cls.mode == Mode.ROOM_MISSION:
+        elif mode == Mode.ROOM_MISSION:
             Mission = GreenRoomMission if RoomMission.area_color == AreaColor.GREEN else BlackRoomMission
             if Mission.run():
                 cls.mission_done += 1
@@ -60,10 +61,10 @@ class Controller:
                 else:
                     cls.mode = Mode.OUT
 
-        elif cls.mode == Mode.OUT:
+        elif mode == Mode.OUT:
             DoorMission.run()
         
-        elif cls.mode == Mode.END:
+        elif mode == Mode.END:
             return True
 
         return False

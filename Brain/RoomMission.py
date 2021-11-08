@@ -276,6 +276,7 @@ class GreenRoomMission(RoomMission):
     @classmethod
     def run(cls):
         mode = cls.mode
+        print(mode.name)
         if mode == Mode.START:
             cls.mode = Mode.DETECT_ALPHABET
 
@@ -354,25 +355,25 @@ class BlackRoomMission(RoomMission):
     @classmethod
     def go_to_corner(cls):
         arm_pos = cls.robot.curr_arm_pos[0]
-        cls.robot._motion.move_arm(dir=arm_pos)
+        cls.robot._motion.move_arm(arm=arm_pos)
         corner = cls.robot._image_processor.get_yellow_line_corner()
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
             if dy > 10:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
-                    pass
+                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="FORWARD", loop=1)
                 elif dx <= -90:
-                    pass
+                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="RIGHT", loop=1)
                 elif -90 < dx <= -50:  # 오른쪽
-                    pass
+                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="RIGHT", loop=2)
                 elif -50 < dx < -40:
-                    pass
+                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="RIGHT", loop=1)
                 elif 90 > dx >= 50:  # 왼쪽
-                    pass
+                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="LEFT", loop=2)
                 elif 50 > dx > 40:  # 왼쪽
-                    pass
+                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="LEFT", loop=2)
                 elif dx >= 90:
-                    pass
+                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="LEFT", loop=1)
             else:
                 if arm_pos == 'HIGH':
                     return True
@@ -384,6 +385,7 @@ class BlackRoomMission(RoomMission):
     @classmethod
     def run(cls):
         mode = cls.mode
+        print(mode.name)
         
         if mode == Mode.START:
             cls.mode = Mode.DETECT_ALPHABET

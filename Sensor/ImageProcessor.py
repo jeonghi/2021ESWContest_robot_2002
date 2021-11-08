@@ -417,8 +417,6 @@ class ImageProcessor:
         return corner
 
 
-
-
 if __name__ == "__main__":
 
     imageProcessor = ImageProcessor(video_path="src/old/green_area.mp4")
