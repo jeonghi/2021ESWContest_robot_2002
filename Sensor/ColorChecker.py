@@ -121,8 +121,8 @@ class ColorPreProcessor():
     @staticmethod
     def get_yellow_mask4hsv(src:np.array) -> np.array:
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        yellow_lower = np.array([10, 40, 95])
-        yellow_upper = np.array([40, 220, 220])
+        yellow_lower = np.array([13, 74, 95])
+        yellow_upper = np.array([55, 202, 195])
         mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
         return mask
 
