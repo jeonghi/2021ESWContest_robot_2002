@@ -348,14 +348,14 @@ class BlackRoomMission(RoomMission):
         if corner:
             return True
         else:
-            if arm_pos == 'MIDDLE':
+            if arm_pos == 'HIGH':
                 cls.robot._motion.turn(cls.robot.direction.name, grab=True, loop=2)         
             cls.robot.curr_arm_pos.rotate(-1)
 
     @classmethod
     def go_to_corner(cls):
         arm_pos = cls.robot.curr_arm_pos[0]
-        cls.robot._motion.move_arm(arm=arm_pos)
+        #cls.robot._motion.move_arm(arm=arm_pos)
         corner = cls.robot._image_processor.get_yellow_line_corner()
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
@@ -406,6 +406,7 @@ class BlackRoomMission(RoomMission):
             if cls.track_box():
                 cls.mode = Mode.FIND_CONRER
                 cls.robot.color = LineColor.YELLOW
+                cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=4)
         
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():

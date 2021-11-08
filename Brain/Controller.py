@@ -21,6 +21,7 @@ class Controller:
     mission_done: int = 0
     DoorMission.set_robot(robot)
     RoomMission.set_robot(robot)
+    robot.set_basic_form()
 
     @classmethod
     def check_go_to_next_room(cls) -> bool:
