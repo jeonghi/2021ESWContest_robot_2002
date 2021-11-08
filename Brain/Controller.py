@@ -337,7 +337,113 @@ class Robot:
         self.color = 'YELLOW'
         self.count += 1
         
+    def start_line(self, line_info):
+        if line_info['compact_H']:
+            self._motion.open_door(loop = 1)
+            self.mode = "entrance"
+        else:
+            self._motion.turn(dir='LEFT')
+            
+    def entrance(self, line_info):
+        if not line_info['V']:
+            if (edge_info['L_Y'][0]< 5 and edge_info['L_Y'][0] > 200) or (edge_info['R_Y'][0]< 5 and edge_info['R_Y'][0] > 200):
+                print('입구 빠져 나옴 -- 조정 필요', ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
+                self._motion.open_door(loop = 1)
+                self._motion.basic_form()
+                self._motion.open_door_turn(dir='RIGHT', loop=3)
+                self.mode = 'direction_line'
+                #self._motion.basic_form()
+                #self._motion.turn(dir='SLIDING_RIGHT', loop=2)
+                #self.mode = 'direction_line'
+            else:
+                if line_info['H_DEGREE'] > 174 :
+                    if 160 <= line_info['H_Y'][1] < 250:
+                        print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
+                        self._motion.open_door(loop = 1)
+                    elif line_info['H_Y'][1] < 160:
+                        print('입구 빠져 나가는 중 - H 멀어서 가까이 다가감', line_info['H'], line_info['H_Y'][1])
+                        self._motion.open_door_walk(dir='FORWARD') # 수정 완료
+                    else: # H가 너무 가깝다는 것, H 업다는 것
+                        print('입구 빠져 나가는 중 - H 가까워서 한발자국 뒤로', line_info['H'], line_info['H_Y'][1])
+                        self._motion.open_door_walk(dir='BACKWARD') # 수정 완료
+                        print('entrance :: H is so closed')
+                        time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
+                else:
+                    print('H:', line_info['H_DEGREE'], ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
+                    if edge_info['EDGE_R']:
+                        self._motion.open_door_turn(dir='LEFT')
+                    elif edge_info['EDGE_L']:
+                        self._motion.open_door_turn(dir='RIGHT')
+                    else:
+                        self._motion.open_door_walk(dir='BACKWARD')
+                        print('No H')
+        else:
+            print('입구 빠져 나옴', 'V:', line_info['V'], line_info["V_X"])
+            #if line_info["V_X"][1] > 550:
+            self._motion.open_door(loop = 1)
+            self._motion.open_door_turn(dir='RIGHT', loop=4)
+            self._motion.basic_form()
+            self.mode = 'direction_line'
+            #self._motion.basic_form()
+            #self._motion.turn(dir='SLIDING_RIGHT', loop=4)
+            #self.mode = 'direction_line'
     
+    def derection_line(self, line_info):
+        if line_info['compact_H']:
+            #self._motion.basic_form()
+            
+            if line_info['H_Y'][1] < 100:
+                print('H랑 멀어서 가까이 다가감', line_info['H_Y'][1])
+                self._motion.walk(dir='FORWARD')
+                
+            print('H 앞에 정지', line_info['H_DEGREE'])
+            print('만약 H 앞이 아닌데 detect_direction 하면 기본 돌기 횟수 수정 필요 --윗줄 print문 중에 조정필요라 떴으면 378번줄, 안 떴으면 407번줄')
+            
+            self._motion.set_head(dir='DOWN', angle=90)
+            time.sleep(1.2)
+            self.mode = 'detect_direction'
+        else:
+            print('H 찾는 중', line_info['H_DEGREE'])
+            self._motion.turn(dir='RIGHT')
+            
+    def detect_direction(self):
+        if self.detect_direction():
+            self._motion.set_head(dir='DOWN', angle=10)
+            time.sleep(0.3)
+            self._motion.walk('FORWARD', 2)  # 너무 뒤에서 멈추면 추가
+            self._motion.walk(self.direction, wide= True, loop = 4)
+            self._motion.turn(self.direction, sliding= True, loop = 4)
+            self.mode = 'walk'
+            self.walk_info = '│'
+        else:
+            self._motion.walk("BACKWARD", 1)
+            print('detect direction is failed')
+            time.sleep(0.5)
+            
+    def is_finish_line(self, line_info):
+        if self.count < 3 and SAFETY:
+            if line_info["H"]:
+                self._motion.walk(dir='FORWARD')
+            else:
+                self.mode = 'walk'
+                self.walk_info = '│'
+        else:
+            #self._motion.walk(dir='FORWARD')
+            self.mode = 'finish'
+            
+    def finish(self):
+        if self.direction == 'LEFT':
+            self._motion.open_door(dir='LEFT', loop=15)
+            print("left")
+        else:
+            self._motion.open_door(loop=15)
+            print("right")
+            
+        if self.black_room:
+            self._motion.notice_alpha(self.black_room)
+            self.black_room.clear()
+            return 0
+
 
     def run(self, in_method = 2):
         # in_method == 1 : 옆으로 걷기
@@ -421,92 +527,18 @@ class Robot:
             
                 
         elif self.mode in ['start_line']:
-            if line_info['compact_H']:
-                self._motion.open_door(loop = 1)
-                self.mode = "entrance"
-            else:
-                self._motion.turn(dir='LEFT')
+            self.start_line(line_info)
                 
         elif self.mode in ['entrance']:
-            if not line_info['V']:
-                if (edge_info['L_Y'][0]< 5 and edge_info['L_Y'][0] > 200) or (edge_info['R_Y'][0]< 5 and edge_info['R_Y'][0] > 200):
-                    print('입구 빠져 나옴 -- 조정 필요', ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
-                    self._motion.open_door(loop = 1)
-                    self._motion.basic_form()
-                    self._motion.open_door_turn(dir='RIGHT', loop=3)
-                    self.mode = 'direction_line'
-                    #self._motion.basic_form()
-                    #self._motion.turn(dir='SLIDING_RIGHT', loop=2)
-                    #self.mode = 'direction_line'
-                else:
-                    if line_info['H_DEGREE'] > 174 :
-                        if 160 <= line_info['H_Y'][1] < 250:
-                            print('입구 빠져 나가는 중', 'H:', line_info['H'], line_info['H_Y'][1])
-                            self._motion.open_door(loop = 1)
-                        elif line_info['H_Y'][1] < 160:
-                            print('입구 빠져 나가는 중 - H 멀어서 가까이 다가감', line_info['H'], line_info['H_Y'][1])
-                            self._motion.open_door_walk(dir='FORWARD') # 수정 완료
-                        else: # H가 너무 가깝다는 것, H 업다는 것
-                            print('입구 빠져 나가는 중 - H 가까워서 한발자국 뒤로', line_info['H'], line_info['H_Y'][1])
-                            self._motion.open_door_walk(dir='BACKWARD') # 수정 완료
-                            print('entrance :: H is so closed')
-                            time.sleep(1) #뒤로 가는 거 휘청거려서 넣음
-                    else:
-                        print('H:', line_info['H_DEGREE'], ', EDGE_R:', edge_info['EDGE_R'], ', EDGE_L:', edge_info['EDGE_L'])
-                        if edge_info['EDGE_R']:
-                            self._motion.open_door_turn(dir='LEFT')
-                        elif edge_info['EDGE_L']:
-                            self._motion.open_door_turn(dir='RIGHT')
-                        else:
-                            self._motion.open_door_walk(dir='BACKWARD')
-                            print('No H')
-            else:
-                print('입구 빠져 나옴', 'V:', line_info['V'], line_info["V_X"])
-                #if line_info["V_X"][1] > 550:
-                self._motion.open_door(loop = 1)
-                self._motion.open_door_turn(dir='RIGHT', loop=4)
-                self._motion.basic_form()
-                self.mode = 'direction_line'
-                #self._motion.basic_form()
-                #self._motion.turn(dir='SLIDING_RIGHT', loop=4)
-                #self.mode = 'direction_line'
+            self.entrance(line_info)
                 
         elif self.mode in ['direction_line']:
-            if line_info['compact_H']:
-                #self._motion.basic_form()
-                
-                if line_info['H_Y'][1] < 100:
-                    print('H랑 멀어서 가까이 다가감', line_info['H_Y'][1])
-                    self._motion.walk(dir='FORWARD')
-                    
-                print('H 앞에 정지', line_info['H_DEGREE'])
-                print('만약 H 앞이 아닌데 detect_direction 하면 기본 돌기 횟수 수정 필요 --윗줄 print문 중에 조정필요라 떴으면 378번줄, 안 떴으면 407번줄')
-                
-                self._motion.set_head(dir='DOWN', angle=90)
-                time.sleep(1.2)
-                self.mode = 'detect_direction'
-            else:
-                print('H 찾는 중', line_info['H_DEGREE'])
-                self._motion.turn(dir='RIGHT')
+            self.direction_line(line_info)
                 
         # 3) 화살표 방향 인식
         elif self.mode in ['detect_direction']:
             
-            if self.detect_direction():
-                self._motion.set_head(dir='DOWN', angle=10)
-                time.sleep(0.3)
-                # if line_info['DEGREE'] != 0:
-                # self.walk(line_info, True)
-                # else:
-                self._motion.walk('FORWARD', 2)  # 너무 뒤에서 멈추면 추가
-                self._motion.walk(self.direction, wide= True, loop = 4)
-                self._motion.turn(self.direction, sliding= True, loop = 4)
-                self.mode = 'walk'
-                self.walk_info = '│'
-            else:
-                self._motion.walk("BACKWARD", 1)
-                print('detect direction is failed')
-                time.sleep(0.5)
+            self.detect_direction()
                 
 
 
@@ -914,29 +946,9 @@ class Robot:
 
         # 나가기
         elif self.mode in ['is_finish_line']:
-            if self.count < 3 and SAFETY:
-                if line_info["H"]:
-                    self._motion.walk(dir='FORWARD')
-                else:
-                    self.mode = 'walk'
-                    self.walk_info = '│'
-            else:
-                #self._motion.walk(dir='FORWARD')
-                self.mode = 'finish'
+            self.is_finish_line(line_info)
 
         # 나가기
         elif self.mode in ['finish']:
-            if self.direction == 'LEFT':
-                self._motion.open_door(dir='LEFT', loop=15)
-                print("left")
-            else:
-                self._motion.open_door(loop=15)
-                print("right")
-            self.mode = 'finish_notice'
-                
-        elif self.mode in ['finish_notice']:
-            if self.black_room:
-                self._motion.notice_alpha(self.black_room)
-                self.black_room.clear()
-                return 0
+            self.finish()
             
