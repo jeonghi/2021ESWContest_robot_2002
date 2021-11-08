@@ -27,7 +27,8 @@ class InDoorMission:
         if alphabet:
             print("alphabet:", alphabet)
             cls.robot._motion.notice_direction(dir=alphabet)   
-            cls.robot._motion.set_head(dir="DOWN", angle=10) 
+            cls.robot._motion.set_head(dir="DOWN", angle=10)
+            time.sleep(0.5)
             return True
         
         cls.robot.curr_head4door_alphabet.rotate(-1)    
