@@ -237,12 +237,11 @@ class Motion:
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
         팔을 위로 하면 머리는 아래로 숙임.
         """
-        angle_list = [35, 90, 60]
+
         level = {'HIGH': 1, 'MIDDLE': 2, 'LOW': 3}
         dir_list = {'FORWARD': 0, 'LEFT': 1, 'RIGHT': 2}
         self.TX_data_py2(76 + level[arm])
         time.sleep(0.1)
-        self.set_head(dir='DOWN', angle=angle_list[level[arm] - 1])
         if walk:
             if dir == 'FORWARD':
                 for _ in range(loop):
