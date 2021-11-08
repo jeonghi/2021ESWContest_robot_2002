@@ -405,6 +405,47 @@ class ImageProcessor:
             cv2.waitKey(1)
             #print(line_info["H_Y"])
         return result
+    
+    def line_checker(self, line_info):
+        if line_info["DEGREE"] == 0: 
+            walk_info = None
+            
+        else:
+            if line_info["H"]:
+                if np.mean(line_info["H_X"]) < 320:
+                    walk_info = 'corner_LEFT'
+                else:
+                    walk_info = 'corner_RIGHT'
+        
+            else:
+                if 85 < line_info["DEGREE"] < 95:
+                    if 290 < line_info["V_X"][0] < 350:
+                            walk_info = 'straight'
+                    else:
+                        if line_info["V_X"][0] < 290:
+                            walk_info = 'V_LEFT'
+                        elif line_info["V_X"][0] > 350:
+                            walk_info = 'V_RIGHT'
+                elif 0 < line_info["DEGREE"] <= 85:
+                    walk_info = 'modify_LEFT'
+                else:
+                    walk_info = 'modify_RIGHT'
+            
+        return walk_info
+    
+    def line_checker(self, line_info):
+        if line_info["DEGREE"] != 0: 
+            if line_info["H"]:
+                if np.mean(line_info["H_X"]) < 320:
+                    walk_info = 'LEFT'
+                else:
+                    walk_info = 'RIGHT'
+            else:
+                if line_info["V"]:
+                    walk_info = 'straight'
+                else:
+                    walk_info = None
+
 
     def get_yellow_line_corner(self, visualization=False):
         """
