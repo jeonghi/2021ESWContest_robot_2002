@@ -1,5 +1,6 @@
 from Brain.Robot import Robot
 from enum import Enum, auto
+import time
 
 class Mode(Enum):
     START = auto()
@@ -42,9 +43,39 @@ class DoorMission:
         
         cls.robot._motion.walk("BACKWARD", 1)
         return False
-    
+
     @classmethod
-    def open_door(cls) -> bool:
+    def in_door(cls) -> bool:
+        if cls.robot.line_info['V']:
+            if 85 < cls.robot.line_info["DEGREE"] < 95:
+                if 290 < cls.robot.line_info["V_X"][0] < 350:
+                    if cls.robot.line_info["H"]:
+                        cls.robot._motion.basic_form()
+                        if cls.robot.line_info['H_Y'][1] < 100:
+                            cls.robot._motion.walk(dir='FORWARD')
+                        return True
+                    else:
+                        cls.robot._motion.walk(dir='FORWARD', loop=2, open_door = True)  # 팔뻗기
+                else:
+                    if cls.robot.line_info["V_X"][0] < 290:
+                        cls.robot._motion.walk(dir='LEFT', loop=1, open_door = True) # 팔뻗기
+                    elif cls.robot.line_info["V_X"][0] > 350:
+                        cls.robot._motion.walk(dir='RIGHT', loop=1, open_door = True) # 팔뻗기
+
+            elif 0 < cls.robot.line_info["DEGREE"] <= 85:
+                cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True) # 팔뻗기
+
+            else:
+                cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True) # 팔뻗기
+
+        elif 0 < cls.robot.line_info["DEGREE"] <= 85:
+                cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True) # 팔뻗기
+        else:
+            cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True) # 팔뻗기
+        return False
+            
+    @classmethod
+    def out_door(cls) -> bool:
         pass
     
     @classmethod
@@ -59,14 +90,22 @@ class DoorMission:
                 cls.mode = Mode.IN
         
         elif mode == Mode.IN:
+            if cls.in_door():
+                cls.mode = Mode.DETECT_DIRECTION
             pass
+        
+        elif mode == Mode.DETECT_DIRECTION:
+            if cls.detect_direction:
+                cls.mode = Mode.END
         
         elif mode == Mode.OUT:
             pass
+        
+        if mode == Mode.END:
+            return True
+        
             
 
-        elif mode == Mode.DETECT_DIRECTION:
-            if cls.detect_direction:
-                cls.mode = Mode.IN
+       
         
         return False
