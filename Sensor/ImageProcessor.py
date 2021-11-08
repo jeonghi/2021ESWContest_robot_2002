@@ -407,10 +407,9 @@ class ImageProcessor:
         return result
     
     def line_checker(self, line_info):
-        if line_info["DEGREE"] == 0: 
-            walk_info = None
-            
-        else:
+        walk_info = None
+
+        if line_info["DEGREE"]:
             if line_info["H"]:
                 if np.mean(line_info["H_X"]) < 320:
                     walk_info = 'corner_LEFT'
