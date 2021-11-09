@@ -5,10 +5,13 @@ from Brain.OutDoorMission import OutDoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
 from Constant import Direction, AreaColor, LineColor, WalkInfo
 
+import time
+
 CLEAR_LIMIT: int = 3
 class Mode(Enum):
     START = auto()
     IN = auto()
+    DETECT_DIRECTION = auto()
     CHECK_AREA_COLOR = auto()
     ROOM_MISSION = auto()
     GO_TO_NEXT_ROOM = auto()
@@ -63,6 +66,24 @@ class Controller:
         return False
 
     @classmethod
+    def detect_direction(cls) -> bool:
+        direction = cls.robot._image_processor.get_arrow_direction()
+        if direction:
+            cls.robot._motion.set_head(dir='DOWN', angle=10)
+            time.sleep(0.5)
+        
+            cls.robot._motion.walk('FORWARD', 2)
+            cls.robot._motion.walk(cls.robot.direction.name, wide=True, loop = 4)
+            cls.robot._motion.turn(cls.robot.direction.name, sliding=True, loop = 4)
+            
+            cls.robot.direction = Direction.LEFT if direction == "LEFT" else Direction.RIGHT
+            return True
+        
+        cls.robot._motion.walk("BACKWARD", 1)
+        time.sleep(0.5)
+        return False
+
+    @classmethod
     def run(cls):
         mode = cls.mode
         cls.robot.set_line_and_edge_info(ROI=cls.ROI)
@@ -73,7 +94,13 @@ class Controller:
 
         elif mode == Mode.IN:
             if InDoorMission.run():
+                cls.mode = Mode.DETECT_DIRECTION
+                cls.ROI = False
+
+        elif mode == Mode.DETECT_DIRECTION:
+            if cls.detect_direction():
                 cls.mode = Mode.GO_TO_NEXT_ROOM
+                cls.ROI = True
         
         elif mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
