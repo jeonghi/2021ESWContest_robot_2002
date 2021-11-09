@@ -213,7 +213,7 @@ class GreenRoomMission(RoomMission):
             cls.robot._motion.move_arm(dir='HIGH')
             return True
 
-        cls.robot._motion.turn(dir=fast_turn.name, loop=1)
+        cls.robot._motion.turn(dir=cls.fast_turn.name, loop=1)
         return False
 
     @classmethod
@@ -315,6 +315,9 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.GO_TO_CORNER:
             if cls.go_to_corner():
                 cls.mode = cls.mode = Mode.OUT_ROOM
+                loop: int
+                loop = 4 if cls.fast_turn == Direction.RIGHT else 2
+                cls.robot._motion.turn(dir=cls.robot.direction, loop=loop)
                 
         elif mode == Mode.OUT_ROOM:
             if cls.out_room():
