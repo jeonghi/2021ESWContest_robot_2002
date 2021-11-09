@@ -33,7 +33,7 @@ class Controller:
         if cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
             cls.robot.color=LineColor.GREEN
-            cls.robot.driection = Direction.LEFT
+            cls.robot.direction = Direction.LEFT
             
 
     @classmethod
@@ -90,6 +90,13 @@ class Controller:
         cls.robot._motion.walk("BACKWARD", 1)
         time.sleep(1.0)
         return False
+    @classmethod
+    def room_run(cls):
+        cls.robot.color = LineColor.YELLOW
+        cls.robot.set_line_and_edge_info(ROI=cls.ROI)
+        Mission = GreenRoomMission
+        return Mission.run()
+        
 
     @classmethod
     def run(cls):
