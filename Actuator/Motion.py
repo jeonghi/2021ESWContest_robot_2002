@@ -179,7 +179,7 @@ class Motion:
             #print(dir_list[dir])
             self.TX_data_py2(dir_list[dir])
             time.sleep(sleep)
-        
+
         if IR:
             if self.get_IR() > 65:
                 return True
@@ -249,8 +249,8 @@ class Motion:
         if walk:
             for _ in range(loop):
                 self.TX_data_py2(112 + level[dir])
-                if
-    
+
+
 
 # **************************************************
 # **************************************************
