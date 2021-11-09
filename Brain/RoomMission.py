@@ -12,6 +12,8 @@ class Mode(Enum):
     TURN_TO_AREA = auto()
     DROP_BOX = auto()
     GO_TO_AREA = auto()
+    FIND_YELLOW_LINE = auto()
+    GO_OUT_AREA = auto()
     FIND_CONRER = auto()
     GO_TO_CORNER = auto()
     OUT_ROOM = auto()
@@ -373,22 +375,49 @@ class BlackRoomMission(RoomMission):
 
 
     @classmethod
-    def go_to_corner(cls):
+    def go_to_corner(cls) -> bool :
         head_angle = cls.robot.curr_head4find_corner[0]
+        cls.robot._motion.set_head("DOWN", angle=head_angle)
+        corner = cls.robot._image_processor.get_yellow_line_corner()
+        if corner:
+            (dx, dy) = get_distance_from_baseline(pos=corner)
+            if dy > 10:  # 기준선 보다 위에 있다면
+                if -50 <= dx <= 50:
+                    cls.robot._motion.walk(dir='FORWARD', loop=1)
+                elif dx <= -70:
+                    cls.robot._motion.turn(dir='RIGHT', loop=1)
+                elif -70 < dx <= -50:  # 오른쪽
+                    cls.robot._motion.walk(dir='RIGHT', loop=1)
+                elif 70 > dx >= 50:  # 왼쪽
+                    cls.robot._motion.walk(dir='LEFT', loop=1)
+                elif dx >= 70:
+                    cls.robot._motion.turn(dir='LEFT', loop=1)
+            else:
+                if head_angle == 35:
+                    cls.robot._motion.walk(dir='FORWARD', loop=1)
+                    return True
+                else:
+                    cls.robot.curr_head4find_corner.rotate(-1)
+        else:
+            cls.mode = Mode.FIND_CONRER
 
-        if cls.robot.line_info["ALL_Y"][1] > 215:
-            if head_angle != min(cls.robot.curr_head4find_corner):
-                cls.robot.curr_head4find_corner.rotate(-1)
-                cls.robot._motion.set_head("DOWN", angle=head_angle)
-
-
-        cls.robot._motion.walk(dir="FORWARD", loop=1, grab=True)
-        if cls.robot.edge_info["EDGE_POS"]:
-            if cls.robot.edge_info["EDGE_POS"][1] > 450:
-                return True
-
-        time.sleep(0.5)
+    @classmethod
+    def find_yellow_line(cls) -> bool:
+        head_angle = cls.robot.curr_head4find_corner[0]
+        cls.robot._motion.set_head("DOWN", angle=head_angle)
+        if cls.robot.line_info["ALL_Y"][1]:
+            return True
         return False
+
+    @classmethod
+    def go_out_area(cls) -> bool:
+        cls.robot._motion.walk(dir="FORWARD", grab=True, loop=1)
+        if cls.robot._image_processor.is_out_of_black():
+            return True
+        else:
+            return False
+
+
     
     @classmethod
     def run(cls):
@@ -416,18 +445,27 @@ class BlackRoomMission(RoomMission):
                 cls.mode = Mode.FIND_CONRER
                 cls.robot.color = LineColor.YELLOW
                 cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=7)
-        
+
+        elif mode == Mode.FIND_YELLOW_LINE:
+            if cls.find_yellow_line():
+                cls.mode = Mode.GO_OUT_AREA
+                cls.robot._motion.set_head("DOWN", angle=35)
+
+        elif mode == Mode.GO_OUT_AREA:
+            if cls.go_out_area():
+                cls.mode = Mode.DROP_BOX
+
+        elif mode == Mode.DROP_BOX:
+            if cls.drop_box():
+                cls.mode = Mode.FIND_CONRER
+
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
                 cls.mode = Mode.GO_TO_CORNER
                 
         elif mode == Mode.GO_TO_CORNER:
             if cls.go_to_corner():
-                cls.mode = Mode.DROP_BOX
-
-        elif mode == Mode.DROP_BOX:
-            if cls.drop_box():
-                cls.mode = Mode.FIND_LINE
+                cls.mode = Mode.OUT_ROOM
                 
         elif mode == Mode.OUT_ROOM:
             if cls.out_room():

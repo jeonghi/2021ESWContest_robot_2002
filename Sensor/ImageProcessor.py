@@ -504,18 +504,36 @@ class ImageProcessor:
 
         return corner
 
+    def is_out_of_black(self, visualization=False) -> bool:
+        src = self.get_image()
+        begin = (bx, by) = (160, 120)
+        end = (ex, ey) = (480, 360)
+
+        mask = ColorPreProcessor.get_black_mask(src=src[by:ey, bx:ex])
+
+        rate = np.count_nonzero(mask) / (ex-bx) * (ey-by)
+        rate *= 100
+
+
+        if visualization:
+            cv2.imshow("roi", cv2.rectangle(src, begin, end, (0, 0, 255), 3))
+            cv2.imshow("mask", mask)
+            cv2.waitKey(1)
+
+        return rate <= 40
+
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor()
+    imageProcessor = ImageProcessor(video_path="src/old/black_area.mp4")
     #imageProcessor = ImageProcessor("")
     #imageProcessor = ImageProcessor(video_path="")
     # imageProcessor.fps.start()
     while True:
         #imageProcessor.get_arrow_direction()
-        line, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=True, edge_visualization=False, ROI=True)
-        result = imageProcessor.line_checker(line)
-        print(result)
+        #line, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=True, edge_visualization=False, ROI=True)
+        #result = imageProcessor.line_checker(line)
+        #print(result)
         #alphabet = imageProcessor.get_door_alphabet(visualization=True)
         #print(alphabet)
         #src = imageProcessor.get_image(visualization=True)
@@ -525,3 +543,4 @@ if __name__ == "__main__":
         #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #imageProcessor.room_test()
         #imageProcessor.get_yellow_line_corner(visualization=True)
+        imageProcessor.is_out_of_black(visualization=True)
