@@ -506,12 +506,12 @@ class ImageProcessor:
 
     def is_out_of_black(self, visualization=False) -> bool:
         src = self.get_image()
-        begin = (bx, by) = (160, 120)
-        end = (ex, ey) = (480, 360)
+        begin = (bx, by) = (160, 200)
+        end = (ex, ey) = (480, 420)
 
         mask = ColorPreProcessor.get_black_mask(src=src[by:ey, bx:ex])
 
-        rate = np.count_nonzero(mask) / (ex-bx) * (ey-by)
+        rate = np.count_nonzero(mask) / ((ex-bx) * (ey-by))
         rate *= 100
 
 
@@ -519,6 +519,7 @@ class ImageProcessor:
             cv2.imshow("roi", cv2.rectangle(src, begin, end, (0, 0, 255), 3))
             cv2.imshow("mask", mask)
             cv2.waitKey(1)
+        print(rate)
 
         return rate <= 40
 

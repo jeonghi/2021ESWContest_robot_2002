@@ -8,4 +8,4 @@ def main():
 if __name__ == "__main__":
     main()
     #while True:
-        #Controller.robot._image_processor.get_arrow_direction(visualization=True)
+        #print(Controller.robot._image_processor.is_out_of_black(visualization=True))
