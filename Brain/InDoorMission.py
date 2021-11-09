@@ -43,12 +43,12 @@ class InDoorMission:
             if cls.robot.walk_info == WalkInfo.STRAIGHT:
                 cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
             elif cls.robot.walk_info == WalkInfo.V_LEFT:
-                if cls.robot.line_info['H']:
+                if cls.robot.line_info['H_Y'][1] <= 100:
                     cls.robot._motion.walk('LEFT', loop=1, open_door=True)
                 else:
                     cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
             elif cls.robot.walk_info == WalkInfo.V_RIGHT:
-                if cls.robot.line_info['H']:
+                if cls.robot.line_info['H_Y'][1] <= 100:
                     cls.robot._motion.walk('RIGHT', loop=1, open_door=True)
                 else:
                     cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
@@ -60,7 +60,7 @@ class InDoorMission:
             elif cls.robot.walk_info in [ WalkInfo.DIRECTION_LINE, WalkInfo.CORNER_RIGHT, WalkInfo.CORNER_LEFT] :
                 cls.robot._motion.basic_form()
                 cls.robot._motion.set_head(dir='DOWN', angle=90)
-                time.sleep(0.5)
+                time.sleep(2)
                 return True
                     
             else: # WalkInfo.BACKWARD

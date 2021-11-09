@@ -68,19 +68,19 @@ class Controller:
     @classmethod
     def detect_direction(cls) -> bool:
         direction = cls.robot._image_processor.get_arrow_direction()
+        
         if direction:
+            cls.robot.direction = Direction.LEFT if direction == "LEFT" else Direction.RIGHT
             cls.robot._motion.set_head(dir='DOWN', angle=10)
             time.sleep(0.5)
         
             cls.robot._motion.walk('FORWARD', 2)
             cls.robot._motion.walk(cls.robot.direction.name, wide=True, loop = 4)
             cls.robot._motion.turn(cls.robot.direction.name, sliding=True, loop = 4)
-            
-            cls.robot.direction = Direction.LEFT if direction == "LEFT" else Direction.RIGHT
             return True
         
         cls.robot._motion.walk("BACKWARD", 1)
-        time.sleep(0.5)
+        time.sleep(1.0)
         return False
 
     @classmethod
