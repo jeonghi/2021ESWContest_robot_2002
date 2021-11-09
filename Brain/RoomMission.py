@@ -292,7 +292,7 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.TRACK_BOX:
             if cls.track_box():
                 cls.mode = Mode.TURN_TO_AREA
-                cls.robot._motion.turn(dir=cls.fast_turn.name, grap=True, loop=2)
+                cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, loop=2)
 
         elif mode == Mode.TURN_TO_AREA:
             if cls.turn_to_area():
