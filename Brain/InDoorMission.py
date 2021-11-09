@@ -36,37 +36,31 @@ class InDoorMission:
 
     @classmethod
     def in_door(cls) -> bool:
-        if cls.robot.walk_info == WalkInfo.STRAIGHT:
-            cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
-        elif cls.robot.walk_info == WalkInfo.V_LEFT:
-            cls.robot._motion.walk('LEFT', loop=1, open_door=True)
-        elif cls.robot.walk_info == WalkInfo.V_RIGHT:
-            cls.robot._motion.walk('RIGHT', loop=1, open_door=True)
-        elif cls.robot.walk_info == WalkInfo.MODIFY_LEFT:
-            cls.robot._motion.open_door_turn('LEFT', 1)
-        elif cls.robot.walk_info == WalkInfo.MODIFY_RIGHT:
-            cls.robot._motion.open_door_turn('RIGHT', 1)
-        
-        elif cls.robot.walk_info in [ WalkInfo.DIRECTION_LINE, WalkInfo.CORNER_RIGHT, WalkInfo.CORNER_LEFT] :
-            cls.robot._motion.basic_form()
-            cls.robot._motion.set_head(dir='DOWN', angle=90)
-            time.sleep(0.5)
-            return True
-                
-        else: # WalkInfo.BACKWARD
-            cls.robot._motion.open_door_walk('BACKWARD', 1)
+        dst = cls.robot._motion.get_IR()
+        if dst > 100 :
+            cls.robot._motion.walk('FORWARD', loop=8, open_door=True)
+        else:
+            if cls.robot.walk_info == WalkInfo.STRAIGHT:
+                cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
+            elif cls.robot.walk_info == WalkInfo.V_LEFT:
+                cls.robot._motion.walk('LEFT', loop=1, open_door=True)
+            elif cls.robot.walk_info == WalkInfo.V_RIGHT:
+                cls.robot._motion.walk('RIGHT', loop=1, open_door=True)
+            elif cls.robot.walk_info == WalkInfo.MODIFY_LEFT:
+                cls.robot._motion.open_door_turn('LEFT', 1)
+            elif cls.robot.walk_info == WalkInfo.MODIFY_RIGHT:
+                cls.robot._motion.open_door_turn('RIGHT', 1)
+            
+            elif cls.robot.walk_info in [ WalkInfo.DIRECTION_LINE, WalkInfo.CORNER_RIGHT, WalkInfo.CORNER_LEFT] :
+                cls.robot._motion.basic_form()
+                cls.robot._motion.set_head(dir='DOWN', angle=90)
+                time.sleep(0.5)
+                return True
+                    
+            else: # WalkInfo.BACKWARD
+                cls.robot._motion.open_door_walk('BACKWARD', 1)
 
         return False
-    
-    @classmethod
-    def in_door_(cls) -> bool:
-        if cls.robot.line_info['H']:
-            if cls.robot.line_info['H_Y'][1] < 100:
-                cls.robot._motion.walk('FORWARD', loop = 1)
-            return True
-        else:
-            cls.robot._motion.walk('FORWARD', loop = 2)
-            return False
 
     @classmethod
     def detect_direction(cls) -> bool:
