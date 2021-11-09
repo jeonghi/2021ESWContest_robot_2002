@@ -114,14 +114,14 @@ class HashDetector:
         
         return result, hdist_dict[result]
 
-    def detect_arrow(self, img : np.ndarray):
+    def detect_arrow(self, img : np.ndarray, thresh=0.6):
         img_hash = self.image_to_hash(img)
 
         distance_1 = self.hamming_distance(img_hash, self.directions_hash[0])
         distance_2 = self.hamming_distance(img_hash, self.directions_hash[1])
 
         #print(distance_1, distance_2)
-        if distance_2 > 0.3 and distance_1 > 0.3:
+        if distance_2 > thresh and distance_1 > thresh:
             return None
 
         if distance_1 < distance_2:

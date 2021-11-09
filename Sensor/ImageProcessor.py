@@ -15,12 +15,14 @@ if __name__ == "__main__":
     from LineDetector import LineDetector
     from ColorChecker import ColorPreProcessor
     from CornerFinder import CornerFinder
+
 else:
     from Sensor.HashDetector import HashDetector
     from Sensor.Target import Target, setLabel
     from Sensor.LineDetector import LineDetector
     from Sensor.ColorChecker import ColorPreProcessor
     from Sensor.CornerFinder import CornerFinder
+    from Constant import WalkInfo
 
 
 class ImageProcessor:
@@ -148,7 +150,7 @@ class ImageProcessor:
         kernel = np.ones((5, 5), np.uint8)
 
         gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
-        _, binary = cv2.threshold(gray, 150, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY_INV)
+        _, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
         edge = auto_canny(binary)
 
@@ -170,7 +172,7 @@ class ImageProcessor:
         cv2.drawContours(dst, [contour], -1, (255, 0, 0), 2)
         if visualization:
             cv2.imshow("src", src)
-            #cv2.imshow("binary", edge)
+            cv2.imshow("binary", edge)
             #cv2.imshow("dst", dst)
             cv2.imshow("roi_mask", roi_mask)
             cv2.waitKey(10)
@@ -403,32 +405,91 @@ class ImageProcessor:
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
             cv2.waitKey(1)
-            #print(line_info["H_Y"])
         return result
     
     def line_checker(self, line_info):
-        walk_info = None
-
-        if line_info["DEGREE"]:
-            if line_info["H"]:
-                if np.mean(line_info["H_X"]) < 320:
-                    walk_info = 'corner_LEFT'
+        if line_info["H"]:
+            if line_info["H_Y"][1] > 100 :
+                if 300 < np.mean(line_info["H_X"]) < 340:
+                    if line_info["V"]:
+                        if 85 < line_info["DEGREE"] < 95:
+                            if 290 < line_info["V_X"][0] < 350:
+                                walk_info = WalkInfo.DIRECTION_LINE
+                            else:
+                                if line_info["V_X"][0] <= 290:
+                                    walk_info = WalkInfo.V_LEFT
+                                elif line_info["V_X"][0] >= 350:
+                                    walk_info = WalkInfo.V_RIGHT
+                        elif 0 < line_info["DEGREE"] <= 85:
+                            walk_info = WalkInfo.MODIFY_LEFT
+                        else:
+                            walk_info = WalkInfo.MODIFY_RIGHT
+                    else:
+                        walk_info = WalkInfo.DIRECTION_LINE
+                    
+                elif np.mean(line_info["H_X"]) >= 340:
+                    if line_info["V"]:
+                        if 85 < line_info["DEGREE"] < 95:
+                            if 290 < line_info["V_X"][0] < 350:
+                                walk_info = WalkInfo.CORNER_RIGHT
+                            else:
+                                if line_info["V_X"][0] <= 290:
+                                    walk_info = WalkInfo.V_LEFT
+                                elif line_info["V_X"][0] >= 350:
+                                    walk_info = WalkInfo.V_RIGHT
+                        elif 0 < line_info["DEGREE"] <= 85:
+                            walk_info = WalkInfo.MODIFY_LEFT
+                        else:
+                            walk_info = WalkInfo.MODIFY_RIGHT
+                    else:
+                        walk_info = WalkInfo.CORNER_RIGHT
+                    
                 else:
-                    walk_info = 'corner_RIGHT'
-        
+                    if line_info["V"]:
+                        if 85 < line_info["DEGREE"] < 95:
+                            if 290 < line_info["V_X"][0] < 350:
+                                walk_info = WalkInfo.CORNER_LEFT
+                            else:
+                                if line_info["V_X"][0] <= 290:
+                                    walk_info = WalkInfo.V_LEFT
+                                elif line_info["V_X"][0] >= 350:
+                                    walk_info = WalkInfo.V_RIGHT
+                        elif 0 < line_info["DEGREE"] <= 85:
+                            walk_info = WalkInfo.MODIFY_LEFT
+                        else:
+                            walk_info = WalkInfo.MODIFY_RIGHT
+                    else:
+                        walk_info = WalkInfo.CORNER_LEFT
+                            
             else:
                 if 85 < line_info["DEGREE"] < 95:
                     if 290 < line_info["V_X"][0] < 350:
-                            walk_info = 'straight'
+                        walk_info = WalkInfo.STRAIGHT
                     else:
-                        if line_info["V_X"][0] < 290:
-                            walk_info = 'V_LEFT'
-                        elif line_info["V_X"][0] > 350:
-                            walk_info = 'V_RIGHT'
+                        if line_info["V_X"][0] <= 290:
+                            walk_info = WalkInfo.V_LEFT
+                        elif line_info["V_X"][0] >= 350:
+                            walk_info = WalkInfo.V_RIGHT
                 elif 0 < line_info["DEGREE"] <= 85:
-                    walk_info = 'modify_LEFT'
+                    walk_info = WalkInfo.MODIFY_LEFT
                 else:
-                    walk_info = 'modify_RIGHT'
+                    walk_info = WalkInfo.MODIFY_RIGHT
+    
+        else:
+            if 85 < line_info["DEGREE"] < 95:
+                if 290 < line_info["V_X"][0] < 350:
+                    walk_info = WalkInfo.STRAIGHT
+                else:
+                    if line_info["V_X"][0] <= 290:
+                        walk_info = WalkInfo.V_LEFT
+                    elif line_info["V_X"][0] >= 350:
+                        walk_info = WalkInfo.V_RIGHT
+            elif 0 < line_info["DEGREE"] <= 85:
+                walk_info = WalkInfo.MODIFY_LEFT
+            elif line_info["DEGREE"] == 0:
+                walk_info = WalkInfo.BACKWARD
+            else:
+                walk_info = WalkInfo.MODIFY_RIGHT
             
         return walk_info
 

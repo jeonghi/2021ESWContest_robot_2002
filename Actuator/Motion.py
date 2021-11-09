@@ -259,15 +259,5 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.move_arm(arm='MIDDLE', walk=False, turn=False)
-    motion.move_arm(arm='HIGH', walk=False, turn=False)
-    motion.move_arm(arm='LOW', walk=False, turn=False)
-    motion.move_arm(arm='MIDDLE', walk=False, turn=False)
-    motion.move_arm(arm='HIGH', walk=False, turn=False)
-    # motion.notice_alpha(['B', 'A', 'D', 'C'])
-    # motion.open_door(dir='LEFT')
-    # motion.open_door_walk(dir='FORWARD',loop=6)
-    # motion.walk("LEFT", wide=True, loop=5)
-#    motion.set_head("DOWN", 80)
-
-# motion.turn(dir='LEFT', loop=10, sleep=0.5, grab=False)
+    motion.TX_data_py2(9)
+    motion.open_door_turn(dir='LEFT', loop=6)
