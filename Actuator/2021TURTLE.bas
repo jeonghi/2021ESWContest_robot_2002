@@ -1305,8 +1305,8 @@ GOSUB_RX_EXIT2:
 
     IF 보행순서 = 0 THEN
         보행순서 = 1
-        MOVE G6A,95,  76, 147,  93, 101
-        MOVE G6D,101,  76, 146,  93, 98
+        MOVE G6A,95,  75, 147,  93, 101
+        MOVE G6D,101,  76, 147,  93, 98
         MOVE G6B,100
         MOVE G6C,100
         WAIT
@@ -1314,7 +1314,7 @@ GOSUB_RX_EXIT2:
         GOTO 횟수_전진종종걸음_1
     ELSE
         보행순서 = 0
-        MOVE G6D,95,  76, 146,  93, 101
+        MOVE G6D,95,  75, 147,  93, 101
         MOVE G6A,101,  76, 147,  93, 98
         MOVE G6B,100
         MOVE G6C,100
@@ -1327,7 +1327,7 @@ GOSUB_RX_EXIT2:
     '**********************
 
 횟수_전진종종걸음_1:
-    MOVE G6A,95,  90, 125, 100, 104
+    MOVE G6A,95,  89, 125, 100, 104
     MOVE G6D,104,  77, 146,  93,  102
     MOVE G6B, 85
     MOVE G6C,115
@@ -1336,7 +1336,7 @@ GOSUB_RX_EXIT2:
 
 횟수_전진종종걸음_2:
 
-    MOVE G6A,103,   73, 140, 103,  100
+    MOVE G6A,103,   72, 140, 103,  100
     MOVE G6D, 95,  85, 146,  85, 102
     WAIT
 
@@ -1354,7 +1354,7 @@ GOSUB_RX_EXIT2:
     IF A <> A_old THEN
 횟수_전진종종걸음_2_stop:
         MOVE G6D,95,  90, 124, 95, 104
-        MOVE G6A,104,  76, 145,  91,  102
+        MOVE G6A,104,  75, 145,  91,  102
         MOVE G6C, 100
         MOVE G6B,100
         WAIT
@@ -1372,7 +1372,7 @@ GOSUB_RX_EXIT2:
 
 횟수_전진종종걸음_4:
     MOVE G6D,95,  95, 119, 100, 104
-    MOVE G6A,104,  77, 147,  93,  102
+    MOVE G6A,104,  76, 147,  93,  102
     MOVE G6C, 85
     MOVE G6B,115
     WAIT
@@ -1380,7 +1380,7 @@ GOSUB_RX_EXIT2:
 
 횟수_전진종종걸음_5:
     MOVE G6D,103,    73, 139, 103,  100
-    MOVE G6A, 95,  85, 147,  85, 102
+    MOVE G6A, 95,  84, 147,  85, 102
     WAIT
 
 
@@ -1396,7 +1396,7 @@ GOSUB_RX_EXIT2:
     ERX 4800,A, 횟수_전진종종걸음_1
     IF A <> A_old THEN
 횟수_전진종종걸음_5_stop:
-        MOVE G6A,95,  90, 125, 95, 104
+        MOVE G6A,95,  89, 125, 95, 104
         MOVE G6D,104,  76, 144,  91,  102
         MOVE G6B, 100
         MOVE G6C,100
@@ -1886,6 +1886,7 @@ GOSUB_RX_EXIT2:
     MOVE G6A,100,  76, 145,  93, 100, 100
     MOVE G6D,100,  78, 145,  93, 100, 100
     GOSUB All_motor_mode3
+    DELAY 3
     GOTO RX_EXIT
 
     '**********************************************
@@ -5287,20 +5288,26 @@ KEY2:
     보행횟수 = 1
     GOTO 후진종종걸음
 
-
     GOTO RX_EXIT
     '***************
-
 KEY3:
     ETX 4800, 3
     ' GOTO 왼쪽옆으로20
+<<<<<<< HEAD
+    GOTO 집고왼쪽턴3
+=======
     GOTO 문열기왼쪽3
+>>>>>>> db72455b91ed812976d195b6376b1c4adbe1374b
     GOTO RX_EXIT
 KEY4:
     ETX 4800, 4
     '   GOTO 오른쪽옆으로20
+<<<<<<< HEAD
+    GOTO 문열기왼쪽3
+=======
     GOSUB 우유깍잡기_3
     GOSUB 전방하향60도
+>>>>>>> db72455b91ed812976d195b6376b1c4adbe1374b
     GOTO RX_EXIT
     '***************
 KEY5:
@@ -5331,7 +5338,11 @@ KEY8:
     '***************
 KEY9:
     ETX 4800, 9
+<<<<<<< HEAD
+    GOSUB 양팔앞으로
+=======
     GOSUB 양팔앞으로 
+>>>>>>> db72455b91ed812976d195b6376b1c4adbe1374b
     GOTO RX_EXIT
     '***************
 KEY10: '0
@@ -5342,7 +5353,7 @@ KEY10: '0
 KEY11: ' ▲
     ETX  4800,11
 
-    GOTO 빠른횟수_전진종종걸음
+    GOSUB 문열고집고전진
     GOTO RX_EXIT
 
     '***************
