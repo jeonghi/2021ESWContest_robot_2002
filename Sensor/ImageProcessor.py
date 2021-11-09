@@ -145,6 +145,7 @@ class ImageProcessor:
 
     def get_arrow_direction(self, visualization: bool = False):
         src = self.get_image()
+        src = cv2.imread("debug_image.png")
         dst = src.copy()
 
         kernel = np.ones((5, 5), np.uint8)
