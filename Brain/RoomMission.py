@@ -1,6 +1,7 @@
 from Brain.Robot import Robot
-from Constant import Direction, AreaColor, LineColor
+from Constant import Direction, AreaColor, LineColor, WalkInfo
 from enum import Enum, auto
+from collections import deque
 import time
 
 class Mode(Enum):
@@ -13,6 +14,7 @@ class Mode(Enum):
     GO_TO_AREA = auto()
     FIND_CONRER = auto()
     GO_TO_CORNER = auto()
+    OUT_ROOM = auto()
     END = auto()
 
 class BoxPos(Enum):
@@ -33,7 +35,7 @@ def get_distance_from_baseline(pos: tuple, baseline: tuple = (320, 370)):
 class RoomMission:
 
     mode: Mode = Mode.START
-    robot: Robot = Robot
+    robot: Robot
 
     alphabet_color: str
     alphabet: str
@@ -42,6 +44,9 @@ class RoomMission:
     @classmethod
     def set_robot(cls, robot:Robot):
         cls.robot = robot
+        cls.robot.curr_head4door_alphabet = deque([85, 80])
+        cls.robot.curr_head4room_alphabet = deque([85, 80])
+        cls.robot.curr_head4box = deque([75, 60, 35])
 
 
     @classmethod
@@ -149,7 +154,7 @@ class RoomMission:
     @classmethod
     def find_line(cls) -> bool:
         if not cls.robot.line_info['V']:
-            cls.robot._motion.turn(dir=cls.robot.direction)
+            cls.robot._motion.turn(dir=cls.robot.direction.name, loop=2)
         else:
             cls.robot._motion.walk('FORWARD', 2)
             return True
@@ -170,6 +175,20 @@ class RoomMission:
     @classmethod
     def go_to_corner(cls) -> bool:
         pass
+
+    @classmethod
+    def out_room(cls) -> bool:
+        if cls.line_info["V"]:
+            if 300 < cls.line_info["V_X"][0] < 340:
+                cls.robot._motion.walk(dir='FORWARD', loop=2)
+                return True
+            elif cls["V_X"][0] <= 300:
+                cls.robot._motion.walk(dir='LEFT', loop=1)
+            else:
+                cls.robot._motion.walk(dir='RIGHT', loop=1)
+        else:
+            cls.robot._motion.turn(dir=cls.robot.direction.name, loop=1)
+        time.sleep(0.5)
     
     @classmethod
     def run(cls) -> bool:
@@ -179,6 +198,11 @@ class RoomMission:
 class GreenRoomMission(RoomMission):
 
     box_pos: BoxPos
+
+    @classmethod
+    def set_robot(cls, robot:Robot) -> None :
+        super().set_robot(robot=robot)
+        cls.robot.curr_head4find_corner = deque([60, 35])
 
     @classmethod
     def find_box(cls) -> bool:
@@ -332,6 +356,12 @@ class GreenRoomMission(RoomMission):
         return False
 
 class BlackRoomMission(RoomMission):
+
+    @classmethod
+    def set_robot(cls, robot:Robot) -> None :
+        super().set_robot(robot=robot)
+        cls.robot.curr_head4find_corner = deque([60, 45, 35])
+
     @classmethod
     def find_box(cls) -> bool:
 
@@ -354,46 +384,38 @@ class BlackRoomMission(RoomMission):
 
     @classmethod
     def find_corner(cls) -> bool:
-        arm_pos = cls.robot.curr_arm_pos[0]
-        cls.robot._motion.move_arm(arm_pos)
+        head_angle = cls.robot.curr_head4find_corner[0]
+        cls.robot._motion.set_head("DOWN", angle=head_angle)
         corner = cls.robot._image_processor.get_yellow_line_corner()
-            
         if corner:
-            return True
-        else:
-            if arm_pos == 'HIGH':
-                cls.robot._motion.turn(cls.robot.direction.name, grab=True, loop=2)         
-            cls.robot.curr_arm_pos.rotate(-1)
+            dx, dy = get_distance_from_baseline(corner, baseline=(320, 240))
+            gap = 100
+            if dx >= gap:
+                cls.robot._motion.turn(dir=Direction.LEFT.name, loop=2)
+            elif dx <= -gap:
+                cls.robot._motion.turn(dir=Direction.RIGHT.name, loop=2)
+            else:
+                return True
+        return False
+
 
     @classmethod
     def go_to_corner(cls):
-        arm_pos = cls.robot.curr_arm_pos[0]
-        #cls.robot._motion.move_arm(arm=arm_pos)
-        corner = cls.robot._image_processor.get_yellow_line_corner()
-        if corner:
-            (dx, dy) = get_distance_from_baseline(pos=corner)
-            if dy > 10:  # 기준선 보다 위에 있다면
-                if -40 <= dx <= 40:
-                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="FORWARD", loop=1)
-                elif dx <= -90:
-                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="RIGHT", loop=1)
-                elif -90 < dx <= -50:  # 오른쪽
-                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="RIGHT", loop=2)
-                elif -50 < dx < -40:
-                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="RIGHT", loop=1)
-                elif 90 > dx >= 50:  # 왼쪽
-                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="LEFT", loop=2)
-                elif 50 > dx > 40:  # 왼쪽
-                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="LEFT", loop=2)
-                elif dx >= 90:
-                    cls.robot._motion.move_arm(arm=arm_pos, walk=True, dir="LEFT", loop=1)
-            else:
-                if arm_pos == 'HIGH':
-                    return True
-                else:
-                    cls.robot.curr_arm_pos.rotate(-1)
-        else:
-            cls.mode = Mode.FIND_CONRER
+        head_angle = cls.robot.curr_head4find_corner[0]
+
+        if cls.robot.line_info["ALL_Y"][1] > 215:
+            if head_angle != min(cls.robot.curr_head4find_corner):
+                cls.robot.curr_head4find_corner[0].rotate(-1)
+                cls.robot._motion.set_head("DOWN", angle=head_angle)
+
+
+        cls.robot._motion.walk(dir="FORWARD", loop=1, grab=True)
+        if cls.robot.edge_info["EDGE_POS"]:
+            if cls.robot.edge_info["EDGE_POS"][1] > 450:
+                return True
+
+        time.sleep(0.5)
+        return False
     
     @classmethod
     def run(cls):
@@ -434,8 +456,8 @@ class BlackRoomMission(RoomMission):
             if cls.drop_box():
                 cls.mode = Mode.FIND_LINE
                 
-        elif mode == Mode.FIND_LINE:
-            if cls.find_line():
+        elif mode == Mode.OUT_ROOM:
+            if cls.out_room():
                 cls.mode = Mode.END
                 
         elif mode == Mode.END:

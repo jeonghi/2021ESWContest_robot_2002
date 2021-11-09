@@ -7,11 +7,10 @@ class Robot:
     def __init__(self, video_path =""):
         self._motion = Motion()
         self._image_processor = ImageProcessor(video_path=video_path)
-        self.curr_head4door_alphabet: deque = deque([85, 80])
-        self.curr_head4room_alphabet: deque = deque([85, 80])
-        self.curr_head4box: deque = deque([75, 60, 35])
-        self.curr_head4find_corner: deque = deque([60, 35])
-        self.curr_arm_pos: deque = deque(['LOW', 'HIGH'])
+        self.curr_head4door_alphabet: deque
+        self.curr_head4room_alphabet: deque
+        self.curr_head4box: deque
+        self.curr_head4find_corner: deque
         self.color: LineColor = LineColor.YELLOW
         self.black_room: list = list()
         self.line_info: tuple

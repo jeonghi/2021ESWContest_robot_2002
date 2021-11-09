@@ -78,7 +78,7 @@ class Controller:
         elif mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
                 if cls.mission_done < CLEAR_LIMIT:
-                    cls.mode = Mode.CHECK_AREA_COLOR # 미션
+                    cls.mode = Mode.CHECK_AREA_COLOR  # 미션
                     cls.ROI = False
                     cls.robot.color = LineColor.GREEN
                 else:
