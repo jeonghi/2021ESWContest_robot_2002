@@ -213,7 +213,7 @@ class GreenRoomMission(RoomMission):
             cls.robot._motion.move_arm(dir='HIGH')
             return True
 
-        cls.robot._motion.turn(dir=cls.fast_turn.name, loop=1)
+        cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, loop=1)
         return False
 
     @classmethod
