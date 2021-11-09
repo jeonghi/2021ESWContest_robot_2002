@@ -1,7 +1,7 @@
 from Brain.Robot import Robot
 from enum import Enum, auto
 import time
-from Brain.Constant import Direction
+from Constant import Direction
 
 class Mode(Enum):
     START = auto()
