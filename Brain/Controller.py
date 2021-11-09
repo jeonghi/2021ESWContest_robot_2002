@@ -3,8 +3,7 @@ from enum import Enum, auto
 from Brain.InDoorMission import InDoorMission
 from Brain.OutDoorMission import OutDoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
-from Brain.Constant import Direction, AreaColor, LineColor
-import time
+from Constant import Direction, AreaColor, LineColor, WalkInfo
 
 CLEAR_LIMIT: int = 3
 class Mode(Enum):
@@ -32,18 +31,18 @@ class Controller:
 
     @classmethod
     def go_to_next_room(cls) -> bool :
-        if cls.robot.walk_info == 'straight':
+        if cls.robot.walk_info == WalkInfo.STRAIGHT:
             cls.robot._motion.walk('FORWARD', 2)
-        elif cls.robot.walk_info == 'V_LEFT':
+        elif cls.robot.walk_info == WalkInfo.V_LEFT:
             cls.robot._motion.walk('LEFT', 1)
-        elif cls.robot.walk_info == 'V_RIGHT':
+        elif cls.robot.walk_info == WalkInfo.V_RIGHT:
             cls.robot._motion.walk('RIGHT', 1)
-        elif cls.robot.walk_info == 'modify_LEFT':
+        elif cls.robot.walk_info == WalkInfo.MODIFY_LEFT:
             cls.robot._motion.turn('LEFT', 1)
-        elif cls.robot.walk_info == 'modify_RIGHT':
+        elif cls.robot.walk_info == WalkInfo.MODIFY_RIGHT:
             cls.robot._motion.turn('RIGHT', 1)
         
-        elif cls.robot.walk_info == 'corner_LEFT':
+        elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
             cls.robot._motion.walk('FORWARD', 2)
             if cls.robot.direction == Direction.RIGHT :
                 return True
@@ -51,14 +50,15 @@ class Controller:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
                 
-        elif cls.robot.walk_info == 'corner_RIGHT':
+        elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
             cls.robot._motion.walk('FORWARD', 2)
             if cls.robot.direction == Direction.LEFT:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
-                
+        else:
+            cls.robot._motion.walk('BACKWARD', 1)
         return False
 
     @classmethod

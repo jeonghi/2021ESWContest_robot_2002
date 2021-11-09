@@ -1,5 +1,5 @@
 from Brain.Robot import Robot
-from Brain.Constant import Direction, AreaColor, LineColor
+from Constant import Direction, AreaColor, LineColor
 from enum import Enum, auto
 import time
 

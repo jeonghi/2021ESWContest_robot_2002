@@ -1,11 +1,6 @@
 from Sensor.ImageProcessor import ImageProcessor
-from Sensor.LineDetector import LineDetector
 from Actuator.Motion import Motion
-from Brain.Constant import LineColor, Direction
-import numpy as np
-import cv2
-import time
-import sys
+from Constant import LineColor, Direction, WalkInfo
 from collections import deque
 
 class Robot:
@@ -21,7 +16,7 @@ class Robot:
         self.black_room: list = list()
         self.line_info: tuple
         self.edge_info: tuple
-        self.walk_info: str
+        self.walk_info: WalkInfo
         self.direction: Direction
 
 
@@ -29,6 +24,7 @@ class Robot:
         self._motion.basic_form()
         self.is_grab = False
         self.cube_grabbed = False
+
 
     def set_line_and_edge_info(self, line_visualization=True, edge_visualization=False, ROI= False):
         self.line_info, self.edge_info, _ = self._image_processor.line_tracing(color=self.color.name, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
