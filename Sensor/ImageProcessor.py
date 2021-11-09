@@ -398,7 +398,7 @@ class ImageProcessor:
         else:
             src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
-        #print(line_info)
+        print(line_info)
         #print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)

@@ -44,14 +44,16 @@ class Controller:
             cls.robot._motion.turn('RIGHT', 1)
         
         elif cls.robot.walk_info == 'corner_LEFT':
-            if cls.robot.direction =='RIGHT':
+            cls.robot._motion.walk('FORWARD', 2)
+            if cls.robot.direction == Direction.RIGHT :
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
                 
         elif cls.robot.walk_info == 'corner_RIGHT':
-            if cls.robot.direction =='LEFT':
+            cls.robot._motion.walk('FORWARD', 2)
+            if cls.robot.direction == Direction.LEFT:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
