@@ -213,10 +213,7 @@ class GreenRoomMission(RoomMission):
             cls.robot._motion.move_arm(dir='HIGH')
             return True
 
-        if cls.box_pos == BoxPos.RIGHT:
-            cls.robot._motion.turn(dir="LEFT", loop=1, grab=True)
-        else:
-            cls.robot._motion.turn(dir="RIGHT", loop=1, grab=True)
+        cls.robot._motion.turn(dir=fast_turn.name, loop=1)
         return False
 
     @classmethod
@@ -295,11 +292,11 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.TRACK_BOX:
             if cls.track_box():
                 cls.mode = Mode.TURN_TO_AREA
+                cls.robot._motion.turn(dir=cls.fast_turn.name, loop=2)
 
         elif mode == Mode.TURN_TO_AREA:
             if cls.turn_to_area():
                 cls.mode = Mode.GO_TO_AREA
-                cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=8)
 
         elif mode == Mode.GO_TO_AREA:
             if cls.go_to_area():
@@ -309,8 +306,7 @@ class GreenRoomMission(RoomMission):
             if cls.drop_box():
                 cls.mode = Mode.FIND_CONRER
                 cls.robot.color = LineColor.YELLOW
-                
-                cls.robot._motion.turn(dir=cls.fast_turn.name, loop=4, wide=True, sliding=True)
+                cls.robot._motion.turn(dir=cls.fast_turn.name, loop=5, wide=True, sliding=True)
 
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
@@ -416,7 +412,7 @@ class BlackRoomMission(RoomMission):
             if cls.track_box():
                 cls.mode = Mode.FIND_CONRER
                 cls.robot.color = LineColor.YELLOW
-                cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=8)
+                cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=7)
         
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
