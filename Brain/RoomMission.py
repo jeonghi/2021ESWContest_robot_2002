@@ -436,7 +436,7 @@ class BlackRoomMission(RoomMission):
 
         elif mode == Mode.TRACK_BOX:
             if cls.track_box():
-                cls.mode = Mode.FIND_CONRER
+                cls.mode = Mode.FIND_YELLOW_LINE
                 cls.robot.color = LineColor.YELLOW
                 cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=7)
                 head_angle = cls.robot.curr_head4find_corner[0]
