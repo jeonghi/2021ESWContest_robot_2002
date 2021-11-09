@@ -19,6 +19,7 @@ class LineColor(Enum):
     YELLOW = auto()
 
 class WalkInfo(Enum):
+    DIRECTION_LINE = auto()
     CORNER_LEFT = auto()
     CORNER_RIGHT = auto()
     STRAIGHT = auto()

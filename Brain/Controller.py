@@ -57,7 +57,7 @@ class Controller:
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
-        else:
+        else: # WalkInfo.BACKWARD
             cls.robot._motion.walk('BACKWARD', 1)
         return False
 

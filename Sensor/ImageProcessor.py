@@ -405,33 +405,53 @@ class ImageProcessor:
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
             cv2.waitKey(1)
-            #print(line_info["H_Y"])
+            if 300 < np.mean(line_info["H_X"] < 340:
+                print('중앙 값: ', np.mean(line_info["H_X"]))
+            elif np.mean(line_info["H_X"] >= 340:
+                print('corner_RIGHT')
+            else:
+                print('corner_LEFT')
         return result
     
     def line_checker(self, line_info):
-        walk_info = None
-
         if line_info["DEGREE"]:
-            angle = line_info["DEGREE"]
             if line_info["H"]:
-                if np.mean(line_info["H_X"]) < 320:
-                    walk_info = WalkInfo.CORNER_LEFT
+                if line_info["H_Y"] > 100 :
+                    if line_info["H_X"][0] < 20 and line_info["H_X"][1] > 620:
+                        walk_info = WalkInfo.DIRECTION_LINE
+                    else:    
+                        if np.mean(line_info["H_X"]) < 320:
+                            walk_info = WalkInfo.CORNER_LEFT
+                        else:
+                            walk_info = WalkInfo.CORNER_RIGHT
                 else:
-                    walk_info = WalkInfo.CORNER_RIGHT
+                    if 85 < line_info["DEGREE"] < 95:
+                        if 290 < line_info["V_X"][0] < 350:
+                            walk_info = WalkInfo.STRAIGHT
+                        else:
+                            if line_info["V_X"][0] <= 290:
+                                walk_info = WalkInfo.V_LEFT
+                            elif line_info["V_X"][0] >= 350:
+                                walk_info = WalkInfo.V_RIGHT
+                    elif 0 < line_info["DEGREE"] <= 85:
+                        walk_info = WalkInfo.MODIFY_LEFT
+                    else:
+                        walk_info = WalkInfo.MODIFY_RIGHT
         
             else:
-                if 85 < angle < 95:
+                if 85 < line_info["DEGREE"] < 95:
                     if 290 < line_info["V_X"][0] < 350:
-                            walk_info = WalkInfo.STRAIGHT
+                        walk_info = WalkInfo.STRAIGHT
                     else:
-                        if line_info["V_X"][0] < 290:
+                        if line_info["V_X"][0] <= 290:
                             walk_info = WalkInfo.V_LEFT
-                        elif line_info["V_X"][0] > 350:
+                        elif line_info["V_X"][0] >= 350:
                             walk_info = WalkInfo.V_RIGHT
-                elif 0 < angle <= 85:
+                elif 0 < line_info["DEGREE"] <= 85:
                     walk_info = WalkInfo.MODIFY_LEFT
                 else:
                     walk_info = WalkInfo.MODIFY_RIGHT
+                    
         else:
             walk_info = WalkInfo.BACKWARD
             
