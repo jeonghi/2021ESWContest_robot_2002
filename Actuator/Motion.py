@@ -259,12 +259,10 @@ class Motion:
 # **************************************************
 if __name__ == '__main__':
     motion = Motion()
-    motion.move_arm(arm='MIDDLE', walk=False, turn=False)
-    motion.move_arm(arm='HIGH', walk=False, turn=False)
-    motion.move_arm(arm='LOW', walk=False, turn=False)
-    motion.move_arm(arm='MIDDLE', walk=False, turn=False)
-    motion.move_arm(arm='HIGH', walk=False, turn=False)
-    # motion.notice_alpha(['B', 'A', 'D', 'C'])
+    motion.walk(dir='FORWARD',loop=1, open_door = True)
+    while True:
+        dst = motion.get_IR()
+        print(dst)
     # motion.open_door(dir='LEFT')
     # motion.open_door_walk(dir='FORWARD',loop=6)
     # motion.walk("LEFT", wide=True, loop=5)
