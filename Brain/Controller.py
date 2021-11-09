@@ -43,7 +43,7 @@ class Controller:
             cls.robot._motion.turn('RIGHT', 1)
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
-            cls.robot._motion.walk('FORWARD', 2)
+            cls.robot._motion.walk('FORWARD', 1)
             if cls.robot.direction == Direction.RIGHT :
                 return True
             else:
@@ -51,13 +51,14 @@ class Controller:
                     return True
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
-            cls.robot._motion.walk('FORWARD', 2)
+            cls.robot._motion.walk('FORWARD', 1)
             if cls.robot.direction == Direction.LEFT:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
-        else: # WalkInfo.BACKWARD
+                
+        else: # WalkInfo.BACKWARD, WalkInfo.DIRECTION_LINE
             cls.robot._motion.walk('BACKWARD', 1)
         return False
 
