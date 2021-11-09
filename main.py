@@ -6,4 +6,6 @@ def main():
         continue
     
 if __name__ == "__main__":
-    main()
+    #main()
+    while True:
+        Controller.robot._image_processor.get_arrow_direction(visualization=True)
