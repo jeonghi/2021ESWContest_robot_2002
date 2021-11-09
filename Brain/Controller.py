@@ -72,11 +72,8 @@ class Controller:
             cls.ROI = True
 
         elif mode == Mode.IN:
-            #in_Door = InDoorMission # 재훈
             if InDoorMission.run():
                 cls.mode = Mode.GO_TO_NEXT_ROOM
-            #cls.mode = Mode.GO_TO_NEXT_ROOM
-            #cls.robot.direction = Direction.LEFT # 임시임
         
         elif mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():
@@ -85,7 +82,7 @@ class Controller:
                     cls.ROI = False
                     cls.robot.color = LineColor.GREEN
                 else:
-                    out_Door = OutDoorMission # 재훈 - 시작은 H 안보일때까지 걷기 - develop Controller 확인하기
+                    out_Door = OutDoorMission
                     if out_Door.run():
                         return True # 퇴장
 
@@ -102,11 +99,5 @@ class Controller:
                     cls.mode = Mode.GO_TO_NEXT_ROOM
                 else:
                     cls.mode = Mode.OUT
-
-        #elif mode == Mode.OUT:
-            #DoorMission.run()
-        
-        #elif mode == Mode.END:
-            #return True
-
+                    
         return False

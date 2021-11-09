@@ -20,30 +20,10 @@ class OutDoorMission:
     @classmethod
     def out_line(cls) -> bool:
         if cls.robot.line_info['H']:
-            if cls.robot.line_info['V']:
-                if 85 < cls.robot.line_info["DEGREE"] < 95:
-                    if 290 < cls.robot.line_info["V_X"][0] < 350:
-                        cls.robot._motion.walk(dir='FORWARD', loop=2, open_door = True)
-                    else:
-                        if cls.robot.line_info["V_X"][0] < 290:
-                            cls.robot._motion.walk(dir='LEFT', loop=1, open_door = True)
-                        elif cls.robot.line_info["V_X"][0] > 350:
-                            cls.robot._motion.walk(dir='RIGHT', loop=1, open_door = True)
-
-                elif 0 < cls.robot.line_info["DEGREE"] <= 85:
-                    cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True)
-
-                else:
-                    cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True)
-
-            elif 0 < cls.robot.line_info["DEGREE"] <= 85:
-                    cls.robot._motion.turn(dir='LEFT', loop=1, open_door = True)
-            else:
-                cls.robot._motion.turn(dir='RIGHT', loop=1, open_door = True)
+            cls.robot._motion.walk('FORWARD', 1)
+            return False
         else:
             return True
-                
-        return False
     
     @classmethod
     def out_door(cls) -> bool:
