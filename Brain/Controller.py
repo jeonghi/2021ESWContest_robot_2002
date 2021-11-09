@@ -27,6 +27,14 @@ class Controller:
     RoomMission.set_robot(robot)
     robot.set_basic_form()
     ROI = False
+    @classmethod
+    def set_test_mode(cls, mode: Mode) -> None:
+        cls.mode = mode
+        if cls.mode == Mode.CHECK_AREA_COLOR:
+            cls.ROI = False
+            cls.robot.color=LineColor.GREEN
+            cls.robot.driection = Direction.LEFT
+            
 
     @classmethod
     def check_go_to_next_room(cls) -> bool:

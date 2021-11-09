@@ -91,7 +91,7 @@ class RoomMission:
             if dy > 10:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
                     print("기준점에서 적정범위. 전진 전진")
-                    cls.robot._motion.walk(dir='FORWARD', loop=1)
+                    cls.robot._motion.walk(dir='FORWARD', loop=1, wide=True)
                 elif dx <= -90:
                     cls.robot._motion.walk(dir='RIGHT', loop=1)
                 elif -90 < dx <= -50:  # 오른쪽
@@ -135,7 +135,7 @@ class RoomMission:
         if not cls.robot.line_info['V']:
             cls.robot._motion.turn(dir=cls.robot.direction.name, loop=2)
         else:
-            cls.robot._motion.walk('FORWARD', 2)
+            cls.robot._motion.walk('FORWARD', loop=2, grab=True)
             return True
         return False
 
@@ -263,7 +263,7 @@ class GreenRoomMission(RoomMission):
             (dx, dy) = get_distance_from_baseline(pos=corner)
             if dy > 10:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
-                    cls.robot._motion.walk(dir='FORWARD', loop=1)
+                    cls.robot._motion.walk(dir='FORWARD', loop=1, wide=True)
                 elif dx <= -90:
                     cls.robot._motion.walk(dir='RIGHT', loop=1)
                 elif -90 < dx <= -50:  # 오른쪽
