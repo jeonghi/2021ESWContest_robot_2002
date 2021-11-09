@@ -33,7 +33,6 @@ class OutDoorMission:
             cls.robot._motion.open_door(dir='RIGHT', loop=15)
 
         cls.robot._motion.notice_alpha(cls.robot.black_room)
-        # 정환 self.blackroom True일때 notice 해주는 구문 작성해주세여
         
         return True
     
