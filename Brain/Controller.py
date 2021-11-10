@@ -27,6 +27,23 @@ class Controller:
     RoomMission.set_robot(robot)
     robot.set_basic_form()
     ROI = False
+    @classmethod
+    def set_test_mode(cls, mode: Mode) -> None:
+        cls.mode = mode
+        if cls.mode == Mode.CHECK_AREA_COLOR:
+            cls.ROI = False
+            cls.robot.color=LineColor.GREEN
+            cls.robot.direction = Direction.LEFT
+        elif cls.mode == Mode.GO_TO_NEXT_ROOM:
+            cls.ROI = True
+            cls.robot.color=LineColor.YELLOW
+            cls.robot.direction = Direction.LEFT
+        elif cls.mode == Mode.OUT:
+            cls.ROI = True
+            cls.robot.color=LineColor.YELLOW
+            cls.robot.direction = Direction.LEFT
+            cls.mission_done = 3
+            
 
     @classmethod
     def check_go_to_next_room(cls) -> bool:
@@ -34,6 +51,8 @@ class Controller:
 
     @classmethod
     def go_to_next_room(cls) -> bool :
+        
+        
         if cls.robot.walk_info == WalkInfo.STRAIGHT:
             cls.robot._motion.walk('FORWARD', 2)
         elif cls.robot.walk_info == WalkInfo.V_LEFT:
@@ -47,7 +66,7 @@ class Controller:
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
             cls.robot._motion.walk('FORWARD', 1)
-            if cls.robot.direction == Direction.RIGHT :
+            if cls.robot.direction == Direction.RIGHT and cls.robot.line_info['H_Y'][0] < 100:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
@@ -55,7 +74,7 @@ class Controller:
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
             cls.robot._motion.walk('FORWARD', 1)
-            if cls.robot.direction == Direction.LEFT:
+            if cls.robot.direction == Direction.LEFT and cls.robot.line_info['H_Y'][0] < 100:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
@@ -82,6 +101,13 @@ class Controller:
         cls.robot._motion.walk("BACKWARD", 1)
         time.sleep(1.0)
         return False
+    @classmethod
+    def room_run(cls):
+        cls.robot.color = LineColor.YELLOW
+        cls.robot.set_line_and_edge_info(ROI=cls.ROI)
+        Mission = GreenRoomMission
+        return Mission.run()
+        
 
     @classmethod
     def run(cls):
@@ -109,8 +135,7 @@ class Controller:
                     cls.ROI = False
                     cls.robot.color = LineColor.GREEN
                 else:
-                    out_Door = OutDoorMission
-                    if out_Door.run():
+                    if OutDoorMission.run():
                         return True # 퇴장
 
         elif mode == Mode.CHECK_AREA_COLOR:

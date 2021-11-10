@@ -7,14 +7,14 @@ import numpy as np
 COLORS = {
     "RED_ABCD": {
         "SCHOOL": {
-            "lower": [[0, 51, 43], [165, 51, 43]],
-            "upper": [[42, 184, 138], [180, 184, 138]]
+            "lower": [[0, 15, 48], [160, 15, 48]],
+            "upper": [[30, 222, 184], [180, 222, 184]]
         }
     },
     "BLUE_ABCD": {
         "SCHOOL": {
-            "lower": [[75, 73, 0], [75, 73, 0]],
-            "upper": [[143, 202, 155], [143, 202, 155]]
+            "lower": [[98, 134, 76], [98, 134, 76]],
+            "upper": [[132, 255, 190], [132, 255, 190]]
         }
     }
 }
@@ -95,9 +95,7 @@ class ColorPreProcessor():
         _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
         h = cv2.bitwise_and(h, h, mask=mask)
         red_mask = ColorPreProcessor.get_red_mask(h)
-        cv2.imshow("red", red_mask)
         blue_mask = ColorPreProcessor.get_blue_mask(h)
-        cv2.imshow("blue", blue_mask)
         answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
         return answer
     
@@ -121,10 +119,19 @@ class ColorPreProcessor():
     @staticmethod
     def get_yellow_mask4hsv(src:np.array) -> np.array:
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        yellow_lower = np.array([13, 74, 95])
-        yellow_upper = np.array([55, 202, 195])
+        yellow_lower = np.array([12, 26, 116])
+        yellow_upper = np.array([48, 128, 182])
         mask = cv2.inRange(hsv, yellow_lower, yellow_upper)
         return mask
+
+    @staticmethod
+    def get_black_mask(src:np.array) -> np.array:
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        black_lower = np.array([0,0,0])
+        black_upper = np.array([180,255,70])
+        mask = cv2.inRange(hsv, black_lower, black_upper)
+        return mask
+
 
 
 

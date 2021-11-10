@@ -10,7 +10,7 @@ class Robot:
         self.curr_head4door_alphabet: deque
         self.curr_head4room_alphabet: deque
         self.curr_head4box: deque
-        self.curr_head4find_corner: deque
+        self.curr_head4find_corner: deque = deque([60, 45, 35])
         self.color: LineColor = LineColor.YELLOW
         self.black_room: list = list()
         self.line_info: tuple
