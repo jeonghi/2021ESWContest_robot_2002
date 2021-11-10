@@ -125,7 +125,7 @@ class CornerFinder():
             h, w = src.shape[:2]
             canvas = src.copy()
 
-        yellow_mask = ColorPreProcessor.get_yellow_mask4hsv(src)
+        yellow_mask = ColorPreProcessor.get_yellow_mask(src)
 
         masked = cv2.bitwise_and(src,src,mask=yellow_mask)
         canny = auto_canny(masked)
