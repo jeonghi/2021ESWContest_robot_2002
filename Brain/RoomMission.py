@@ -294,7 +294,7 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.TRACK_BOX:
             if cls.track_box():
                 cls.mode = Mode.TURN_TO_AREA
-                cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, loop=2)
+                cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, wide=True, sliding=True, loop=2)
 
         elif mode == Mode.TURN_TO_AREA:
             if cls.turn_to_area():
@@ -438,7 +438,7 @@ class BlackRoomMission(RoomMission):
             if cls.track_box():
                 cls.mode = Mode.FIND_YELLOW_LINE
                 cls.robot.color = LineColor.YELLOW
-                cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=7)
+                cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=5)
                 head_angle = cls.robot.curr_head4find_corner[0]
                 cls.robot._motion.set_head("DOWN", angle=head_angle)
 

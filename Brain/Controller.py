@@ -34,6 +34,15 @@ class Controller:
             cls.ROI = False
             cls.robot.color=LineColor.GREEN
             cls.robot.direction = Direction.LEFT
+        elif cls.mode == Mode.GO_TO_NEXT_ROOM:
+            cls.ROI = True
+            cls.robot.color=LineColor.YELLOW
+            cls.robot.direction = Direction.LEFT
+        elif cls.mode == Mode.OUT:
+            cls.ROI = True
+            cls.robot.color=LineColor.YELLOW
+            cls.robot.direction = Direction.LEFT
+            cls.mission_done = 3
             
 
     @classmethod
