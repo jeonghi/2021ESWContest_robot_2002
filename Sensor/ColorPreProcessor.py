@@ -23,7 +23,7 @@ class ColorPreProcessor():
 
     @staticmethod
     def get_color_mask(src:np.array, const:list):
-        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2_HSV)
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         lower = np.array(const[0])
         upper = np.array(const[1])
         mask = cv2.inRange(hsv, lower, upper)
