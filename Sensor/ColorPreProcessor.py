@@ -49,7 +49,7 @@ class ColorPreProcessor():
         return int(np.mean(src_mean))
 
     @classmethod
-    def get_red_or_blue(src: np.array) -> str:
+    def get_red_or_blue(cls, src: np.array) -> str:
         red_mask = ColorPreProcessor.get_red_mask(src)
         blue_mask = ColorPreProcessor.get_blue_mask(src)
         answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
