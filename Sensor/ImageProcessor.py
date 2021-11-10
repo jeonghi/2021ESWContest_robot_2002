@@ -13,7 +13,7 @@ if __name__ == "__main__":
     from HashDetector import HashDetector
     from Target import Target, setLabel
     from LineDetector import LineDetector
-    from ColorChecker import ColorPreProcessor
+    from ColorPreProcessor import ColorPreProcessor
     from CornerFinder import CornerFinder
 
 else:
