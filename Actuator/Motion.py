@@ -155,7 +155,6 @@ class Motion:
                 return True
             return False
 
-
     def turn(self, dir, loop=1, sleep=0.5, grab=False, sliding=False, wide=False, open_door=False, IR=False):
         """parameter 설명
         dir = ['SLIDING_LEFT', 'SLIDING_RIGHT', 'LEFT', 'RIGHT']
