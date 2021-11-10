@@ -20,7 +20,7 @@ else:
     from Sensor.HashDetector import HashDetector
     from Sensor.Target import Target, setLabel
     from Sensor.LineDetector import LineDetector
-    from Sensor.ColorChecker import ColorPreProcessor
+    from Sensor.ColorPreProcessor import ColorPreProcessor
     from Sensor.CornerFinder import CornerFinder
     from Constant import WalkInfo
 
@@ -49,7 +49,6 @@ class ImageProcessor:
             self.hash_detector4arrow = HashDetector(file_path='Sensor/src/arrow/')
 
         self.line_detector = LineDetector()
-        self.color_preprocessor = ColorPreProcessor()
 
         shape = (self.height, self.width, _) = self.get_image().shape
         print(shape)  # 이미지 세로, 가로 (행, 열) 정보 출력
@@ -188,7 +187,7 @@ class ImageProcessor:
             canvas = src.copy()
         alphabet_info = None
         candidates = []
-        mask = self.color_preprocessor.get_alphabet_mask(src=src)
+        mask = ColorPreProcessor.get_alphabet_mask(src=src)
 
         if method == "LABEL":
             _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
@@ -208,7 +207,7 @@ class ImageProcessor:
 
                 candidate = Target(stats=stats[idx], centroid=centroid)
                 roi = candidate.get_target_roi(src, pad=15)
-                candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
+                candidate.set_color(ColorPreProcessor.check_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
 
@@ -245,7 +244,7 @@ class ImageProcessor:
 
                 candidate = Target(contour=contour)
                 roi = candidate.get_target_roi(src, pad=10)
-                candidate.set_color(self.color_preprocessor.check_red_or_blue(roi))
+                candidate.set_color(ColorPreProcessor.check_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
                 normalizing = cr if candidate.get_color() == "RED" else cb
@@ -282,7 +281,7 @@ class ImageProcessor:
                 setLabel(canvas, selected.get_pts(), label=f"{selected.get_name()}:{selected.get_color()}", color=(0, 0, 255))
                 pos = selected.get_pts()
                 roi = selected.get_target_roi(src)
-                selected.set_color(self.color_preprocessor.check_red_or_blue(roi))
+                selected.set_color(ColorPreProcessor.check_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
                 normalizing = cr if selected.get_color() == "RED" else cb
@@ -317,9 +316,9 @@ class ImageProcessor:
 
         ### 색상 이진화를 이용한 마스킹 과정 ###
         if color == "BLUE":
-            color_mask = self.color_preprocessor.get_blue_mask(h)
+            color_mask = ColorPreProcessor.get_blue_mask(h)
         elif color == "RED":
-            color_mask = self.color_preprocessor.get_red_mask(h)
+            color_mask = ColorPreProcessor.get_red_mask(h)
         else:
             color_mask = mask
 
@@ -400,7 +399,7 @@ class ImageProcessor:
         else:
             src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
-        print(line_info)
+        #print(line_info)
         #print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
@@ -518,7 +517,7 @@ class ImageProcessor:
             cv2.imshow("roi", cv2.rectangle(src, begin, end, (0, 0, 255), 3))
             cv2.imshow("mask", mask)
             cv2.waitKey(1)
-        print(rate)
+        #print(rate)
 
         return rate <= 40
 

@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import math
+from Sensor.ColorPreProcessor import ColorPreProcessor
 
 
 class LineDetector:
@@ -62,30 +63,15 @@ class LineDetector:
     # return mask
 
     def mask_color(self, src, color='YELLOW'):
-        if color == 'YELLOW':
-            hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
-            h, l, s = cv2.split(hls)
-            ret, mask = cv2.threshold(s, 40, 255, cv2.THRESH_BINARY)
-            src = cv2.bitwise_and(src, src, mask=mask)
-            match_lower = np.array([13, 91, 90]) # yellow_lower
-            match_upper = np.array([55, 255, 255])  # yellow_upper
-
-        if color == 'GREEN':
-            hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
-            h, l, s = cv2.split(hls)
-            ret, mask = cv2.threshold(s, 100, 255, cv2.THRESH_BINARY)
-            src = cv2.bitwise_and(src, src, mask=mask)
-            match_lower = np.array([49, 74, 76])  # green_lower
-            match_upper = np.array([98, 223, 242])  # green_upper
-
         if color == 'BLACK':
-            match_lower = np.array([0, 0, 0])  # black_lower
-            match_upper = np.array([255, 255, 30])  # black_upper
-        
-        src = cv2.GaussianBlur(src, (5, 5), 0)
-        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        mask = cv2.inRange(hsv, match_lower, match_upper)
-        return mask
+            return ColorPreProcessor.get_yellow_mask(src)
+
+        elif color == 'GREEN':
+            return ColorPreProcessor.get_green_mask(src)
+
+        else:
+            return ColorPreProcessor.get_yellow_mask(src)
+
 
     def get_lines(self, src, color='YELLOW'):
         mask = self.mask_color(src, color)
