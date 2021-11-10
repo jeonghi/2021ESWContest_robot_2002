@@ -42,6 +42,8 @@ class Controller:
 
     @classmethod
     def go_to_next_room(cls) -> bool :
+        
+        
         if cls.robot.walk_info == WalkInfo.STRAIGHT:
             cls.robot._motion.walk('FORWARD', 2)
         elif cls.robot.walk_info == WalkInfo.V_LEFT:
@@ -54,16 +56,16 @@ class Controller:
             cls.robot._motion.turn('RIGHT', 1)
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
-            cls.robot._motion.walk('FORWARD', 3)
-            if cls.robot.direction == Direction.RIGHT :
+            cls.robot._motion.walk('FORWARD', 1)
+            if cls.robot.direction == Direction.RIGHT and cls.robot.line_info['H_Y'] < 100:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
-            cls.robot._motion.walk('FORWARD', 3)
-            if cls.robot.direction == Direction.LEFT:
+            cls.robot._motion.walk('FORWARD', 1)
+            if cls.robot.direction == Direction.LEFT and cls.robot.line_info['H_Y' < 100]:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
