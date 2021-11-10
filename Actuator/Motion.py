@@ -138,12 +138,8 @@ class Motion:
         dir_list = ['FORWARD', 'BACKWARD', 'LEFT', 'RIGHT', 'LEFT2', 'RIGHT2']
         """
         dir_list = {'FORWARD': 56, 'BACKWARD': 57, 'LEFT': 58, 'RIGHT': 59, 'LEFT2': 96, 'RIGHT2': 97}
-<<<<<<< HEAD
-        if dir =='FORWARD':
-            wide=True
-=======
-    
->>>>>>> bc548bc36798c93e1ff8c896518dcddf201bb070
+        #if dir =='FORWARD':
+       #     wide=True
         if grab: dir_list[dir] += 13  # if grab is true, change walk motion with grab
         if wide: dir_list[dir] += 38
         if open_door and dir == 'FORWARD':
