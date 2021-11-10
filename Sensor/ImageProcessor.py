@@ -418,21 +418,18 @@ class ImageProcessor:
                 else:
                     walk_info = WalkInfo.DIRECTION_LINE
         else:
-            if line_info["V"]:
-                if line_info["V_X"][0] <= 290:
+            if 0 < line_info["DEGREE"] <= 85:
+                walk_info = WalkInfo.MODIFY_LEFT
+            elif 95 < line_info["DEGREE"] <= 180:
+                walk_info = WalkInfo.MODIFY_RIGHT
+            else:
+                if 0 < line_info["V_X"][0] <= 290:
                     walk_info = WalkInfo.V_LEFT
-                elif line_info["V_X"][0] >= 350:
+                elif 350 <= line_info["V_X"][0] < 640:
                     walk_info = WalkInfo.V_RIGHT
                 else:
                     walk_info = WalkInfo.STRAIGHT
-            else:
-                if 0 < line_info["DEGREE"] <= 85:
-                    walk_info = WalkInfo.MODIFY_LEFT
-                elif 95 < line_info["DEGREE"] <= 180:
-                    walk_info = WalkInfo.MODIFY_RIGHT
-                else:
-                    walk_info = WalkInfo.STRAIGHT
-            
+                
         return walk_info
 
     def get_yellow_line_corner(self, visualization=False):
