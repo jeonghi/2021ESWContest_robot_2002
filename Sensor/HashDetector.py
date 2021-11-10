@@ -66,11 +66,16 @@ class HashDetector:
         return scaled_img
          
     @staticmethod
-    def image_to_hash(img : np.ndarray) -> list:
+    def image_to_hash(img : np.ndarray, is_arrow : bool = False) -> list:
         
         if len(img.shape) == 3:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = HashDetector.image_resize_with_pad(img=img, size=HashDetector.dim)
+        
+        if is_arrow:
+            img = cv2.resize(img=img, size=HashDetector.dim)
+        else:  
+            img = HashDetector.image_resize_with_pad(img=img, size=HashDetector.dim)
+            
         avg = img.mean()
         bin = 1 * (img > avg)
         return bin
@@ -115,7 +120,7 @@ class HashDetector:
         return result, hdist_dict[result]
 
     def detect_arrow(self, img : np.ndarray, thresh=0.6):
-        img_hash = self.image_to_hash(img)
+        img_hash = self.image_to_hash(img, is_arrow=True)
 
         distance_1 = self.hamming_distance(img_hash, self.directions_hash[0])
         distance_2 = self.hamming_distance(img_hash, self.directions_hash[1])
