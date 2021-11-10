@@ -407,88 +407,31 @@ class ImageProcessor:
         return result
     
     def line_checker(self, line_info):
-        if line_info["H"]:
-            if line_info["H_Y"][1] > 100 :
-                if 300 < np.mean(line_info["H_X"]) < 340:
-                    if line_info["V"]:
-                        if 85 < line_info["DEGREE"] < 95:
-                            if 290 < line_info["V_X"][0] < 350:
-                                walk_info = WalkInfo.DIRECTION_LINE
-                            else:
-                                if line_info["V_X"][0] <= 290:
-                                    walk_info = WalkInfo.V_LEFT
-                                elif line_info["V_X"][0] >= 350:
-                                    walk_info = WalkInfo.V_RIGHT
-                        elif 0 < line_info["DEGREE"] <= 85:
-                            walk_info = WalkInfo.MODIFY_LEFT
-                        else:
-                            walk_info = WalkInfo.MODIFY_RIGHT
-                    else:
-                        walk_info = WalkInfo.DIRECTION_LINE
-                    
-                elif np.mean(line_info["H_X"]) >= 340:
-                    if line_info["V"]:
-                        if 85 < line_info["DEGREE"] < 95:
-                            if 290 < line_info["V_X"][0] < 350:
-                                walk_info = WalkInfo.CORNER_RIGHT
-                            else:
-                                if line_info["V_X"][0] <= 290:
-                                    walk_info = WalkInfo.V_LEFT
-                                elif line_info["V_X"][0] >= 350:
-                                    walk_info = WalkInfo.V_RIGHT
-                        elif 0 < line_info["DEGREE"] <= 85:
-                            walk_info = WalkInfo.MODIFY_LEFT
-                        else:
-                            walk_info = WalkInfo.MODIFY_RIGHT
-                    else:
-                        walk_info = WalkInfo.CORNER_RIGHT
-                    
+        walk_info = WalkInfo.STRAIGHT if line_info["V"] and (290 < line_info["V_X"][0] < 350) else None
+        
+        if walk_info == WalkInfo.STRAIGHT:
+            if line_info["H"]:
+                if 0 < np.mean(line_info["H_X"]) <= 300:
+                    walk_info = WalkInfo.CORNER_LEFT
+                elif 340 <= np.mean(line_info["H_X"]) < 640:
+                    walk_info = WalkInfo.CORNER_RIGHT
                 else:
-                    if line_info["V"]:
-                        if 85 < line_info["DEGREE"] < 95:
-                            if 290 < line_info["V_X"][0] < 350:
-                                walk_info = WalkInfo.CORNER_LEFT
-                            else:
-                                if line_info["V_X"][0] <= 290:
-                                    walk_info = WalkInfo.V_LEFT
-                                elif line_info["V_X"][0] >= 350:
-                                    walk_info = WalkInfo.V_RIGHT
-                        elif 0 < line_info["DEGREE"] <= 85:
-                            walk_info = WalkInfo.MODIFY_LEFT
-                        else:
-                            walk_info = WalkInfo.MODIFY_RIGHT
-                    else:
-                        walk_info = WalkInfo.CORNER_LEFT
-                            
-            else:
-                if 85 < line_info["DEGREE"] < 95:
-                    if 290 < line_info["V_X"][0] < 350:
-                        walk_info = WalkInfo.STRAIGHT
-                    else:
-                        if line_info["V_X"][0] <= 290:
-                            walk_info = WalkInfo.V_LEFT
-                        elif line_info["V_X"][0] >= 350:
-                            walk_info = WalkInfo.V_RIGHT
-                elif 0 < line_info["DEGREE"] <= 85:
-                    walk_info = WalkInfo.MODIFY_LEFT
-                else:
-                    walk_info = WalkInfo.MODIFY_RIGHT
-    
+                    walk_info = WalkInfo.DIRECTION_LINE
         else:
-            if 85 < line_info["DEGREE"] < 95:
-                if 290 < line_info["V_X"][0] < 350:
-                    walk_info = WalkInfo.STRAIGHT
+            if line_info["V"]:
+                if line_info["V_X"][0] <= 290:
+                    walk_info = WalkInfo.V_LEFT
+                elif line_info["V_X"][0] >= 350:
+                    walk_info = WalkInfo.V_RIGHT
                 else:
-                    if line_info["V_X"][0] <= 290:
-                        walk_info = WalkInfo.V_LEFT
-                    elif line_info["V_X"][0] >= 350:
-                        walk_info = WalkInfo.V_RIGHT
-            elif 0 < line_info["DEGREE"] <= 85:
-                walk_info = WalkInfo.MODIFY_LEFT
-            elif line_info["DEGREE"] == 0:
-                walk_info = WalkInfo.BACKWARD
+                    walk_info = WalkInfo.STRAIGHT
             else:
-                walk_info = WalkInfo.MODIFY_RIGHT
+                if 0 < line_info["DEGREE"] <= 85:
+                    walk_info = WalkInfo.MODIFY_LEFT
+                elif 95 < line_info["DEGREE"] <= 180:
+                    walk_info = WalkInfo.MODIFY_RIGHT
+                else:
+                    walk_info = WalkInfo.STRAIGHT
             
         return walk_info
 
