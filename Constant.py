@@ -18,7 +18,7 @@ const.RED_RANGE2 = [[153, 33, 40], [180, 201, 142]]
 const.GREEN_RANGE = [[56, 75, 67], [87, 255, 144]]
 const.BLUE_RANGE = [[73, 52, 53], [124, 170, 156]]
 const.BLACK_RANGE = [[0, 0, 0], [180, 95, 111]]
-const.YELLOW_RANGE = [[11, 68, 110], [45, 151, 202]]
+const.YELLOW_RANGE = [[22, 83, 126], [44, 230, 235]]
 
 class Direction(Enum):
     LEFT = auto()
