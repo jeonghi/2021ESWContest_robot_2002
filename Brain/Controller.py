@@ -66,7 +66,7 @@ class Controller:
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
             cls.robot._motion.walk('FORWARD', 1)
-            if cls.robot.direction == Direction.RIGHT and cls.robot.line_info['H_Y'][0] < 100:
+            if cls.robot.direction == Direction.RIGHT:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
@@ -74,7 +74,7 @@ class Controller:
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
             cls.robot._motion.walk('FORWARD', 1)
-            if cls.robot.direction == Direction.LEFT and cls.robot.line_info['H_Y'][0] < 100:
+            if cls.robot.direction == Direction.LEFT:
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
