@@ -54,7 +54,7 @@ class Controller:
             cls.robot._motion.turn('RIGHT', 1)
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
-            cls.robot._motion.walk('FORWARD', 1)
+            cls.robot._motion.walk('FORWARD', 3)
             if cls.robot.direction == Direction.RIGHT :
                 return True
             else:
@@ -62,7 +62,7 @@ class Controller:
                     return True
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
-            cls.robot._motion.walk('FORWARD', 1)
+            cls.robot._motion.walk('FORWARD', 3)
             if cls.robot.direction == Direction.LEFT:
                 return True
             else:
@@ -124,8 +124,7 @@ class Controller:
                     cls.ROI = False
                     cls.robot.color = LineColor.GREEN
                 else:
-                    out_Door = OutDoorMission
-                    if out_Door.run():
+                    if OutDoorMission.run():
                         return True # 퇴장
 
         elif mode == Mode.CHECK_AREA_COLOR:
