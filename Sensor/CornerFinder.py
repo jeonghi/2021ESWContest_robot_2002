@@ -6,7 +6,7 @@ import cv2
 import os
 import math
 from imutils import auto_canny
-from Sensor.ColorChecker import ColorPreProcessor
+from Sensor.ColorPreProcessor import ColorPreProcessor
 
 
 class CornerFinder():
