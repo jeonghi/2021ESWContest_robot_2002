@@ -87,6 +87,8 @@ class RoomMission:
         head_angle = cls.robot.curr_head4box[0]
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         box_info = cls.robot._image_processor.get_milk_info(color=cls.alphabet_color, edge_info=cls.robot.edge_info)
+        
+        width = False if head_angle == 35 else True
         if box_info:
             (dx, dy) = get_distance_from_baseline(pos=box_info)
 
