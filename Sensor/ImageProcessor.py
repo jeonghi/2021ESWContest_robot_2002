@@ -207,7 +207,7 @@ class ImageProcessor:
 
                 candidate = Target(stats=stats[idx], centroid=centroid)
                 roi = candidate.get_target_roi(src, pad=15)
-                candidate.set_color(ColorPreProcessor.check_red_or_blue(roi))
+                candidate.set_color(ColorPreProcessor.get_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
 
@@ -244,7 +244,7 @@ class ImageProcessor:
 
                 candidate = Target(contour=contour)
                 roi = candidate.get_target_roi(src, pad=10)
-                candidate.set_color(ColorPreProcessor.check_red_or_blue(roi))
+                candidate.set_color(ColorPreProcessor.get_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
                 normalizing = cr if candidate.get_color() == "RED" else cb
@@ -281,7 +281,7 @@ class ImageProcessor:
                 setLabel(canvas, selected.get_pts(), label=f"{selected.get_name()}:{selected.get_color()}", color=(0, 0, 255))
                 pos = selected.get_pts()
                 roi = selected.get_target_roi(src)
-                selected.set_color(ColorPreProcessor.check_red_or_blue(roi))
+                selected.set_color(ColorPreProcessor.get_red_or_blue(roi))
                 ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
                 y, cr, cb = cv2.split(ycrcb)
                 normalizing = cr if selected.get_color() == "RED" else cb
