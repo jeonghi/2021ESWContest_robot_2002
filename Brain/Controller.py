@@ -21,7 +21,7 @@ class Mode(Enum):
 class Controller:
     robot: Robot = Robot()
     mode: Mode = Mode.START
-    mission_done: int = 0
+    mission_done: int = 3
     InDoorMission.set_robot(robot)
     OutDoorMission.set_robot(robot)
     RoomMission.set_robot(robot)
@@ -57,7 +57,10 @@ class Controller:
     def go_to_next_room(cls) -> bool :   
         print(cls.robot.walk_info)    
         if cls.robot.walk_info == WalkInfo.STRAIGHT:
-            cls.robot._motion.walk('FORWARD', 1)
+            if cls.robot.line_info["H"]:
+                cls.robot._motion.walk('FORWARD', 1, width = False)
+            else:
+                cls.robot._motion.walk('FORWARD', 1)
         elif cls.robot.walk_info == WalkInfo.V_LEFT:
             cls.robot._motion.walk('LEFT', 1)
         elif cls.robot.walk_info == WalkInfo.V_RIGHT:
@@ -141,8 +144,7 @@ class Controller:
                     cls.ROI = False
                     cls.robot.color = LineColor.GREEN
                 else:
-                    if OutDoorMission.run():
-                        return True # 퇴장
+                    cls.mode = Mode.OUT
 
         elif mode == Mode.CHECK_AREA_COLOR:
             if RoomMission.check_area_color():
@@ -153,9 +155,13 @@ class Controller:
             if Mission.run():
                 cls.mission_done += 1
                 cls.ROI = True
-                if cls.check_go_to_next_room():
-                    cls.mode = Mode.GO_TO_NEXT_ROOM
-                else:
-                    cls.mode = Mode.OUT
+                #if cls.check_go_to_next_room():
+                cls.mode = Mode.GO_TO_NEXT_ROOM
+                #else:
+                    #cls.mode = Mode.OUT
+        
+        elif mode == Mode.OUT:
+            if OutDoorMission.run():
+                return True # 퇴장
                     
         return False

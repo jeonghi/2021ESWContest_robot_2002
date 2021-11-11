@@ -389,7 +389,7 @@ class ImageProcessor:
         else:
             src = self.get_image()
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
-        print(line_info)
+        #print(line_info)
         #print(edge_info)
         if line_visualization or edge_visualization :
             cv2.imshow("line", dst)
@@ -398,7 +398,7 @@ class ImageProcessor:
     
     def line_checker(self, line_info):
         if line_info["H"]:
-            if line_info["H_Y"][1] > 100 :
+            if line_info["H_Y"][1] < 240 :
                 if 300 < np.mean(line_info["H_X"]) < 340:
                     walk_info = WalkInfo.DIRECTION_LINE
                 elif np.mean(line_info["H_X"]) >= 340:
