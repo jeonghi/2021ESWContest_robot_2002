@@ -55,10 +55,14 @@ class RoomMission:
     def check_area_color(cls):
         cls.robot._motion.set_head(dir=cls.robot.direction.name, angle=45)
         cls.robot._motion.set_head(dir="DOWN", angle=45)
-        time.sleep(1)
+        time.sleep(0.5)
+        cls.robot.color = LineColor.GREEN
+        cls.robot.set_line_and_edge_info()
+        
         print(cls.robot.edge_info)
         print(cls.robot.line_info)
         cls.area_color = AreaColor.GREEN if cls.robot.edge_info["EDGE_DOWN"] else AreaColor.BLACK
+        
         cls.robot._motion.notice_area(area=cls.area_color.name)
         cls.robot._motion.set_head(dir="LEFTRIGHT_CENTER")
         cls.robot.color = LineColor.GREEN if cls.area_color == AreaColor.GREEN else LineColor.BLACK
@@ -206,7 +210,6 @@ class GreenRoomMission(RoomMission):
                 cls.update_box_pos(box_info=box_info)
             cls.robot.curr_head4box.rotate(-1)
             return False
-
     @classmethod
     def update_box_pos(cls, box_info: tuple):
         cls.box_pos = BoxPos.LEFT if cls.robot.direction == Direction.LEFT else BoxPos.RIGHT
@@ -466,7 +469,7 @@ class BlackRoomMission(RoomMission):
         elif mode == Mode.DROP_BOX:
             if cls.drop_box():
                 cls.mode = Mode.FIND_CONRER
-                cls.robot.curr_head4find_corner = deque([50, 45, 35])
+                cls.robot.curr_head4find_corner = deque([55, 45, 35])
 
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():

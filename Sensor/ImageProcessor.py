@@ -311,7 +311,7 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None

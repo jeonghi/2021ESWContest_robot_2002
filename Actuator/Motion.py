@@ -264,5 +264,5 @@ if __name__ == '__main__':
    # motion.TX_data_py2(9)
     #motion.open_door_turn(dir='LEFT', loop=6)
     #motion.walk(dir='FORWARD')
-    motion.open_door(dir='LEFT', loop=15)
-    #motion.set_head("DOWN", 90)
+    #motion.open_door(dir='LEFT', loop=15)
+    motion.set_head("DOWN", 80)
