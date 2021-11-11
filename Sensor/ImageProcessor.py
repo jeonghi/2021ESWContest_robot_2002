@@ -302,7 +302,7 @@ class ImageProcessor:
 
 
 
-    def get_milk_info(self, color:str, edge_info:dict, visualization=False) -> tuple:
+    def get_milk_info(self, color:str, visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -365,12 +365,12 @@ class ImageProcessor:
                 setLabel(canvas, candidate.get_pts(), label=f"MILK POS x:{candidate.x}, y:{candidate.y}", color=(255, 255, 255))
             candidates.append(candidate)
 
-        if candidates:
-            if edge_info:
-                if edge_info["EDGE_UP"] :
-                    #print("필터 적용전", candidates)
-                    candidates = list(filter(lambda candidate: candidate.y + candidate.height > edge_info["EDGE_UP_Y"], candidates))
-                    #print("적용 후", candidates)
+        # if candidates:
+        #     if edge_info:
+        #         if edge_info["EDGE_UP"] :
+        #             #print("필터 적용전", candidates)
+        #             candidates = list(filter(lambda candidate: candidate.y + candidate.height > edge_info["EDGE_UP_Y"], candidates))
+        #             #print("적용 후", candidates)
 
         ### 후보 라벨이 있다면 그중에서 가장 큰 크기 객체의 중심 좌표를 반환
         if candidates:
@@ -478,6 +478,12 @@ class ImageProcessor:
         #print(rate)
 
         return rate <= 60
+
+
+
+
+
+
 
 
 if __name__ == "__main__":
