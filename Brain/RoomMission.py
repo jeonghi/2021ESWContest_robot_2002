@@ -241,7 +241,7 @@ class GreenRoomMission(RoomMission):
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         time.sleep(0.5)
         
-        corner = cls.robot._image_processor.get_yellow_line_corner()
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
         if corner:
             return True
         else:
@@ -257,7 +257,7 @@ class GreenRoomMission(RoomMission):
         head_angle = cls.robot.curr_head4find_corner[0]
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         width = False if head_angle == 35 else True
-        corner = cls.robot._image_processor.get_yellow_line_corner()
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
             if dy > 10:  # 기준선 보다 위에 있다면
@@ -371,7 +371,7 @@ class BlackRoomMission(RoomMission):
         head_angle = cls.robot.curr_head4find_corner[0]
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         time.sleep(0.4)
-        corner = cls.robot._image_processor.get_yellow_line_corner()
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
         if corner:
             return True
         else:
@@ -386,7 +386,7 @@ class BlackRoomMission(RoomMission):
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         time.sleep(0.3)
         width = False if head_angle == 35 else True
-        corner = cls.robot._image_processor.get_yellow_line_corner()
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
             if dy > 10:  # 기준선 보다 위에 있다면
