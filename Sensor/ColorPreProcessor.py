@@ -21,8 +21,47 @@ COLORS = {
 
 class ColorPreProcessor():
 
-    @staticmethod
-    def get_color_mask(src:np.array, const:list):
+    @classmethod
+    def get_blue_mask4hue(cls, hue: np.array) -> np.array:
+        blue_upper = 135
+        blue_lower = 95
+        if hue.dtype != np.uint8:
+            hue = hue.astype(dtype=np.uint8)
+        blue_mask = np.where(hue > blue_lower, hue, 0)
+        blue_mask = np.where(hue < blue_upper, blue_mask, 0)
+        blue_mask = np.where(blue_mask == 0, blue_mask, 255)
+        return blue_mask
+
+    @classmethod
+    def get_red_mask4hue(cls, hue: np.array) -> np.array:
+        red_upper = 145
+        red_lower = 30
+        if hue.dtype != np.uint8:
+            hue = hue.astype(dtype=np.uint8)
+        red_mask_a = np.where(hue > red_upper, hue, 0)
+        red_mask_b = np.where(hue < red_lower, hue, 0)
+        red_mask = cv2.bitwise_or(red_mask_a, red_mask_b)
+        red_mask = np.where(red_mask == 0, red_mask, 255)
+        return red_mask
+
+    @classmethod
+    def check_red_or_blue(cls, src: np.array) -> str:
+
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
+        h = cv2.bitwise_and(h, h, mask=mask)
+        red_mask = ColorPreProcessor.get_red_mask4hue(h)
+        cv2.imshow("red", red_mask)
+        blue_mask = ColorPreProcessor.get_blue_mask4hue(h)
+        cv2.imshow("blue", blue_mask)
+        answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
+        return answer
+
+
+
+    @classmethod
+    def get_color_mask(cls, src:np.array, const:list):
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         lower = np.array(const[0])
         upper = np.array(const[1])
@@ -47,6 +86,19 @@ class ColorPreProcessor():
     def get_mean_value_for_non_zero(cls, src: np.array) -> int:
         src_mean = np.true_divide(src.sum(), (src != 0).sum())
         return int(np.mean(src_mean))
+
+    @classmethod
+    def check_red_or_blue4hue(cls, src: np.array) -> str:
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, mask = cv2.threshold(s, 30, 255, cv2.THRESH_BINARY)
+        h = cv2.bitwise_and(h, h, mask=mask)
+        red_mask = ColorPreProcessor.get_red_mask(h)
+        cv2.imshow("red", red_mask)
+        blue_mask = ColorPreProcessor.get_blue_mask(h)
+        cv2.imshow("blue", blue_mask)
+        answer = "RED" if np.count_nonzero(red_mask) > np.count_nonzero(blue_mask) else "BLUE"
+        return answer
 
     @classmethod
     def get_red_or_blue(cls, src: np.array) -> str:
