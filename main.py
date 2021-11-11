@@ -7,5 +7,8 @@ def main():
         continue
 if __name__ == "__main__":
     main()
+    
     #while True:
-        #print(Controller.robot._image_processor.is_out_of_black(visualization=True))
+        #(line_info, edge_info, _) = Controller.robot._image_processor.line_tracing("YELLOW", ROI=True, line_visualization=True)
+        #alphabet_info = Controller.robot._image_processor.line_checker(line_info)
+        #print(alphabet_info)

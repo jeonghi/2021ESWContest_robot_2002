@@ -57,7 +57,7 @@ class Controller:
     def go_to_next_room(cls) -> bool :   
         print(cls.robot.walk_info)    
         if cls.robot.walk_info == WalkInfo.STRAIGHT:
-            cls.robot._motion.walk('FORWARD', 2)
+            cls.robot._motion.walk('FORWARD', 1)
         elif cls.robot.walk_info == WalkInfo.V_LEFT:
             cls.robot._motion.walk('LEFT', 1)
         elif cls.robot.walk_info == WalkInfo.V_RIGHT:
@@ -68,7 +68,6 @@ class Controller:
             cls.robot._motion.turn('RIGHT', 1)
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
-            cls.robot._motion.walk('FORWARD', 1)
             if cls.robot.direction == Direction.RIGHT:
                 #cls.robot._motion.walk('FORWARD', 1)
                 print(cls.robot.direction)
@@ -78,7 +77,6 @@ class Controller:
                     return True
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
-            cls.robot._motion.walk('FORWARD', 1)
             if cls.robot.direction == Direction.LEFT:
                 #cls.robot._motion.walk('FORWARD', 1)
                 print(cls.robot.direction)
@@ -100,7 +98,7 @@ class Controller:
             cls.robot._motion.set_head(dir='DOWN', angle=10)
             time.sleep(0.5)
         
-            cls.robot._motion.walk('FORWARD', 2)
+            cls.robot._motion.walk('FORWARD', 2, width= False)
             cls.robot._motion.walk(cls.robot.direction.name, wide=True, loop = 4)
             cls.robot._motion.turn(cls.robot.direction.name, sliding=True, loop = 4)
             return True
