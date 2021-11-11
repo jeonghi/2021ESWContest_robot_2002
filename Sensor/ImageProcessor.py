@@ -399,7 +399,9 @@ class ImageProcessor:
     def line_checker(self, line_info):
         walk_info = WalkInfo.STRAIGHT if line_info["V"] and (290 < line_info["V_X"][0] < 350) else None
         
-        if walk_info == WalkInfo.STRAIGHT:
+        if line_info["DEGREE"] == 0:
+            walk_info = WalkInfo.BACKWARD
+        elif walk_info == WalkInfo.STRAIGHT:
             if line_info["H"]:
                 if 0 < np.mean(line_info["H_X"]) <= 300:
                     walk_info = WalkInfo.CORNER_LEFT
@@ -407,7 +409,7 @@ class ImageProcessor:
                     walk_info = WalkInfo.CORNER_RIGHT
                 else:
                     walk_info = WalkInfo.DIRECTION_LINE
-        else:
+        elif line_info["V"] or line_info["H"]:
             if 0 < line_info["DEGREE"] <= 85:
                 walk_info = WalkInfo.MODIFY_LEFT
             elif 95 < line_info["DEGREE"] <= 180:

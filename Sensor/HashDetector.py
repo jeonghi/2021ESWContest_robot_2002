@@ -21,7 +21,8 @@ class HashDetector:
         print(self.directions)
 
     @staticmethod
-    def image_resize_with_pad(img, size, padColor=255):
+    def image_resize_with_pad(src, size, padColor=255):
+        img = src
         h, w = img.shape[:2]
         sh, sw = size
 
@@ -72,9 +73,9 @@ class HashDetector:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         
         if is_arrow:
-            img = cv2.resize(img=img, size=HashDetector.dim)
+            img = cv2.resize(src=img, dsize=HashDetector.dim)
         else:  
-            img = HashDetector.image_resize_with_pad(img=img, size=HashDetector.dim)
+            img = HashDetector.image_resize_with_pad(src=img, size=HashDetector.dim)
             
         avg = img.mean()
         bin = 1 * (img > avg)

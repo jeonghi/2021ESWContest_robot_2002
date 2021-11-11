@@ -30,11 +30,15 @@ class Controller:
     @classmethod
     def set_test_mode(cls, mode: Mode) -> None:
         cls.mode = mode
-        if cls.mode == Mode.CHECK_AREA_COLOR:
+        if cls.mode == Mode.DETECT_DIRECTION:
+            cls.ROI = False
+            cls.robot.color=LineColor.YELLOW
+        elif cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
             cls.robot.color=LineColor.GREEN
             cls.robot.direction = Direction.RIGHT
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
+            cls.robot._motion.set_head("DOWN", 10)
             cls.ROI = True
             cls.robot.color=LineColor.YELLOW
             cls.robot.direction = Direction.LEFT
@@ -50,9 +54,8 @@ class Controller:
         return False if cls.mission_done > CLEAR_LIMIT else True
 
     @classmethod
-    def go_to_next_room(cls) -> bool :
-        
-        
+    def go_to_next_room(cls) -> bool :   
+        print(cls.robot.walk_info)    
         if cls.robot.walk_info == WalkInfo.STRAIGHT:
             cls.robot._motion.walk('FORWARD', 2)
         elif cls.robot.walk_info == WalkInfo.V_LEFT:
@@ -67,6 +70,8 @@ class Controller:
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
             cls.robot._motion.walk('FORWARD', 1)
             if cls.robot.direction == Direction.RIGHT:
+                #cls.robot._motion.walk('FORWARD', 1)
+                print(cls.robot.direction)
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
@@ -75,6 +80,8 @@ class Controller:
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
             cls.robot._motion.walk('FORWARD', 1)
             if cls.robot.direction == Direction.LEFT:
+                #cls.robot._motion.walk('FORWARD', 1)
+                print(cls.robot.direction)
                 return True
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
@@ -132,6 +139,7 @@ class Controller:
             if cls.go_to_next_room():
                 if cls.mission_done < CLEAR_LIMIT:
                     cls.mode = Mode.CHECK_AREA_COLOR  # 미션
+                    print("COLOR MODE: ", cls.mode)
                     cls.ROI = False
                     cls.robot.color = LineColor.GREEN
                 else:
