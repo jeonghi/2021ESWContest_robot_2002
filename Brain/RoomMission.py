@@ -50,6 +50,11 @@ class RoomMission:
     alphabet_color: str
     alphabet: str
     area_color: AreaColor
+    
+    @classmethod
+    def reset(cls):
+        cls.mode = Mode.START
+        cls.set_robot(robot=cls.robot)
 
     @classmethod
     def set_robot(cls, robot:Robot):
