@@ -21,7 +21,7 @@ class Mode(Enum):
 class Controller:
     robot: Robot = Robot()
     mode: Mode = Mode.START
-    mission_done: int = 3
+    mission_done: int = 0
     InDoorMission.set_robot(robot)
     OutDoorMission.set_robot(robot)
     RoomMission.set_robot(robot)
@@ -36,7 +36,7 @@ class Controller:
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
             cls.robot.color=LineColor.GREEN
-            cls.robot.direction = Direction.RIGHT
+            cls.robot.direction = Direction.LEFT
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             cls.robot._motion.set_head("DOWN", 10)
             cls.ROI = True
@@ -78,6 +78,8 @@ class Controller:
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
+                else:
+                    cls.robot._motion.walk('FORWARD', 4)
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
             if cls.robot.direction == Direction.LEFT:
@@ -87,6 +89,8 @@ class Controller:
             else:
                 if cls.mission_done >= CLEAR_LIMIT:
                     return True
+                else:
+                    cls.robot._motion.walk('FORWARD', 4)
                 
         else: # WalkInfo.BACKWARD, WalkInfo.DIRECTION_LINE
             cls.robot._motion.walk('BACKWARD', 1)
@@ -155,10 +159,9 @@ class Controller:
             if Mission.run():
                 cls.mission_done += 1
                 cls.ROI = True
-                #if cls.check_go_to_next_room():
                 cls.mode = Mode.GO_TO_NEXT_ROOM
-                #else:
-                    #cls.mode = Mode.OUT
+                cls.robot._motion.set_head("DOWN", angle=10)
+                time.sleep(0.3)
         
         elif mode == Mode.OUT:
             if OutDoorMission.run():

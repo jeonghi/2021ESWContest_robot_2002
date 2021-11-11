@@ -311,16 +311,16 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
-        _, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None
 
         ### 색상 이진화를 이용한 마스킹 과정 ###
         if color == "BLUE":
-            color_mask = ColorPreProcessor.get_blue_mask(h)
+            color_mask = ColorPreProcessor.get_blue_mask4hue(h)
         elif color == "RED":
-            color_mask = ColorPreProcessor.get_red_mask(h)
+            color_mask = ColorPreProcessor.get_red_mask4hue(h)
         else:
             color_mask = mask
 
@@ -477,7 +477,7 @@ class ImageProcessor:
             cv2.waitKey(1)
         #print(rate)
 
-        return rate <= 40
+        return rate <= 60
 
 
 if __name__ == "__main__":
