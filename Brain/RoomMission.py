@@ -87,7 +87,7 @@ class RoomMission:
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         time.sleep(0.3)
         cls.robot.set_line_and_edge_info()
-        alphabet_info = cls.robot._image_processor.get_alphabet_info4room(visualization=True,edge_info=cls.robot.edge_info)
+        alphabet_info = cls.robot._image_processor.get_alphabet_info4room(visualization=False,edge_info=cls.robot.edge_info)
         if alphabet_info:
             cls.alphabet_color, cls.alphabet = alphabet_info
             return True
@@ -262,7 +262,7 @@ class GreenRoomMission(RoomMission):
         time.sleep(0.2)
         cls.robot.set_line_and_edge_info()
         
-        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=False)
         corner = corner if corner_filtering(corner=corner, line_info=cls.robot.line_info) else None
         if corner :
             return True
@@ -282,7 +282,7 @@ class GreenRoomMission(RoomMission):
         time.sleep(0.2)
         cls.robot.set_line_and_edge_info()
         width = False if head_angle == 35 else True
-        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=False)
         corner = corner if corner_filtering(corner=corner, line_info=cls.robot.line_info) else None
         if corner :
             (dx, dy) = get_distance_from_baseline(pos=corner)
@@ -400,7 +400,7 @@ class BlackRoomMission(RoomMission):
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         time.sleep(0.2)
         cls.robot.set_line_and_edge_info()
-        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=False)
         corner = corner if corner_filtering(corner=corner, line_info=cls.robot.line_info) else None
         if corner:
             return True
@@ -417,7 +417,7 @@ class BlackRoomMission(RoomMission):
         cls.robot.set_line_and_edge_info()
         time.sleep(0.3)
         width = False if head_angle == 35 else True
-        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=True)
+        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=False)
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
             if dy > 10:  # 기준선 보다 위에 있다면

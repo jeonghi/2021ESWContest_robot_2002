@@ -156,7 +156,7 @@ class Controller:
             Mission = GreenRoomMission if RoomMission.area_color == AreaColor.GREEN else BlackRoomMission
             if Mission.run():
                 cls.mission_done += 1
-                cls.Mission.reset()
+                Mission.reset()
                 print(Mode.ROOM_MISSION.name, cls.mission_done)
                 cls.ROI = True
                 cls.mode = Mode.GO_TO_NEXT_ROOM
