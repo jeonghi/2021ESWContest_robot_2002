@@ -35,6 +35,8 @@ def get_distance_from_baseline(pos: tuple, baseline: tuple = (320, 370)):
     return bx - cx, by - cy
 
 def corner_filtering(corner:tuple, line_info:list):
+    if corner is None:
+        return False
     cx, cy = corner[0], corner[1]
     max_y = line_info["ALL_Y"][1]
     dy = abs(max_y-cy)
@@ -52,8 +54,8 @@ class RoomMission:
     @classmethod
     def set_robot(cls, robot:Robot):
         cls.robot = robot
-        cls.robot.curr_head4door_alphabet = deque([85, 80])
-        cls.robot.curr_head4room_alphabet = deque([85, 80])
+        
+        cls.robot.curr_head4room_alphabet = deque([90, 85, 80])
         cls.robot.curr_head4box = deque([75, 60, 35])
 
 
@@ -78,8 +80,9 @@ class RoomMission:
     def detect_alphabet(cls) -> bool:
         head_angle = cls.robot.curr_head4room_alphabet[0]
         cls.robot._motion.set_head("DOWN", angle=head_angle)
+        time.sleep(0.3)
         cls.robot.set_line_and_edge_info()
-        alphabet_info = cls.robot._image_processor.get_alphabet_info4room(edge_info=cls.robot.edge_info)
+        alphabet_info = cls.robot._image_processor.get_alphabet_info4room(visualization=True,edge_info=cls.robot.edge_info)
         if alphabet_info:
             cls.alphabet_color, cls.alphabet = alphabet_info
             return True

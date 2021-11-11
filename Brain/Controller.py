@@ -35,7 +35,7 @@ class Controller:
             cls.robot.color=LineColor.YELLOW
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
-            cls.robot.direction = Direction.LEFT
+            cls.robot.direction = Direction.RIGHT
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             cls.robot._motion.set_head("DOWN", 10)
             cls.ROI = True
@@ -145,7 +145,6 @@ class Controller:
                     cls.mode = Mode.CHECK_AREA_COLOR  # 미션
                     print("COLOR MODE: ", cls.mode)
                     cls.ROI = False
-                    cls.robot.color = LineColor.GREEN
                 else:
                     cls.mode = Mode.OUT
 
@@ -157,12 +156,14 @@ class Controller:
             Mission = GreenRoomMission if RoomMission.area_color == AreaColor.GREEN else BlackRoomMission
             if Mission.run():
                 cls.mission_done += 1
+                print(Mode.ROOM_MISSION.name, cls.mission_done)
                 cls.ROI = True
                 cls.mode = Mode.GO_TO_NEXT_ROOM
                 cls.robot._motion.set_head("DOWN", angle=10)
                 time.sleep(0.3)
         
         elif mode == Mode.OUT:
+            cls.robot.color=LineColor.YELLOW
             if OutDoorMission.run():
                 return True # 퇴장
                     

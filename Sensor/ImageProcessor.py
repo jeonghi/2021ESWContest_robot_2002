@@ -191,7 +191,7 @@ class ImageProcessor:
         hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         #_, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV+ cv2.THRESH_OTSU)
         red_mask = ColorPreProcessor.get_red_mask4hue(h)
         blue_mask = ColorPreProcessor.get_blue_mask4hue(h)
         color_mask = cv2.bitwise_or(blue_mask, red_mask)

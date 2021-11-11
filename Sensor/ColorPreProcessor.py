@@ -23,8 +23,8 @@ class ColorPreProcessor():
 
     @classmethod
     def get_blue_mask4hue(cls, hue: np.array) -> np.array:
-        blue_upper = 135
-        blue_lower = 95
+        blue_upper = 124
+        blue_lower = 85
         if hue.dtype != np.uint8:
             hue = hue.astype(dtype=np.uint8)
         blue_mask = np.where(hue > blue_lower, hue, 0)
@@ -34,8 +34,8 @@ class ColorPreProcessor():
 
     @classmethod
     def get_red_mask4hue(cls, hue: np.array) -> np.array:
-        red_upper = 145
-        red_lower = 30
+        red_upper = 160
+        red_lower = 20
         if hue.dtype != np.uint8:
             hue = hue.astype(dtype=np.uint8)
         red_mask_a = np.where(hue > red_upper, hue, 0)
