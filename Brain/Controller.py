@@ -71,7 +71,7 @@ class Controller:
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
             if cls.robot.direction == Direction.RIGHT:
-                cls.robot._motion.walk('FORWARD', 1, width = False)
+                cls.robot._motion.walk('FORWARD', 1)
                 print(cls.robot.direction)
                 return True
             else:
@@ -82,7 +82,7 @@ class Controller:
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
             if cls.robot.direction == Direction.LEFT:
-                cls.robot._motion.walk('FORWARD', 1, width = False)
+                cls.robot._motion.walk('FORWARD', 1)
                 print(cls.robot.direction)
                 return True
             else:
