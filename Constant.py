@@ -34,7 +34,7 @@ for line in rdr:
 const = Constant()
 const.RED_RANGE1 = [[0, 33, 40], [30, 201, 142]]
 const.RED_RANGE2 = [[121, 20, 85], [180, 255, 145]]
-const.GREEN_RANGE = [[29, 80, 68], [76, 255, 134]]
+const.GREEN_RANGE = [[29, 80, 30], [76, 255, 255]]
 const.BLUE_RANGE = [[73, 52, 53], [124, 170, 156]]
 const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
 const.YELLOW_RANGE = [[11, 68, 126], [44, 230, 235]]
