@@ -83,7 +83,7 @@ class LineDetector:
             edges = cv2.Canny(mask, 75, 150)
             #cv2.imshow('mask', mask)
             #cv2.imshow('edges', edges)
-            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=30, maxLineGap=150)
+            lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=50, maxLineGap=150)
             lines = np.squeeze(lines)
             #print(lines)
 

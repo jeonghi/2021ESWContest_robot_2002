@@ -2,8 +2,8 @@ from Brain.Robot import Robot
 from enum import Enum, auto
 from Brain.InDoorMission import InDoorMission
 from Brain.OutDoorMission import OutDoorMission
-#from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
-from Brain.RoomMission_hard import RoomMission, GreenRoomMission, BlackRoomMission
+from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
+#from Brain.RoomMission_hard import RoomMission, GreenRoomMission, BlackRoomMission
 from Constant import Direction, AreaColor, LineColor, WalkInfo
 
 import time

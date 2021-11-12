@@ -14,7 +14,7 @@ def img_test():
          #print(line_info, edge_info)
          #alphabet_info = Controller.robot._image_processor.line_checker(line_info)
          #print(alphabet_info)
-         #continue
+         continue
     
 if __name__ == "__main__":
     main()

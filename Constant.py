@@ -37,7 +37,7 @@ const.RED_RANGE2 = [[121, 20, 85], [180, 255, 145]]
 const.GREEN_RANGE = [[29, 80, 30], [76, 255, 255]]
 const.BLUE_RANGE = [[73, 52, 53], [124, 170, 156]]
 const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
-const.YELLOW_RANGE = [[11, 60, 126], [44, 230, 235]]
+const.YELLOW_RANGE = [[11, 80, 129], [44, 255, 255]]
 const.GRAB_IR = 70
 
 class Direction(Enum):

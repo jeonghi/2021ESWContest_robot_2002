@@ -401,7 +401,7 @@ class ImageProcessor:
         if ROI and not ROI_edge:
             src = src[0:200,:]
         elif ROI_edge and not ROI:
-            src = src[:,0+150:640-150]
+            src = src[:,0+200:640-200]
         result = (line_info, edge_info, dst) = self.line_detector.get_all_lines(src=src, color=color, line_visualization = line_visualization, edge_visualization = edge_visualization)
         #print(line_info)
         #print(edge_info)

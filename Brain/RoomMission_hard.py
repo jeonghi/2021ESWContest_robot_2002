@@ -107,6 +107,7 @@ class RoomMission:
         """
         :return: if grab box return True else False
         """
+        head_angle = cls.robot.curr_head4box[0]
         cls.robot.set_line_and_edge_info()
         box_info = cls.robot._image_processor.get_milk_info(color=cls.alphabet_color)
         
@@ -278,7 +279,7 @@ class GreenRoomMission(RoomMission):
         
     @classmethod
     def setting_head_green(cls) -> bool:
-        if cls.robot.line_info["ALL_Y"][1] >= 215 :
+        if cls.robot.line_info["ALL_Y"][1] >= 210 :
             cls.return_head = 45
             cls.robot._motion.set_head(dir='DOWN', angle=cls.return_head)
         return True
@@ -289,15 +290,15 @@ class GreenRoomMission(RoomMission):
         print('cls.robot.line_info["ALL_Y"][1]: ', cls.robot.line_info["ALL_Y"][1])
         print('edge: ', edge["EDGE_POS"])
         if edge["EDGE_POS"]:
-            if 120 < edge["EDGE_POS"][0] < 220:
+            if 70 < edge["EDGE_POS"][0] < 170:
                 return True
             else:
-                if cls.box_pos == 'RIGHT':
+                if cls.box_pos == BoxPos.RIGHT :
                     cls.robot._motion.turn(dir='LEFT', loop=1)
                 else:
                     cls.robot._motion.turn(dir='RIGHT', loop=1)
         else:
-            if cls.box_pos == 'RIGHT':
+            if cls.box_pos == BoxPos.RIGHT :
                 cls.robot._motion.turn(dir='LEFT', loop=1)
             else:
                 cls.robot._motion.turn(dir='RIGHT', loop=1)
@@ -307,7 +308,7 @@ class GreenRoomMission(RoomMission):
     @classmethod
     def go_to_corner_green(cls) -> bool:
         if cls.return_head in [60, 45]:
-            if cls.robot.line_info["ALL_Y"][1] >= 215 :
+            if cls.robot.line_info["ALL_Y"][1] >= 210 :
                 cls.return_head -= 15
                 cls.robot._motion.set_head(dir='DOWN', angle=cls.return_head)
                 time.sleep(0.2)
@@ -343,7 +344,8 @@ class GreenRoomMission(RoomMission):
                     cls.fast_turn = Direction.LEFT if cls.box_pos == BoxPos.RIGHT else Direction.RIGHT
                 else:
                     cls.fast_turn = Direction.RIGHT if cls.box_pos == BoxPos.LEFT else Direction.LEFT
-                    
+                print(cls.box_pos)
+                
         elif mode == Mode.CHECK_BOX:
             if cls.check_box():
                 cls.mode = Mode.TRACK_BOX
@@ -365,7 +367,7 @@ class GreenRoomMission(RoomMission):
             if cls.drop_box():
                 cls.mode = Mode.SETTING_HEAD
                 cls.robot.color = LineColor.YELLOW
-                cls.robot._motion.turn(dir=cls.fast_turn.name, loop=5, wide=True, sliding=True)
+                cls.robot._motion.turn(dir=cls.fast_turn.name, loop=4, wide=True, sliding=True)
 
         elif mode == Mode.SETTING_HEAD:
             if cls.setting_head_green():
@@ -374,6 +376,7 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner_green():
                 cls.mode = Mode.GO_TO_CORNER
+            time.sleep(0.1) # 넘어지려하는 거 때문에 0.1 넣음
 
         elif mode == Mode.GO_TO_CORNER:
             print('here2')
@@ -419,7 +422,7 @@ class BlackRoomMission(RoomMission):
 
     @classmethod
     def setting_head_black(cls) -> bool:
-        if cls.robot.line_info["ALL_Y"][1] >= 215 :
+        if cls.robot.line_info["ALL_Y"][1] >= 210 :
             cls.return_head = 45
             cls.robot._motion.set_head(dir='DOWN', angle=cls.return_head)
         return True
@@ -430,7 +433,7 @@ class BlackRoomMission(RoomMission):
         print('cls.robot.line_info["ALL_Y"][1]: ', cls.robot.line_info["ALL_Y"][1])
         print('edge: ', edge["EDGE_POS"])
         if edge["EDGE_POS"]:
-            if 120 < edge["EDGE_POS"][0] < 220 :
+            if 70 < edge["EDGE_POS"][0] < 170 :
                 return True
             else:
                 cls.robot._motion.turn(dir=cls.robot.direction.name, loop=1, grab=True)
@@ -441,7 +444,7 @@ class BlackRoomMission(RoomMission):
     @classmethod
     def go_to_corner_black(cls) -> bool:
         if cls.return_head in [60, 45]:
-            if cls.robot.line_info["ALL_Y"][1] >= 215 :
+            if cls.robot.line_info["ALL_Y"][1] >= 210 :
                 cls.return_head -= 15
                 cls.robot._motion.set_head(dir='DOWN', angle=cls.return_head)
                 time.sleep(0.2)
@@ -484,6 +487,7 @@ class BlackRoomMission(RoomMission):
             if cls.check_box():
                 cls.mode = Mode.TRACK_BOX
 
+
         elif mode == Mode.TRACK_BOX:
             if cls.track_box():
                 cls.mode = Mode.SETTING_HEAD
@@ -498,6 +502,7 @@ class BlackRoomMission(RoomMission):
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner_black():
                 cls.mode = Mode.GO_TO_CORNER
+            time.sleep(0.1) # 넘어지려하는 거 때문에 0.1 넣음
 
         elif mode == Mode.GO_TO_CORNER:
             if cls.go_to_corner_black():
