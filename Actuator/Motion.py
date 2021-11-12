@@ -145,6 +145,8 @@ class Motion:
         if wide: dir_list[dir] += 38
         if open_door and dir == 'FORWARD':
             dir_list[dir] += 33
+            if width=False:
+                dir_list[dir]+=31
         elif open_door and dir in ['LEFT', 'RIGHT']:
             dir_list[dir] += 53
         for _ in range(loop):
