@@ -269,17 +269,16 @@ class GreenRoomMission(RoomMission):
 
     @classmethod
     def find_corner_green(cls) -> bool:
-        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=False)
-        if corner:
-            if 280 < corner[0] < 360 :
+        if cls.robot.edge_info["EDGE_POS"]:
+            if 280 < cls.robot.edge_info["EDGE_POS"][0] < 360 :
                 return True
         else:
             if cls.box_pos == 'RIGHT':
-                cls.robot._motion.turn(dir='LEFT')
+                cls.robot._motion.turn(dir='LEFT', sliding= True, loop=1)
             else:
-                cls.robot._motion.turn(dir='RIGHT')
+                cls.robot._motion.turn(dir='RIGHT', sliding= True, loop=1)
         return False
-
+    
     @classmethod
     def go_to_corner_green(cls) -> bool:
         if cls.return_head in [60, 45]:
@@ -399,14 +398,13 @@ class BlackRoomMission(RoomMission):
     
     @classmethod
     def find_corner_black(cls) -> bool:
-        corner = cls.robot._image_processor.get_yellow_line_corner(visualization=False)
-        if corner:
-            if 280 < corner[0] < 360 :
+        if cls.robot.edge_info["EDGE_POS"]:
+            if 280 < cls.robot.edge_info["EDGE_POS"][0] < 360 :
                 return True
         else:
             cls.robot._motion.turn(dir=cls.robot.direction.name, loop=1, grab=True)
         return False
-
+    
     @classmethod
     def go_to_corner_black(cls) -> bool:
         if cls.return_head in [60, 45]:

@@ -461,6 +461,16 @@ class ImageProcessor:
         corner = CornerFinder.get_yellow_line_corner_pos(src=src, visualization=visualization)
 
         return corner
+    
+    def get_yellow_line_corner_3view(self, visualization=False):
+        """
+
+        :return: if corner exist return (cx, cy) else return None
+        """
+        src = self.get_image()
+        corner = CornerFinder.get_yellow_line_corner_pos(src=src, visualization=visualization)
+
+        return corner
 
     def is_out_of_black(self, visualization=False) -> bool:
         src = self.get_image()
