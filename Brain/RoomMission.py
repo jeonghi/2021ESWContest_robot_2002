@@ -310,25 +310,17 @@ class GreenRoomMission(RoomMission):
 
     @classmethod
     def out_to_area(cls):
-        if cls.robot.direction.name == cls.box_pos.name:
-            if cls.robot.line_info['ALL_Y'][1] < 320 :
-                cls.robot._motion.turn(dir = 'LEFT', sliding=True, wide = True, loop = 4) # 90
-                return True
-            else:
-                cls.robot._motion.walk(dir='BACKWARD', loop =1)
+        if cls.robot.line_info['ALL_Y'][1] < 50 :
+            cls.robot._motion.turn(dir = 'LEFT', sliding=True, wide = True, loop = 4) # 90
+            return True
         else:
-            if cls.robot.line_info['ALL_Y'][0] > 400 or not cls.robot.line_info['ALL']:
-                cls.robot._motion.walk(dir='FORWARD', loop =2)
-                cls.robot._motion.turn(dir = 'LEFT', sliding=True, wide = True, loop = 4) # 90
-                return True
-            else:
-                cls.robot._motion.walk(dir='FORWARD', loop =1)
+            cls.robot._motion.walk(dir='BACKWARD', loop =1)
         return False
      
     @classmethod
     def go_to_line(cls):
-        if cls.robot.line_info['H']:
-            if cls.robot.line_info['ALL_Y'][0] < 470:
+        if cls.robot.line_info['V']:
+            if cls.robot.line_info['V_Y'][1] < 450:
                 if 80 < cls.robot.line_info["DEGREE"] < 100:
                     if 290 < np.mean(cls.robot.line_info["V_X"]) < 350:
                         cls.robot._motion.walk('FORWARD', 1)
@@ -344,14 +336,38 @@ class GreenRoomMission(RoomMission):
                 else:
                     cls.robot._motion.turn('RIGHT', 1)
             else:
-                cls.robot._motion.walk('FORWARD', 2)
+                cls.robot._motion.walk('FORWARD', 1)
                 cls.robot._motion.set_head(dir='DOWN', angle= 10)
                 time.sleep(1)
+                if cls.box_pos.name != cls.robot.direction.name:
+                    if cls.box_pos == BoxPos.RIGHT:
+                        cls.robot._motion.turn(dir = 'RIGHT', wide=True, sliding=True, loop=2)
+                    else:
+                        cls.robot._motion.turn(dir = 'LEFT', wide=True, sliding=True, loop=2)
                 return True
         else:
-            cls.robot._motion.turn(dir = 'LEFT')
+            if cls.box_pos == BoxPos.RIGHT:
+                cls.robot._motion.turn(dir = 'LEFT')
+            else:
+                cls.robot._motion.turn(dir = 'RIGHT')
            
         return False
+    
+    @classmethod
+    def in_line(cls):
+        if cls.box_pos.name == cls.robot.direction.name :
+            cls.robot._motion.walk('FORWARD', 2)
+            return True
+            
+        else:
+            if cls.robot.line_info['V']:
+                cls.robot._motion.walk('FORWARD', 2)
+            else:
+                if cls.box_pos == BoxPos.RIGHT:
+                    cls.robot._motion.turn(dir = 'RIGHT')
+                else:
+                    cls.robot._motion.turn(dir = 'LEFT')
+            return True
 
     @classmethod
     def run(cls, mode = 'default'):
@@ -396,13 +412,7 @@ class GreenRoomMission(RoomMission):
                     cls.robot.curr_head4find_corner = deque([60, 45, 35])
                 else:
                     cls.mode = Mode.FIND_CONRER
-                    cls.robot._motion.set_head(dir='DOWN', angle = 45)
-                    time.sleep(0.5)
-                    print(cls.robot.direction.name, cls.box_pos.name)
-                    if cls.robot.direction.name == cls.box_pos.name:
-                        cls.robot._motion.walk(dir='BACKWARD', loop = 3) # H_Y < 50 일 때까지
-                    else:
-                        cls.robot._motion.turn(dir='LEFT', sliding=True, wide=True, loop =4) # 90
+                    cls.robot._motion.walk(dir='BACKWARD', loop = 3)
 
         elif mode == Mode.FIND_CONRER:
             if mode == 'default':
@@ -431,7 +441,8 @@ class GreenRoomMission(RoomMission):
                 if cls.out_room():
                     cls.mode = Mode.END
             else:
-                cls.mode = Mode.END
+                if cls.in_line():
+                    cls.mode = Mode.END
 
         elif mode == Mode.END:
             return True
