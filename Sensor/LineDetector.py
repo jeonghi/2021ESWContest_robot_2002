@@ -345,16 +345,19 @@ class LineDetector:
                     size = int(edge_lines_R.shape[0] * edge_lines_R.shape[2] / 2)
                     edge_line_R = self.get_fitline(src, edge_lines_R, size, 'edge_R')
                     edge_info["EDGE_R"] = True
-                    edge_info["R_X"] = [edge_line_R[0], edge_line_R[2]]  # [max_x, min_y, min_x, max_y]
+                    edge_info["R_X"] = [edge_line_R[2], edge_line_R[0]]  # [max_x, min_y, min_x, max_y]
                     edge_info["R_Y"] = [edge_line_R[1], edge_line_R[3]]
                     if edge_visualization is True:
                         self.draw_lines(temp, edge_line_R, 'edge_R', 'fit')
                         src = cv2.addWeighted(src, 1, temp, 1., 0.)
 
-                if len(edge_lines) != 0 and len(edge_lines_L) != 0 and len(edge_lines_R) != 0:
+                if len(edge_lines) != 0 and len(edge_lines_L) != 0 and len(edge_lines_R) != 0 and edge_info["R_X"][0] > edge_info["L_X"][0]:
                     x_center = int((edge_line_L[2] + edge_line_R[2]) / 2)
                     y_center = edge_fit_line_DOWN[1]  # [max_x, max_y, min_x, max_y]
                     edge_info["EDGE_POS"] = [x_center, y_center]
+                    if edge_visualization is True:
+                        temp = cv2.line(temp, (x_center, y_center), (x_center, y_center), (0,0,255), 20)
+                        src = cv2.addWeighted(src, 1, temp, 1., 0.)
                 else:
                     edge_info["EDGE_POS"] = None
 

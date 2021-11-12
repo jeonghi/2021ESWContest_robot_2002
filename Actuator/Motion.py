@@ -266,4 +266,4 @@ if __name__ == '__main__':
     #motion.open_door_turn(dir='LEFT', loop=6)
     #motion.walk(dir='FORWARD')
     #motion.open_door(dir='LEFT', loop=15)
-    motion.set_head("DOWN", 60)
+    motion.turn(dir='LEFT', loop=1)

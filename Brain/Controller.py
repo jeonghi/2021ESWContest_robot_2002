@@ -2,7 +2,8 @@ from Brain.Robot import Robot
 from enum import Enum, auto
 from Brain.InDoorMission import InDoorMission
 from Brain.OutDoorMission import OutDoorMission
-from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
+#from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
+from Brain.RoomMission_hard import RoomMission, GreenRoomMission, BlackRoomMission
 from Constant import Direction, AreaColor, LineColor, WalkInfo
 
 import time
@@ -54,7 +55,7 @@ class Controller:
 
     @classmethod
     def go_to_next_room(cls) -> bool :   
-        print(cls.robot.walk_info)    
+        #print(cls.robot.walk_info)    
         if cls.robot.walk_info == WalkInfo.STRAIGHT:
             if cls.robot.line_info["H"]:
                 cls.robot._motion.walk('FORWARD', 1, width = False)
@@ -125,7 +126,7 @@ class Controller:
     def run(cls):
         mode = cls.mode
         cls.robot.set_line_and_edge_info(ROI=cls.ROI)
-        print(mode.name)
+        #print(mode.name)
         if mode == Mode.START:
             cls.mode = Mode.IN
             cls.ROI = True
