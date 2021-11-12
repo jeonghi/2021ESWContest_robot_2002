@@ -176,9 +176,14 @@ class ImageProcessor:
             cv2.imshow("roi_mask", roi_mask)
             cv2.waitKey(10)
 
-        direction = self.hash_detector4arrow.detect_arrow(roi_mask)
+        #direction = self.hash_detector4arrow.detect_arrow(roi_mask)
+        mid = (leftmost[0] + rightmost[0]) / 2
+        if topmost[1] < mid:
+            direction = "LEFT"
+        else:
+            direction = "RIGHT"
+            
         print(direction)
-
         return direction
 
     def get_alphabet_info4room(self, edge_info={}, method="CONTOUR", visualization=False) -> tuple:
