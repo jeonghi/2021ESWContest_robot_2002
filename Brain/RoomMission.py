@@ -40,7 +40,7 @@ def corner_filtering(corner:tuple, line_info:list):
     cx, cy = corner[0], corner[1]
     max_y = line_info["ALL_Y"][1]
     dy = abs(max_y-cy)
-    return dy <= 40
+    return dy <= 80
 
 class RoomMission:
 
@@ -427,7 +427,7 @@ class BlackRoomMission(RoomMission):
         head_angle = cls.robot.curr_head4find_corner[0]
         cls.robot._motion.set_head("DOWN", angle=head_angle)
         cls.robot.set_line_and_edge_info()
-        time.sleep(0.3)
+        time.sleep(0.2)
         width = False if head_angle == 35 else True
         corner = cls.robot._image_processor.get_yellow_line_corner(visualization=False)
         if corner:
@@ -460,7 +460,6 @@ class BlackRoomMission(RoomMission):
         if cls.robot.line_info["ALL_Y"][1]:
             return True
         cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=1)
-        time.sleep(0.5)
         return False
 
     @classmethod
