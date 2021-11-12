@@ -129,7 +129,7 @@ class Motion:
             self.TX_data_py2(dir_list[dir][angle])
         time.sleep(0.3)
 
-    def is_grabbed(self) -> bool:
+    def is_grab(self) -> bool:
         if self.get_IR() > 65:
             return True
         return False

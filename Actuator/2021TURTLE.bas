@@ -3668,7 +3668,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 0 !"
     'GOSUB SOUND_PLAY_CHK
-    DELAY 10
+    DELAY 500
     PRINT "SOUND 0 !"
     DELAY 10
     GOSUB 기본자세2
@@ -3681,7 +3681,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 1 !"
     'GOSUB SOUND_PLAY_CHK
-    DELAY 10
+    DELAY 500
     PRINT "SOUND 1 !"
     DELAY 10
     GOSUB 기본자세2	
@@ -3694,7 +3694,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 2 !"
     'GOSUB SOUND_PLAY_CHK
-    DELAY 10
+    DELAY 500
     PRINT "SOUND 2 !"
     DELAY 10
     GOSUB 기본자세2
@@ -3707,7 +3707,7 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 3 !"
     'GOSUB SOUND_PLAY_CHK
-    DELAY 10
+    DELAY 500
     PRINT "SOUND 3 !"
     DELAY 10
     GOSUB 기본자세2
