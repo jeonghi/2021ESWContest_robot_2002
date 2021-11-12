@@ -60,7 +60,7 @@ class RoomMission:
     def set_robot(cls, robot:Robot):
         cls.robot = robot
         
-        cls.robot.curr_head4room_alphabet = deque([90, 85, 80])
+        cls.robot.curr_head4room_alphabet = deque([85, 80])
         cls.robot.curr_head4box = deque([75, 60, 35])
 
 
@@ -224,7 +224,7 @@ class GreenRoomMission(RoomMission):
             return True
         else:
             if head_angle == 35:
-                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=8)
+                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=4)
                 cls.update_box_pos(box_info=box_info)
             cls.robot.curr_head4box.rotate(-1)
             return False

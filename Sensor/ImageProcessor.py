@@ -148,8 +148,10 @@ class ImageProcessor:
 
         kernel = np.ones((5, 5), np.uint8)
 
-        gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
-        _, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
+        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, binary = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
         edge = auto_canny(binary)
 
