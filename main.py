@@ -6,9 +6,12 @@ def main():
     while not Controller.run():
         continue
 if __name__ == "__main__":
-    main()
-    #while True:
-         #(line_info, edge_info, _) = Controller.robot._image_processor.line_tracing("YELLOW", ROI=False, line_visualization=True)
-         #print(line_info)
+    #main()
+    while True:
+         #Controller.robot._image_processor.get_milk_info(color="RED", visualization=True)
+         corner = Controller.robot._image_processor.get_yellow_line_corner(visualization=True)
+         print(corner)
+         #(line_info, edge_info, _) = Controller.robot._image_processor.line_tracing("YELLOW", ROI=False, edge_visualization=True)
+         #print(line_info, edge_info)
          #alphabet_info = Controller.robot._image_processor.line_checker(line_info)
          #print(alphabet_info)

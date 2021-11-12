@@ -148,8 +148,10 @@ class ImageProcessor:
 
         kernel = np.ones((5, 5), np.uint8)
 
-        gray = cv2.cvtColor(src, cv2.COLOR_RGB2GRAY)
-        _, binary = cv2.threshold(gray, 100, 255, cv2.THRESH_BINARY_INV)
+        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s = cv2.split(hls)
+        _, binary = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
         edge = auto_canny(binary)
 
@@ -311,7 +313,7 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
-        _, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 50, 255, cv2.THRESH_BINARY)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None
@@ -451,6 +453,16 @@ class ImageProcessor:
         return walk_info
 
     def get_yellow_line_corner(self, visualization=False):
+        """
+
+        :return: if corner exist return (cx, cy) else return None
+        """
+        src = self.get_image()
+        corner = CornerFinder.get_yellow_line_corner_pos(src=src, visualization=visualization)
+
+        return corner
+    
+    def get_yellow_line_corner_3view(self, visualization=False):
         """
 
         :return: if corner exist return (cx, cy) else return None
