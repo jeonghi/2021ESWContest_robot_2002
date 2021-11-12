@@ -3,7 +3,6 @@ from Constant import Direction, AreaColor, LineColor, WalkInfo
 from enum import Enum, auto
 from collections import deque
 import time
-import numpy as np
 
 class Mode(Enum):
     START = auto()
@@ -103,7 +102,6 @@ class RoomMission:
     @classmethod
     def track_box(cls) -> bool:
         """
-
         :return: if grab box return True else False
         """
         head_angle = cls.robot.curr_head4box[0]
@@ -154,7 +152,7 @@ class RoomMission:
     def drop_box(cls) -> bool:
         cls.robot._motion.walk(dir='FORWARD', loop=2, grab=True)
         cls.robot._motion.grab(switch=False)
-        #cls.robot.color = LineColor.YELLOW
+        cls.robot.color = LineColor.YELLOW
         time.sleep(0.5)
         return True
     
@@ -308,69 +306,9 @@ class GreenRoomMission(RoomMission):
             cls.mode = Mode.FIND_CONRER
         return False
 
-    @classmethod
-    def out_to_area(cls):
-        if cls.robot.line_info['ALL_Y'][1] < 50 :
-            cls.robot._motion.turn(dir = 'LEFT', sliding=True, wide = True, loop = 4) # 90
-            return True
-        else:
-            cls.robot._motion.walk(dir='BACKWARD', loop =1)
-        return False
-     
-    @classmethod
-    def go_to_line(cls):
-        if cls.robot.line_info['V']:
-            if cls.robot.line_info['V_Y'][1] < 450:
-                if 80 < cls.robot.line_info["DEGREE"] < 100:
-                    if 290 < np.mean(cls.robot.line_info["V_X"]) < 350:
-                        cls.robot._motion.walk('FORWARD', 1)
-                    else:
-                        if np.mean(cls.robot.line_info["V_X"]) <= 290:
-                            cls.robot._motion.walk('LEFT', 1)
-                        elif np.mean(cls.robot.line_info["V_X"]) >= 350:
-                            cls.robot._motion.walk('RIGHT', 1)
-                elif 0 < cls.robot.line_info["DEGREE"] <= 80:
-                    cls.robot._motion.turn('LEFT', 1)
-                elif cls.robot.line_info["DEGREE"] == 0:
-                    print('색깔 masking 확인하거나 sleep 확인')
-                else:
-                    cls.robot._motion.turn('RIGHT', 1)
-            else:
-                cls.robot._motion.walk('FORWARD', 1)
-                cls.robot._motion.set_head(dir='DOWN', angle= 10)
-                time.sleep(1)
-                if cls.box_pos.name != cls.robot.direction.name:
-                    if cls.box_pos == BoxPos.RIGHT:
-                        cls.robot._motion.turn(dir = 'RIGHT', wide=True, sliding=True, loop=2)
-                    else:
-                        cls.robot._motion.turn(dir = 'LEFT', wide=True, sliding=True, loop=2)
-                return True
-        else:
-            if cls.box_pos == BoxPos.RIGHT:
-                cls.robot._motion.turn(dir = 'LEFT')
-            else:
-                cls.robot._motion.turn(dir = 'RIGHT')
-           
-        return False
-    
-    @classmethod
-    def in_line(cls):
-        if cls.box_pos.name == cls.robot.direction.name :
-            cls.robot._motion.walk('FORWARD', 2)
-            return True
-            
-        else:
-            if cls.robot.line_info['V']:
-                cls.robot._motion.walk('FORWARD', 2)
-            else:
-                if cls.box_pos == BoxPos.RIGHT:
-                    cls.robot._motion.turn(dir = 'RIGHT')
-                else:
-                    cls.robot._motion.turn(dir = 'LEFT')
-            return True
 
     @classmethod
-    def run(cls, mode = 'default'):
+    def run(cls):
         mode = cls.mode
         print(mode.name)
         if mode == Mode.START:
@@ -393,7 +331,7 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.TRACK_BOX:
             if cls.track_box():
                 cls.mode = Mode.TURN_TO_AREA
-                cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, wide=True, sliding=True, loop=3)
+                cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, wide=True, sliding=True, loop=2)
 
         elif mode == Mode.TURN_TO_AREA:
             if cls.turn_to_area():
@@ -405,44 +343,25 @@ class GreenRoomMission(RoomMission):
 
         elif mode == Mode.DROP_BOX:
             if cls.drop_box():
-                if mode == 'default':
-                    cls.mode = Mode.FIND_CONRER
-                    cls.robot.color = LineColor.YELLOW
-                    cls.robot._motion.turn(dir=cls.fast_turn.name, loop=5, wide=True, sliding=True)
-                    cls.robot.curr_head4find_corner = deque([60, 45, 35])
-                else:
-                    cls.mode = Mode.FIND_CONRER
-                    cls.robot._motion.walk(dir='BACKWARD', loop = 3)
+                cls.mode = Mode.FIND_CONRER
+                cls.robot.color = LineColor.YELLOW
+                cls.robot._motion.turn(dir=cls.fast_turn.name, loop=5, wide=True, sliding=True)
+                cls.robot.curr_head4find_corner = deque([60, 45, 35])
 
         elif mode == Mode.FIND_CONRER:
-            if mode == 'default':
-                if cls.find_corner():
-                    cls.mode = Mode.GO_TO_CORNER
-            else:
-                if cls.out_to_area():
-                    cls.robot._motion.set_head(dir='DOWN', angle = 60)
-                    time.sleep(0.5)
-                    cls.robot.color = LineColor.YELLOW
-                    cls.mode = Mode.GO_TO_CORNER
+            if cls.find_corner():
+                cls.mode = Mode.GO_TO_CORNER
 
         elif mode == Mode.GO_TO_CORNER:
-            if mode == 'default':
-                if cls.go_to_corner():
-                    cls.mode = cls.mode = Mode.OUT_ROOM
-                    loop: int
-                    loop = 4 if cls.fast_turn == Direction.RIGHT else 2
-                    cls.robot._motion.turn(dir=cls.robot.direction.name, loop=loop)
-            else:
-                if cls.go_to_line():
-                    cls.mode = cls.mode = Mode.OUT_ROOM
-                    
+            if cls.go_to_corner():
+                cls.mode = cls.mode = Mode.OUT_ROOM
+                loop: int
+                loop = 4 if cls.fast_turn == Direction.RIGHT else 2
+                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=loop)
+                
         elif mode == Mode.OUT_ROOM:
-            if mode == 'default':
-                if cls.out_room():
-                    cls.mode = Mode.END
-            else:
-                if cls.in_line():
-                    cls.mode = Mode.END
+            if cls.out_room():
+                cls.mode = Mode.END
 
         elif mode == Mode.END:
             return True
