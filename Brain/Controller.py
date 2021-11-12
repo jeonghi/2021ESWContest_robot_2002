@@ -112,6 +112,7 @@ class Controller:
         cls.robot._motion.walk("BACKWARD", 1)
         time.sleep(1.0)
         return False
+    
     @classmethod
     def room_run(cls):
         cls.robot.color = LineColor.YELLOW

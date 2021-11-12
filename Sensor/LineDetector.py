@@ -249,6 +249,8 @@ class LineDetector:
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
                     for cnt in contours:
                         cv2.drawContours(src, cnt, -1, (255, 0, 0), 2)
+                        
+                
 
         else:
             lines, horizontal_lines,vertical_lines,edge_lines,edge_lines_L,edge_lines_R ,compact_horizontal_lines, H_degree = self.get_lines(src, color)
@@ -356,7 +358,7 @@ class LineDetector:
                 else:
                     edge_info["EDGE_POS"] = None
 
-            if color == 'GREEN':
+            elif color == 'GREEN':
                 line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, "len(H)":0, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
                 edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
@@ -428,6 +430,7 @@ class LineDetector:
                         self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
                         self.draw_lines(temp, edge_fit_line_DOWN, 'edge', 'fit')
                         src = cv2.addWeighted(src, 1, temp, 1., 0.)
+
 
         return line_info, edge_info, src
 
