@@ -80,7 +80,6 @@ class Motion:
         dir_list = {'E': 33, 'W': 34, 'S': 35, 'N': 36}
         self.TX_data_py2(dir_list[dir])
         time.sleep(1)
-        self.TX_data_py2(dir_list[dir])
 
     def notice_area(self, area):
         """area='GREEN' or area='BLACK'

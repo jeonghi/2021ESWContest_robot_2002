@@ -608,7 +608,7 @@ GOSUB_RX_EXIT2:
         SPEED 5
         GOSUB 기본자세2
 
-        DELAY 400
+        DELAY 150
         GOTO RX_EXIT
     ENDIF
     '*********************************
@@ -1839,27 +1839,25 @@ GOSUB_RX_EXIT2:
     MOTORMODE G6D,3,3,3,3,2
 
     SPEED 12
-    MOVE G6D, 95,  90, 125, 100, 109, 100
-    MOVE G6A,105,  78, 146,  93, 104, 100
+    MOVE G6D, 92,  90, 122, 102, 106, 100
+    MOVE G6A,102,  76, 146,  93, 105, 100
     WAIT
 
     SPEED 12
     MOVE G6D, 102,  77, 145, 93, 100, 100
-    MOVE G6A,90,  82, 140,  95, 107, 100
+    MOVE G6A,86,  80, 140,  96, 111, 100
     WAIT
 
     SPEED 10
-    MOVE G6D,95,  76, 145,  93, 102, 100
-    MOVE G6A,95,  78, 145,  93, 102, 100
+    MOVE G6D,96,  76, 145,  93, 102, 100
+    MOVE G6A,96,  76, 145,  93, 102, 100
     WAIT
 
     SPEED 8
-    'GOSUB 기본자세2
-    MOVE G6A,100,  78, 145,  93, 100, 100
-    MOVE G6D,100,  76, 145,  93, 100, 100
-    WAIT
+    GOSUB 기본자세2
     GOSUB All_motor_mode3
     GOTO RX_EXIT
+    '*************
     '*************
 
 왼쪽옆으로20: '****
@@ -1867,24 +1865,22 @@ GOSUB_RX_EXIT2:
     MOTORMODE G6D,3,3,3,3,2
 
     SPEED 12
-    MOVE G6A, 95,  90, 125, 100, 109, 100 ' before 95, 90, 125, 100, 104, 100
-    MOVE G6D,105,  78, 145,  93, 104, 100
+    MOVE G6A, 92,  90, 122, 102, 106, 100
+    MOVE G6D,102,  76, 146,  93, 105, 100
     WAIT
 
     SPEED 12
     MOVE G6A, 102,  77, 145, 93, 100, 100
-    MOVE G6D,90,  82, 140,  95, 107, 100
+    MOVE G6D,86,  80, 140,  96, 111, 100
     WAIT
 
     SPEED 10
-    MOVE G6A,95,  76, 145,  93, 102, 100
-    MOVE G6D,95,  78, 145,  93, 102, 100
+    MOVE G6A,96,  76, 145,  93, 102, 100
+    MOVE G6D,96,  76, 145,  93, 102, 100
     WAIT
 
     SPEED 8
-    'GOSUB 기본자세2
-    MOVE G6A,100,  76, 145,  93, 100, 100
-    MOVE G6D,100,  78, 145,  93, 100, 100
+    GOSUB 기본자세2
     GOSUB All_motor_mode3
     GOTO RX_EXIT
 
@@ -3673,6 +3669,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "SOUND 0 !"
     'GOSUB SOUND_PLAY_CHK
     DELAY 10
+    PRINT "SOUND 0 !"
+    DELAY 10
     GOSUB 기본자세2
     RETURN
 
@@ -3683,6 +3681,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 1 !"
     'GOSUB SOUND_PLAY_CHK
+    DELAY 10
+    PRINT "SOUND 1 !"
     DELAY 10
     GOSUB 기본자세2	
     RETURN
@@ -3695,6 +3695,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "SOUND 2 !"
     'GOSUB SOUND_PLAY_CHK
     DELAY 10
+    PRINT "SOUND 2 !"
+    DELAY 10
     GOSUB 기본자세2
     RETURN
 북쪽:
@@ -3705,6 +3707,8 @@ Number_Play: '  BUTTON_NO = 숫자대입
     PRINT "OPEN 20GongMo.mrs !"
     PRINT "SOUND 3 !"
     'GOSUB SOUND_PLAY_CHK
+    DELAY 10
+    PRINT "SOUND 3 !"
     DELAY 10
     GOSUB 기본자세2
     RETURN
@@ -5290,7 +5294,7 @@ KEY3:
 KEY4:
     ETX 4800, 4
     GOTO 오른쪽옆으로20
-   '  GOTO 문열기왼쪽3
+    '  GOTO 문열기왼쪽3
     GOTO RX_EXIT
     '***************
 KEY5:
@@ -5458,7 +5462,7 @@ KEY23: 'G
     '***************
 KEY24: '#
     ETX 4800, 24
-    GOTO 집고왼쪽옆으로2
+    GOTO 왼쪽옆으로70연속
     GOTO RX_EXIT
     '***************
 KEY25: 'P1
