@@ -79,6 +79,7 @@ class Motion:
         """
         dir_list = {'E': 33, 'W': 34, 'S': 35, 'N': 36}
         self.TX_data_py2(dir_list[dir])
+        time.sleep(1)
 
     def notice_area(self, area):
         """area='GREEN' or area='BLACK'
@@ -264,5 +265,5 @@ if __name__ == '__main__':
    # motion.TX_data_py2(9)
     #motion.open_door_turn(dir='LEFT', loop=6)
     #motion.walk(dir='FORWARD')
-    motion.open_door(dir='LEFT', loop=15)
-    #motion.set_head("DOWN", 90)
+    #motion.open_door(dir='LEFT', loop=15)
+    motion.set_head("DOWN", 60)

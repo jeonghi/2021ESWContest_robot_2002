@@ -191,7 +191,7 @@ class ImageProcessor:
         hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         #_, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV+ cv2.THRESH_OTSU)
         red_mask = ColorPreProcessor.get_red_mask4hue(h)
         blue_mask = ColorPreProcessor.get_blue_mask4hue(h)
         color_mask = cv2.bitwise_or(blue_mask, red_mask)
@@ -302,7 +302,7 @@ class ImageProcessor:
 
 
 
-    def get_milk_info(self, color:str, edge_info:dict, visualization=False) -> tuple:
+    def get_milk_info(self, color:str, visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -311,7 +311,7 @@ class ImageProcessor:
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
         k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
-        _, mask = cv2.threshold(s, 0, 255, cv2.THRESH_OTSU + cv2.THRESH_BINARY)
+        _, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
         mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None
@@ -365,12 +365,12 @@ class ImageProcessor:
                 setLabel(canvas, candidate.get_pts(), label=f"MILK POS x:{candidate.x}, y:{candidate.y}", color=(255, 255, 255))
             candidates.append(candidate)
 
-        if candidates:
-            if edge_info:
-                if edge_info["EDGE_UP"] :
-                    #print("필터 적용전", candidates)
-                    candidates = list(filter(lambda candidate: candidate.y + candidate.height > edge_info["EDGE_UP_Y"], candidates))
-                    #print("적용 후", candidates)
+        # if candidates:
+        #     if edge_info:
+        #         if edge_info["EDGE_UP"] :
+        #             #print("필터 적용전", candidates)
+        #             candidates = list(filter(lambda candidate: candidate.y + candidate.height > edge_info["EDGE_UP_Y"], candidates))
+        #             #print("적용 후", candidates)
 
         ### 후보 라벨이 있다면 그중에서 가장 큰 크기 객체의 중심 좌표를 반환
         if candidates:
@@ -478,6 +478,12 @@ class ImageProcessor:
         #print(rate)
 
         return rate <= 60
+
+
+
+
+
+
 
 
 if __name__ == "__main__":

@@ -21,7 +21,7 @@ class OutDoorMission:
     
     @classmethod
     def out_line(cls) -> bool:
-        print(np.mean(cls.robot.line_info['H_Y']))
+        #print(np.mean(cls.robot.line_info['H_Y']))
         if not cls.robot.line_info['H'] or np.mean(cls.robot.line_info['H_Y']) > 155:
             return True
         else:

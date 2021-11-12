@@ -35,7 +35,6 @@ class Controller:
             cls.robot.color=LineColor.YELLOW
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
-            cls.robot.color=LineColor.GREEN
             cls.robot.direction = Direction.LEFT
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             cls.robot._motion.set_head("DOWN", 10)
@@ -72,7 +71,7 @@ class Controller:
         
         elif cls.robot.walk_info == WalkInfo.CORNER_LEFT:
             if cls.robot.direction == Direction.RIGHT:
-                #cls.robot._motion.walk('FORWARD', 1)
+                cls.robot._motion.walk('FORWARD', 1)
                 print(cls.robot.direction)
                 return True
             else:
@@ -83,7 +82,7 @@ class Controller:
                 
         elif cls.robot.walk_info == WalkInfo.CORNER_RIGHT:
             if cls.robot.direction == Direction.LEFT:
-                #cls.robot._motion.walk('FORWARD', 1)
+                cls.robot._motion.walk('FORWARD', 1)
                 print(cls.robot.direction)
                 return True
             else:
@@ -113,6 +112,7 @@ class Controller:
         cls.robot._motion.walk("BACKWARD", 1)
         time.sleep(1.0)
         return False
+    
     @classmethod
     def room_run(cls):
         cls.robot.color = LineColor.YELLOW
@@ -146,7 +146,6 @@ class Controller:
                     cls.mode = Mode.CHECK_AREA_COLOR  # 미션
                     print("COLOR MODE: ", cls.mode)
                     cls.ROI = False
-                    cls.robot.color = LineColor.GREEN
                 else:
                     cls.mode = Mode.OUT
 
@@ -158,12 +157,15 @@ class Controller:
             Mission = GreenRoomMission if RoomMission.area_color == AreaColor.GREEN else BlackRoomMission
             if Mission.run():
                 cls.mission_done += 1
+                Mission.reset()
+                print(Mode.ROOM_MISSION.name, cls.mission_done)
                 cls.ROI = True
                 cls.mode = Mode.GO_TO_NEXT_ROOM
                 cls.robot._motion.set_head("DOWN", angle=10)
                 time.sleep(0.3)
         
         elif mode == Mode.OUT:
+            cls.robot.color=LineColor.YELLOW
             if OutDoorMission.run():
                 return True # 퇴장
                     

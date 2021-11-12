@@ -244,11 +244,13 @@ class LineDetector:
                 edge_info["EDGE_DOWN_Y"] = edge_contour_line_DOWN[1]
 
                 if edge_visualization is True:
-                    self.draw_lines(temp, edge_contour_line_UP, 'lines', 'fit')
-                    self.draw_lines(temp, edge_contour_line_DOWN, 'lines', 'fit')
+                    self.draw_lines(temp, edge_contour_line_UP, 'horizontal', 'fit') # green line
+                    self.draw_lines(temp, edge_contour_line_DOWN, 'lines', 'fit') # blue line
                     src = cv2.addWeighted(src, 1, temp, 1., 0.)
-                    for cnt in contours:
-                        cv2.drawContours(src, cnt, -1, (255, 0, 0), 2)
+                    #for cnt in contours:
+                        #cv2.drawContours(src, cnt, -1, (255, 0, 0), 2)
+                        
+                
 
         else:
             lines, horizontal_lines,vertical_lines,edge_lines,edge_lines_L,edge_lines_R ,compact_horizontal_lines, H_degree = self.get_lines(src, color)
@@ -356,13 +358,14 @@ class LineDetector:
                 else:
                     edge_info["EDGE_POS"] = None
 
-            if color == 'GREEN':
-                line_info = {'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, "len(H)":0, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
+            elif color == 'GREEN':
+                line_info = {'ALL': False,'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, "len(H)":0, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
                 edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
                 if len(edge_lines) != 0:
                     size = int(edge_lines.shape[0] * edge_lines.shape[2] / 2)
                     line = self.get_fitline(src, edge_lines, size, 'all')
+                    line_info["ALL"] = True
                     line_info["ALL_X"] = [line[0], line[2]]  # [min_x, min_y, max_x, max_y]
                     line_info["ALL_Y"] = [line[1], line[3]]
 
@@ -428,6 +431,7 @@ class LineDetector:
                         self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
                         self.draw_lines(temp, edge_fit_line_DOWN, 'edge', 'fit')
                         src = cv2.addWeighted(src, 1, temp, 1., 0.)
+
 
         return line_info, edge_info, src
 
