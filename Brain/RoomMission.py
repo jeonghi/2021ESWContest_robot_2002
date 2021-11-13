@@ -217,7 +217,7 @@ class GreenRoomMission(RoomMission):
             return True
         else:
             if head_angle == 35:
-                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.GREEN_ROOM_DEFAULT_TURN)
+                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.GREEN_ROOM_DEFAULT_TURN_FIND_BOX)
                 cls.update_box_pos(box_info=box_info)
             cls.robot.curr_head4box.rotate(-1)
             head_angle = cls.robot.curr_head4box[0]
