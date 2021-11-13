@@ -4,7 +4,7 @@ from Brain.InDoorMission import InDoorMission
 from Brain.OutDoorMission import OutDoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
 #from Brain.RoomMission_hard import RoomMission, GreenRoomMission, BlackRoomMission
-from Constant import Direction, AreaColor, LineColor, WalkInfo
+from Constant import Direction, AreaColor, LineColor, WalkInfo, debug_mode
 
 import time
 
@@ -26,6 +26,11 @@ class Controller:
     InDoorMission.set_robot(robot)
     OutDoorMission.set_robot(robot)
     RoomMission.set_robot(robot)
+    
+    if debug_mode.IS_ON:
+        room = debug_mode.ROOMS[mission_done]
+        RoomMission.set_debug(room.name_color, room.room_name, room.area_color)
+        
     robot.set_basic_form()
     ROI = False
     @classmethod
@@ -98,7 +103,10 @@ class Controller:
 
     @classmethod
     def detect_direction(cls) -> bool:
-        direction = cls.robot._image_processor.get_arrow_direction()
+        if debug_mode.IS_ON:
+            direction = debug_mode.DIRECTION
+        else:
+            direction = cls.robot._image_processor.get_arrow_direction()
         
         if direction:
             cls.robot.direction = Direction.LEFT if direction == "LEFT" else Direction.RIGHT

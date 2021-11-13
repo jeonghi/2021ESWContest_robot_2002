@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from collections import namedtuple
 import csv
 
 
@@ -69,10 +70,14 @@ const.BLUE_RANGE = [[73, 52, 53], [124, 170, 156]]
 const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
 const.YELLOW_RANGE = [[11, 80, 129], [44, 255, 255]]
 const.GRAB_IR = 70
-const.DOOR_ALPHABET = "E"
-const.DIRECTION = Direction.LEFT
-const.BLACK_ROOMS = ["A","B"]
-const.IN_DOOR_WALK = 5
-const.IN_DOOR_TURN = 4
 
+Room = namedtuple('area_color', 'room_name', 'name_color')
+first_room = Room("GREEN", "A", "BLUE")
+second_room = Room("BLACK", "B", "RED")
+third_room = Room("GREEN", "C", "BLUE")
 
+debug_mode = Constant()
+debug_mode.IS_ON = False
+debug_mode.DOOR_ALPHABET = "E"
+debug_mode.DIRECTION = Direction.LEFT
+debug_mode.ROOMS = [first_room, second_room, third_room]
