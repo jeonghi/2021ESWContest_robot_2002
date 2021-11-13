@@ -319,7 +319,7 @@ class GreenRoomMission(RoomMission):
 
         if mode == Mode.START:
             cls.mode = Mode.DETECT_ALPHABET
-            cls.robot._motion.set_head("DOWN", angle=cls.curr_head4room_alphabet[0])
+            cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4room_alphabet[0])
 
         elif mode == Mode.DETECT_ALPHABET:
             if cls.detect_alphabet():
@@ -471,7 +471,7 @@ class BlackRoomMission(RoomMission):
         
         if mode == Mode.START:
             cls.mode = Mode.DETECT_ALPHABET
-            cls.robot._motion.set_head("DOWN", angle=cls.curr_head4room_alphabet[0])
+            cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4room_alphabet[0])
             
         elif mode == Mode.DETECT_ALPHABET:
             if cls.detect_alphabet():
