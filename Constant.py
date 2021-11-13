@@ -1,14 +1,6 @@
 from enum import Enum, auto
 import csv
-class Constant:
-    def __setattr__(self, name, value):
-        if name in self.__dict__:
-            raise Exception('변수에 값을 할당할 수 없습니다.')
-        self.__dict__[name] = value
 
-    def __delattr__(self, name):
-        if name in self.__dict__:
-            raise Exception('변수를 삭제할 수 없습니다.')
 
 
 f = open('Cts5_v1.csv', 'r', encoding='utf-8')
@@ -30,15 +22,8 @@ for line in rdr:
     #print("color: ", line[0])
     #print(lower_range)
     #print(upper_range)
-    
-const = Constant()
-const.RED_RANGE1 = [[0, 33, 40], [30, 201, 142]]
-const.RED_RANGE2 = [[121, 20, 85], [180, 255, 145]]
-const.GREEN_RANGE = [[29, 80, 30], [76, 255, 255]]
-const.BLUE_RANGE = [[73, 52, 53], [124, 170, 156]]
-const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
-const.YELLOW_RANGE = [[11, 80, 129], [44, 255, 255]]
-const.GRAB_IR = 70
+
+
 
 class Direction(Enum):
     LEFT = auto()
@@ -65,3 +50,29 @@ class WalkInfo(Enum):
     MODIFY_LEFT = auto()
     MODIFY_RIGHT = auto()
     BACKWARD = auto()
+
+class Constant:
+    def __setattr__(self, name, value):
+        if name in self.__dict__:
+            raise Exception('변수에 값을 할당할 수 없습니다.')
+        self.__dict__[name] = value
+
+    def __delattr__(self, name):
+        if name in self.__dict__:
+            raise Exception('변수를 삭제할 수 없습니다.')
+
+const = Constant()
+const.RED_RANGE1 = [[0, 33, 40], [30, 201, 142]]
+const.RED_RANGE2 = [[121, 20, 85], [180, 255, 145]]
+const.GREEN_RANGE = [[29, 80, 30], [76, 255, 255]]
+const.BLUE_RANGE = [[73, 52, 53], [124, 170, 156]]
+const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
+const.YELLOW_RANGE = [[11, 80, 129], [44, 255, 255]]
+const.GRAB_IR = 70
+const.DOOR_ALPHABET = "E"
+const.DIRECTION = Direction.LEFT
+const.BLACK_ROOMS = ["A","B"]
+const.IN_DOOR_WALK = 5
+const.IN_DOOR_TURN = 4
+
+
