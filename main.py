@@ -1,43 +1,21 @@
-from Actuator.Motion import Motion
-from imutils import video
-from Sensor.LineDetector import LineDetector
-from Brain.Controller import Robot
-from Sensor.ImageProcessor import ImageProcessor
-from Sensor.VideoRecorder import VideoRecorder
-
-import cv2
-#import kbhit # press any key to exit
-
-VIDEO_PATH = ""
+from Brain.Controller import Controller, Mode
 
 def main():
-    robot = Robot(video_path=VIDEO_PATH, DEBUG=True)
-    robot.set_basic_form()
-    #====================== debug ======================
+    Controller.set_test_mode(mode=Mode.CHECK_AREA_COLOR)
 
-    #video_recorder = VideoRecorder()
-    #kb = kbhit.KBHit()
-
-    #print("Press ESC key to exit")
+    while not Controller.run():
+        continue
+    
+def img_test():
     while True:
-       # if kb.kbhit():
-           # key = ord(kb.getch())
-
-            #if key == 27: # ESC
-             #   break
-
-        #rame = robot._image_processor.get_image()
-        #video_recorder.record_frame(frame)
-
-    #===================== function ======================
-        #robot.check_motion()
-        robot.run()
+         #corner = Controller.robot._image_processor.get_yellow_line_corner(visualization=True)
+         #print(corner)
+         #(line_info, edge_info, _) = Controller.robot._image_processor.line_tracing("YELLOW", ROI=False, ROI_edge=True, edge_visualization=True, line_visualization=False)
+         #print(line_info, edge_info)
+         #alphabet_info = Controller.robot._image_processor.line_checker(line_info)
+         #print(alphabet_info)
+         continue
     
-
-    #=====================================================
-    
-    #video_recorder.stop()
-    #robot.set_basic_form()
-
 if __name__ == "__main__":
     main()
+    #img_test()
