@@ -1,7 +1,7 @@
 from Brain.Robot import Robot
 from enum import Enum, auto
 import time
-from Constant import Direction, WalkInfo
+from Constant import Direction, WalkInfo, debug_mode
 
 class Mode(Enum):
     START = auto()
@@ -22,7 +22,10 @@ class InDoorMission:
     def detect_alphabet(cls) -> bool:
         cls.robot._motion.set_head(dir="DOWN", angle=cls.robot.curr_head4door_alphabet[0])
         
-        alphabet = cls.robot._image_processor.get_door_alphabet()
+        if debug_mode.IS_ON:
+            alphabet = debug_mode.DOOR_ALPHABET
+        else:
+            alphabet = cls.robot._image_processor.get_door_alphabet()
         
         if alphabet:
             print("alphabet:", alphabet)

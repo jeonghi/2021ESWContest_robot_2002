@@ -1,4 +1,5 @@
 from enum import Enum, auto
+from collections import namedtuple
 import csv
 
 
@@ -72,6 +73,10 @@ const.GRAB_IR = 70
 const.IN_DOOR_WALK = 5
 const.IN_DOOR_TURN = 4
 
+Room = namedtuple('Room', 'area_color room_name name_color')
+first_room = Room(AreaColor.GREEN, "B", "RED")
+second_room = Room(AreaColor.BLACK, "B", "BLUE")
+third_room = Room(AreaColor.GREEN, "D", "BLUE")
 const.CORNER_FILTER_DISTANCE = 80
 
 ### GREEN ROOM ###
@@ -89,3 +94,8 @@ const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER = 5
 const.BLACK_ROOM_DEFUALT_OUT_ROOM_WALK = 4
 const.ROOM_MISSION_DEBUG = False
 const.DEBUG = False
+debug_mode = Constant()
+debug_mode.IS_ON = True
+debug_mode.DOOR_ALPHABET = "E"
+debug_mode.DIRECTION = "RIGHT"
+debug_mode.ROOMS = [first_room, second_room, third_room]

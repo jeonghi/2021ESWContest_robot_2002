@@ -1,5 +1,5 @@
 from Brain.Robot import Robot
-from Constant import Direction, AreaColor, LineColor, WalkInfo, const
+from Constant import Direction, AreaColor, LineColor, WalkInfo, const, debug_mode
 from enum import Enum, auto
 from collections import deque
 import time
@@ -56,7 +56,6 @@ class RoomMission:
 
     mode: Mode = Mode.START
     robot: Robot
-    head: deque
 
     alphabet_color: str
     alphabet: str
@@ -74,6 +73,12 @@ class RoomMission:
         cls.robot.curr_head4room_alphabet = deque([85, 80])
         cls.robot.curr_head4box = deque([75, 60, 35])
 
+    @classmethod
+    def set_debug(cls, alphabet_color, alphabet, area_color):
+        cls.alphabet_color = alphabet_color
+        cls.alphabet = alphabet
+        cls.area_color = area_color
+
 
     @classmethod
     def check_area_color(cls):
@@ -85,7 +90,9 @@ class RoomMission:
         
         print(cls.robot.edge_info)
         print(cls.robot.line_info)
-        cls.area_color = AreaColor.GREEN if cls.robot.edge_info["EDGE_DOWN"] else AreaColor.BLACK
+
+        if not debug_mode.IS_ON:
+            cls.area_color = AreaColor.GREEN if cls.robot.edge_info["EDGE_DOWN"] else AreaColor.BLACK
         
         cls.robot._motion.notice_area(area=cls.area_color.name)
         cls.robot._motion.set_head(dir="LEFTRIGHT_CENTER")
@@ -95,9 +102,11 @@ class RoomMission:
     @classmethod
     def detect_alphabet(cls) -> bool:
 
-        alphabet_info = cls.robot._image_processor.get_alphabet_info4room(visualization=DEBUG, edge_info=cls.robot.edge_info)
-        if alphabet_info:
-            cls.alphabet_color, cls.alphabet = alphabet_info
+        if not debug_mode.IS_ON:
+            cls.alphabet_color, cls.alphabet = cls.robot._image_processor.get_alphabet_info4room(visualization=False,
+                                                                                                 edge_info=cls.robot.edge_info)
+
+        if cls.alphabet and cls.alphabet_color:
             return True
         else:
             cls.robot.curr_head4room_alphabet.rotate(-1)
@@ -374,12 +383,6 @@ class GreenRoomMission(RoomMission):
 class BlackRoomMission(RoomMission):
 
     @classmethod
-    def turn_to_area(cls) -> bool:
-
-        return True
-
-
-    @classmethod
     def find_box(cls) -> bool:
 
         head_angle = cls.robot.curr_head4box[0]
@@ -472,7 +475,7 @@ class BlackRoomMission(RoomMission):
         if mode == Mode.START:
             cls.mode = Mode.DETECT_ALPHABET
             cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4room_alphabet[0])
-            
+
         elif mode == Mode.DETECT_ALPHABET:
             if cls.detect_alphabet():
                 cls.robot.black_room.append(cls.alphabet)
@@ -480,7 +483,7 @@ class BlackRoomMission(RoomMission):
                 cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4box[0])
                 cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX)
 
-                
+
         elif mode == Mode.FIND_BOX:
             if cls.find_box():
                 cls.mode = Mode.TRACK_BOX
