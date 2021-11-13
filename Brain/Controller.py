@@ -30,7 +30,7 @@ class Controller:
     if debug_mode.IS_ON:
         room = debug_mode.ROOMS[mission_done]
         RoomMission.set_debug(room.name_color, room.room_name, room.area_color)
-        
+
     robot.set_basic_form()
     ROI = False
     @classmethod
@@ -56,6 +56,10 @@ class Controller:
 
     @classmethod
     def check_go_to_next_room(cls) -> bool:
+        if debug_mode.IS_ON:
+            room = debug_mode.ROOMS[cls.mission_done]
+            RoomMission.set_debug(room.name_color, room.room_name, room.area_color)
+
         return False if cls.mission_done > CLEAR_LIMIT else True
 
     @classmethod
