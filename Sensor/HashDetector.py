@@ -21,7 +21,8 @@ class HashDetector:
         print(self.directions)
 
     @staticmethod
-    def image_resize_with_pad(img, size, padColor=255):
+    def image_resize_with_pad(src, size, padColor=255):
+        img = src
         h, w = img.shape[:2]
         sh, sw = size
 
@@ -66,11 +67,16 @@ class HashDetector:
         return scaled_img
          
     @staticmethod
-    def image_to_hash(img : np.ndarray) -> list:
+    def image_to_hash(img : np.ndarray, is_arrow : bool = False) -> list:
         
         if len(img.shape) == 3:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
-        img = HashDetector.image_resize_with_pad(img=img, size=HashDetector.dim)
+        
+        if is_arrow:
+            img = cv2.resize(src=img, dsize=HashDetector.dim)
+        else:  
+            img = HashDetector.image_resize_with_pad(src=img, size=HashDetector.dim)
+            
         avg = img.mean()
         bin = 1 * (img > avg)
         return bin
@@ -114,14 +120,14 @@ class HashDetector:
         
         return result, hdist_dict[result]
 
-    def detect_arrow(self, img : np.ndarray):
-        img_hash = self.image_to_hash(img)
+    def detect_arrow(self, img : np.ndarray, thresh=0.6):
+        img_hash = self.image_to_hash(img, is_arrow=True)
 
         distance_1 = self.hamming_distance(img_hash, self.directions_hash[0])
         distance_2 = self.hamming_distance(img_hash, self.directions_hash[1])
 
         #print(distance_1, distance_2)
-        if distance_2 > 0.3 and distance_1 > 0.3:
+        if distance_2 > thresh and distance_1 > thresh:
             return None
 
         if distance_1 < distance_2:
