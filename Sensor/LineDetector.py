@@ -75,17 +75,13 @@ class LineDetector:
 
     def get_lines(self, src, color='YELLOW'):
         mask = self.mask_color(src, color)
-        cv2.imshow('mask', mask)
         if color == 'BLACK':
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             return contours
         else:
             edges = cv2.Canny(mask, 75, 150)
-            #cv2.imshow('mask', mask)
-            #cv2.imshow('edges', edges)
             lines = cv2.HoughLinesP(edges, 1, 1 * np.pi / 180, 30, np.array([]), minLineLength=50, maxLineGap=150)
             lines = np.squeeze(lines)
-            #print(lines)
 
             if len(lines.shape) == 0:
                 return [], [], [], [], [], [], [], 0

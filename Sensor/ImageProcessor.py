@@ -22,8 +22,7 @@ else:
     from Sensor.LineDetector import LineDetector
     from Sensor.ColorPreProcessor import ColorPreProcessor
     from Sensor.CornerFinder import CornerFinder
-    from Constant import WalkInfo, LineColor
-
+    from Constant import WalkInfo, LineColor, const
 
 class ImageProcessor:
 
