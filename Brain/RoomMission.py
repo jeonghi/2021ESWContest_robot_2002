@@ -129,7 +129,7 @@ class RoomMission:
         if box_info:
             (dx, dy) = get_distance_from_baseline(pos=box_info)
 
-            Y_LIMIT = 10 if head_angle is not 35 else -10
+            Y_LIMIT = 10 if head_angle is not 35 else 0
 
             if dy > Y_LIMIT:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
@@ -155,7 +155,8 @@ class RoomMission:
 
             else:
                 if head_angle == 35:
-                    return cls.robot._motion.grab(switch=True, IR=True)
+                    cls.robot._motion.grab(switch=True)
+                    return True
                     ###### 여기 마저 작설 ###
                 else:
                     cls.robot.curr_head4box.rotate(-1)
@@ -164,6 +165,7 @@ class RoomMission:
 
         else:
             cls.mode = Mode.FIND_BOX
+        time.sleep(0.5)
 
         return False
 

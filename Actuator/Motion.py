@@ -220,7 +220,7 @@ class Motion:
         tx = 65 if switch else 66
         self.TX_data_py2(tx)
         if IR:
-            time.sleep(4)
+            time.sleep(3)
             distance = self.get_IR()
             print(f"IR Value: {distance}")
             if distance < const.GRAB_IR:
