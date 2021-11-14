@@ -130,11 +130,6 @@ class Motion:
             self.TX_data_py2(dir_list[dir][angle])
         time.sleep(0.3)
 
-    def is_grab(self) -> bool:
-        if self.get_IR() > 65:
-            return True
-        return False
-
     def walk(self, dir, loop=1, sleep=0.1, wide=False, grab=False, open_door=False, IR=False, width=True):
         """
         dir_list = ['FORWARD', 'BACKWARD', 'LEFT', 'RIGHT', 'LEFT2', 'RIGHT2']
@@ -227,8 +222,11 @@ class Motion:
         if IR:
             time.sleep(2)
             distance = self.get_IR()
-            print(f"IR: {distance}")
-            return distance > const.GRAB_IR
+            print(f"IR Value: {distance}")
+            if distance < const.GRAB_IR:
+                self.TX_data_py2(55)
+                self.TX_data_py2(10)
+                
 
     def get_head(self):
         """Return vertical, horizontal head angle
