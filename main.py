@@ -1,7 +1,7 @@
 from Brain.Controller import Controller, Mode
 
 def main():
-    #Controller.set_test_mode(Mode.CHECK_AREA_COLOR)
+    Controller.set_test_mode(Mode.DETECT_DIRECTION)
     
     while not Controller.run():
         continue
