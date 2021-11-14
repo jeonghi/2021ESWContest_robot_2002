@@ -238,7 +238,6 @@ class Motion:
         self.TX_data_py2(55)
         self.TX_data_py2(10)
 
-<<<<<<< HEAD
     def move_arm(self, dir='HIGH',walk=False, loop=1):
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
         팔을 위로 하면 머리는 아래로 숙임.
@@ -252,8 +251,7 @@ class Motion:
             for _ in range(loop):
                 self.TX_data_py2(112 + level[dir])
                 if
-    
-=======
+
     def move_arm(self, arm='HIGH', walk=False, turn=False, dir='FORWARD', loop=1):
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
         팔을 위로 하면 머리는 아래로 숙임.
@@ -275,7 +273,6 @@ class Motion:
             for _ in range(loop):
                 self.TX_data_py2(115 + dir_list[dir])
 
->>>>>>> cf27a0f848661c99756f0417e9a84f35a66c2a47
 
 # **************************************************
 # **************************************************
