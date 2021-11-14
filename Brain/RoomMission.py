@@ -129,7 +129,9 @@ class RoomMission:
         if box_info:
             (dx, dy) = get_distance_from_baseline(pos=box_info)
 
-            if dy > 0:  # 기준선 보다 위에 있다면
+            Y_LIMIT = 10 if head_angle is not 35 else -10
+
+            if dy > Y_LIMIT:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
                     print("기준점에서 적정범위. 전진 전진")
                     cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
@@ -154,7 +156,8 @@ class RoomMission:
             else:
                 if head_angle == 35:
                     cls.robot._motion.grab(switch=True)
-                    return True
+                    time.sleep(0.5)
+                    return cls.robot._motion.is_grab()
                 else:
                     cls.robot.curr_head4box.rotate(-1)
                     head_angle = cls.robot.curr_head4box[0]
@@ -467,7 +470,6 @@ class BlackRoomMission(RoomMission):
                 cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4box[0])
                 cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX)
 
-
         elif mode == Mode.FIND_BOX:
             if cls.find_box():
                 cls.mode = Mode.TRACK_BOX
@@ -485,7 +487,6 @@ class BlackRoomMission(RoomMission):
                 cls.robot._motion.set_head("DOWN", angle=35)
                 cls.robot._motion.walk(dir="FORWARD", grab=True, loop=const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK)
 
-
         elif mode == Mode.GO_OUT_AREA:
             if cls.go_out_area():
                 cls.mode = Mode.DROP_BOX
@@ -493,7 +494,6 @@ class BlackRoomMission(RoomMission):
         elif mode == Mode.DROP_BOX:
             if cls.drop_box():
                 cls.mode = Mode.FIND_CONRER
-
 
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
