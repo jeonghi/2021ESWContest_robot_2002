@@ -155,8 +155,8 @@ class RoomMission:
 
             else:
                 if head_angle == 35:
+                    return cls.robot._motion.grab(switch=True, IR=True)
                     ###### 여기 마저 작설 ###
-                    pass
                 else:
                     cls.robot.curr_head4box.rotate(-1)
                     head_angle = cls.robot.curr_head4box[0]
