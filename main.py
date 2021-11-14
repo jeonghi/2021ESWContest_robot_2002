@@ -8,3 +8,5 @@ def main():
 
 if __name__ == "__main__":
     main()
+    #while True:
+        #print(Controller.robot._image_processor.get_milk_info(color="RED"))
