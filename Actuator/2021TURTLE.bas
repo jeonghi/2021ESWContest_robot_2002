@@ -4756,7 +4756,7 @@ D지역:
         HIGHSPEED SETOFF
         SPEED 15
         ' GOSUB 안정화자세
-        SPEED 5
+        SPEED 13
         ' GOSUB 기본자세2
         MOVE G6A,100,  76, 145,  91, 100, 100
         MOVE G6D,100,  76, 145,  91, 100, 100
@@ -4801,7 +4801,7 @@ D지역:
         HIGHSPEED SETOFF
         SPEED 15
         ' GOSUB 안정화자세
-        SPEED 5
+        SPEED 13
         ' GOSUB 기본자세2
         MOVE G6A,100,  76, 145,  91, 100, 100
         MOVE G6D,100,  76, 145,  91, 100, 100
