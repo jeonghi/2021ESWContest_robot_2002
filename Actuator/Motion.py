@@ -226,7 +226,9 @@ class Motion:
             if distance < const.GRAB_IR:
                 self.TX_data_py2(55)
                 self.TX_data_py2(10)
-                
+                return False
+            else: 
+                return True
 
     def get_head(self):
         """Return vertical, horizontal head angle
