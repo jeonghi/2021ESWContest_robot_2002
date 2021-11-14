@@ -72,7 +72,7 @@ class RoomMission:
 
         cls.robot.curr_head4room_alphabet = deque([85, 80])
         cls.robot.curr_head4box = deque([75, 60, 35])
-        cls.robot.curr_head4find_corner = deque([55, 45, 35])
+        cls.robot.curr_head4find_corner = deque([60, 45, 35])
 
     @classmethod
     def set_debug(cls, alphabet_color, alphabet, area_color):
@@ -192,6 +192,7 @@ class RoomMission:
     def out_room(cls) -> bool:
         if cls.robot.line_info["V"]:
             if 300 < cls.robot.line_info["V_X"][0] < 340:
+                cls.robot._motion.walk(dir='FORWARD', loop=2)
                 return True
             elif cls.robot.line_info["V_X"][0] <= 300:
                 cls.robot._motion.walk(dir='LEFT', loop=1)
@@ -388,7 +389,6 @@ class BlackRoomMission(RoomMission):
     @classmethod
     def find_yellow_line(cls) -> bool:
         if cls.robot.line_info["ALL_Y"][1]:
-            cls.robot._motion.walk(dir="FORWARD", grab=True, loop=const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK)
             return True
         cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=1)
         return False
@@ -483,6 +483,8 @@ class BlackRoomMission(RoomMission):
             if cls.find_yellow_line():
                 cls.mode = Mode.GO_OUT_AREA
                 cls.robot._motion.set_head("DOWN", angle=35)
+                cls.robot._motion.walk(dir="FORWARD", grab=True, loop=const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK)
+
 
         elif mode == Mode.GO_OUT_AREA:
             if cls.go_out_area():
