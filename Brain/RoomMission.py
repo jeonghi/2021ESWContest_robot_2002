@@ -388,7 +388,7 @@ class BlackRoomMission(RoomMission):
 
     @classmethod
     def find_yellow_line(cls) -> bool:
-        if cls.robot.line_info["ALL_Y"][1]:
+        if cls.robot.line_info["ALL_Y"][1] + cls.robot.line_info["ALL_Y"][0] :
             return True
         cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=1)
         return False
@@ -417,7 +417,7 @@ class BlackRoomMission(RoomMission):
         corner = cls.robot._image_processor.get_yellow_line_corner(visualization=DEBUG)
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
-            if dy > 10:  # 기준선 보다 위에 있다면
+            if dy > 20:  # 기준선 보다 위에 있다면
                 if -50 <= dx <= 50:
                     cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
                 elif dx <= -70:
