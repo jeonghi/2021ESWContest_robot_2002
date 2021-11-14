@@ -41,20 +41,20 @@ class InDoorMission:
     def in_door(cls) -> bool:
         dst = cls.robot._motion.get_IR()
         if dst > 100 :
-            cls.robot._motion.walk('FORWARD', loop=4, open_door=True)
+            cls.robot._motion.walk('FORWARD', loop=4, open_door=True, width=False)
         else:
             if cls.robot.walk_info == WalkInfo.STRAIGHT:
-                cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
+                cls.robot._motion.walk('FORWARD', loop=2, open_door=True, width=False)
             elif cls.robot.walk_info == WalkInfo.V_LEFT:
                 if cls.robot.line_info['H_Y'][1] <= 100:
                     cls.robot._motion.walk('LEFT', loop=1, open_door=True)
                 else:
-                    cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
+                    cls.robot._motion.walk('FORWARD', loop=2, open_door=True, width=False)
             elif cls.robot.walk_info == WalkInfo.V_RIGHT:
                 if cls.robot.line_info['H_Y'][1] <= 100:
                     cls.robot._motion.walk('RIGHT', loop=1, open_door=True)
                 else:
-                    cls.robot._motion.walk('FORWARD', loop=2, open_door=True)
+                    cls.robot._motion.walk('FORWARD', loop=2, open_door=True, width=False)
             elif cls.robot.walk_info == WalkInfo.MODIFY_LEFT:
                 cls.robot._motion.open_door_turn('LEFT', 1)
             elif cls.robot.walk_info == WalkInfo.MODIFY_RIGHT:
@@ -80,8 +80,8 @@ class InDoorMission:
 
         elif mode == Mode.DETECT_ALPHABET:
             if cls.detect_alphabet():
-                cls.robot._motion.walk('FORWARD', loop=15, open_door=True)
-                #cls.robot._motion.walk('FORWARD', loop=7, open_door=True, width=False)
+                #cls.robot._motion.walk('FORWARD', loop=15, open_door=True)
+                cls.robot._motion.walk('FORWARD', loop=7, open_door=True, width=False)
                 cls.mode = Mode.IN_DOOR
         
         elif mode == Mode.IN_DOOR:
