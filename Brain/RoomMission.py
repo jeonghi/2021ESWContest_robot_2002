@@ -102,11 +102,9 @@ class RoomMission:
     @classmethod
     def detect_alphabet(cls) -> bool:
 
-        if not debug_mode.IS_ON:
-            cls.alphabet_color, cls.alphabet = cls.robot._image_processor.get_alphabet_info4room(visualization=False,
-                                                                                                 edge_info=cls.robot.edge_info)
-
-        if cls.alphabet and cls.alphabet_color:
+        alphabet_info = cls.robot._image_processor.get_alphabet_info4room(visualization=False, edge_info=cls.robot.edge_info)
+        if alphabet_info:
+            cls.alphabet_color, cls.alphabet = alphabet_info
             return True
         else:
             cls.robot.curr_head4room_alphabet.rotate(-1)
@@ -240,26 +238,13 @@ class GreenRoomMission(RoomMission):
     @classmethod
     def turn_to_area(cls) -> bool:
 
-        is_horizon: bool = cls.robot.line_info["H"] and cls.robot.line_info["len(H)"] >= 300
-        is_in_area: bool
-        if cls.box_pos == "RIGHT":
-            is_in_area = cls.robot.line_info["H_X"][0] < const.GREEN_ROOM_AREA_LEFT_LIMIT
-        else:
-            is_in_area = cls.robot.line_info["H_X"][1] > const.GREEN_ROOM_AREA_RIGHT_LIMIT
-        
-        found_area: bool = is_horizon and is_in_area
-        
-        if found_area :
+        found_area: bool = cls.robot.line_info["H"] and cls.robot.line_info["len(H)"] >= 300
+
+        if found_area:
             cls.robot._motion.move_arm(dir='HIGH')
             return True
-        else:
-            if is_horizon:
-                cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, loop=1)
-            else:
-                if cls.box_pos == "LEFT":
-                    cls.robot._motion.walk(dir="LEFT", grab=True, loop=1)
-                else:
-                    cls.robot._motion.walk(dir="RIGHT", grab=True, loop=1)
+
+        cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, loop=1)
         return False
 
     @classmethod

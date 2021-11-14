@@ -89,13 +89,13 @@ const.GREEN_ROOM_AREA_IN_LIMIT = 460
 
 
 ### BLACK ROOM ###
-const.BLACK_ROOM_DEFUALT_TURN_FIND_BOX = 3
+const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX = 3
 const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER = 5
-const.BLACK_ROOM_DEFUALT_OUT_ROOM_WALK = 4
+const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK = 4
 const.ROOM_MISSION_DEBUG = False
 const.DEBUG = False
 debug_mode = Constant()
-debug_mode.IS_ON = True
-debug_mode.DOOR_ALPHABET = "E"
+debug_mode.IS_ON = False
+debug_mode.DOOR_ALPHABET = "N"
 debug_mode.DIRECTION = "RIGHT"
 debug_mode.ROOMS = [first_room, second_room, third_room]
