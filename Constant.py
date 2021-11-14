@@ -72,7 +72,7 @@ const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
 const.YELLOW_RANGE = [[11, 80, 129], [44, 255, 255]]
 
 ### DOOR SETTING ###
-const.GRAB_IR = 70
+const.GRAB_IR = 80
 const.IN_DOOR_WALK = 5
 const.IN_DOOR_TURN = 4
 
