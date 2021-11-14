@@ -124,11 +124,11 @@ class Target:
             else:
                 return None
 
-        elif targets1:
-            return max(targets1, key=lambda target: target.y)
-
-        elif targets2:
-            return max(targets2, key=lambda target: target.y)
+        # elif targets1:
+        #     return max(targets1, key=lambda target: target.y)
+        #
+        # elif targets2:
+        #     return max(targets2, key=lambda target: target.y)
 
         else:
             return None

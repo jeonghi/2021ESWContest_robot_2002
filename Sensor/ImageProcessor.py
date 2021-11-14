@@ -71,9 +71,11 @@ class ImageProcessor:
         no_canny_targets = []
         canny_targets = []
         # 그레이스케일화
-        gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
+        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
+        h, l, s =cv2.split(hls)
+        #gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(gray, 20, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(l, 20, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         #cv2.imshow("mask",mask)
 
         canny = auto_canny(mask)
@@ -90,7 +92,7 @@ class ImageProcessor:
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
 
-            if not ( 3500 < area  and area_ratio <= 1.4 and vertice == 4):
+            if not ( 3000 < area and area_ratio <= 1.5 and vertice == 4):
                 continue
 
             target = Target(contour=cnt)
@@ -107,7 +109,7 @@ class ImageProcessor:
             area_ratio = width / height if height < width else height / width
             area_ratio = round(area_ratio, 2)
 
-            if not (3500 < area and area_ratio <= 1.4 and vertice == 4):
+            if not (3000 < area and area_ratio <= 1.5 and vertice == 4):
                 continue
             target = Target(contour=cnt)
             canny_targets.append(target)
@@ -127,13 +129,14 @@ class ImageProcessor:
         if target is None:
             return None
         roi = target.get_target_roi(src=src)
-        roi_gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
-        _, roi_mask = cv2.threshold(roi_gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        roi_hls = cv2.cvtColor(roi, cv2.COLOR_BGR2HLS)
+        roi_h, roi_l, roi_s = cv2.split(roi_hls)
+        _, roi_mask = cv2.threshold(roi_l, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
         if visualization:
             pos = target.get_pts()
             setLabel(roi_canvas, target.get_pts(), label="roi", color=(255,0,0))
             mask = HashDetector.image_resize_with_pad(img=roi_mask, size=HashDetector.dim)
-            roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
+            #roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("src", cv2.hconcat(
                 [canvas, roi_canvas]))
             cv2.imshow('mask', mask)
