@@ -250,7 +250,6 @@ class Motion:
         if walk:
             for _ in range(loop):
                 self.TX_data_py2(112 + level[dir])
-                if
 
     def move_arm(self, arm='HIGH', walk=False, turn=False, dir='FORWARD', loop=1):
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.

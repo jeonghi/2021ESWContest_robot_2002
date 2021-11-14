@@ -102,11 +102,9 @@ class RoomMission:
     @classmethod
     def detect_alphabet(cls) -> bool:
 
-        if not debug_mode.IS_ON:
-            cls.alphabet_color, cls.alphabet = cls.robot._image_processor.get_alphabet_info4room(visualization=False,
-                                                                                                 edge_info=cls.robot.edge_info)
-
-        if cls.alphabet and cls.alphabet_color:
+        alphabet_info = cls.robot._image_processor.get_alphabet_info4room(visualization=False, edge_info=cls.robot.edge_info)
+        if alphabet_info:
+            cls.alphabet_color, cls.alphabet = alphabet_info
             return True
         else:
             cls.robot.curr_head4room_alphabet.rotate(-1)
@@ -468,7 +466,7 @@ class BlackRoomMission(RoomMission):
                 cls.robot.black_room.append(cls.alphabet)
                 cls.mode = Mode.FIND_BOX
                 cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4box[0])
-                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX)
+                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.BLACK_ROOM_TURN_FIND_BOX)
 
 
         elif mode == Mode.FIND_BOX:
