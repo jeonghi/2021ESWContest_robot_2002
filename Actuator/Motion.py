@@ -6,6 +6,7 @@ import serial
 import time
 import sys
 from threading import Thread, Lock
+from Constant import const
 
 
 # -----------------------------------------------
@@ -224,9 +225,10 @@ class Motion:
         tx = 65 if switch else 66
         self.TX_data_py2(tx)
         if IR:
-            if self.get_IR() > 65:
-                return True
-            return False
+            time.sleep(2)
+            distance = self.get_IR()
+            print(f"IR: {distance}")
+            return distance > const.GRAB_IR
 
     def get_head(self):
         """Return vertical, horizontal head angle
