@@ -466,7 +466,7 @@ class BlackRoomMission(RoomMission):
                 cls.robot.black_room.append(cls.alphabet)
                 cls.mode = Mode.FIND_BOX
                 cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4box[0])
-                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.BLACK_ROOM_TURN_FIND_BOX)
+                cls.robot._motion.turn(dir=cls.robot.direction.name, loop=const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX)
 
 
         elif mode == Mode.FIND_BOX:
