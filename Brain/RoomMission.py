@@ -72,6 +72,7 @@ class RoomMission:
 
         cls.robot.curr_head4room_alphabet = deque([85, 80])
         cls.robot.curr_head4box = deque([75, 60, 35])
+        cls.robot.curr_head4find_corner = deque([55, 45, 35])
 
     @classmethod
     def set_debug(cls, alphabet_color, alphabet, area_color):
@@ -128,7 +129,7 @@ class RoomMission:
         if box_info:
             (dx, dy) = get_distance_from_baseline(pos=box_info)
 
-            if dy > 10:  # 기준선 보다 위에 있다면
+            if dy > 0:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
                     print("기준점에서 적정범위. 전진 전진")
                     cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
@@ -191,7 +192,6 @@ class RoomMission:
     def out_room(cls) -> bool:
         if cls.robot.line_info["V"]:
             if 300 < cls.robot.line_info["V_X"][0] < 340:
-                cls.robot._motion.walk(dir='FORWARD', loop=2)
                 return True
             elif cls.robot.line_info["V_X"][0] <= 300:
                 cls.robot._motion.walk(dir='LEFT', loop=1)
@@ -266,9 +266,9 @@ class GreenRoomMission(RoomMission):
         else:
             if head_angle == 35:
                 if cls.box_pos == BoxPos.RIGHT:
-                    cls.robot._motion.turn(dir=Direction.LEFT.name, loop=2)
+                    cls.robot._motion.turn(dir=Direction.LEFT.name, loop=const.GREEN_ROOM_TURN_FIND_CORNER)
                 else:
-                    cls.robot._motion.turn(dir=Direction.RIGHT.name, loop=2)
+                    cls.robot._motion.turn(dir=Direction.RIGHT.name, loop=const.GREEN_ROOM_TURN_FIND_CORNER)
             cls.robot.curr_head4find_corner.rotate(-1)
             head_angle = cls.robot.curr_head4find_corner[0]
             cls.robot._motion.set_head("DOWN", angle=head_angle)
@@ -341,7 +341,6 @@ class GreenRoomMission(RoomMission):
         elif mode == Mode.DROP_BOX:
             if cls.drop_box():
                 cls.mode = Mode.FIND_CONRER
-                cls.robot.curr_head4find_corner = deque([60, 45, 35])
                 cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4find_corner[0])
                 cls.robot.color = LineColor.YELLOW
                 cls.robot._motion.turn(dir=cls.fast_turn.name, loop=const.GREEN_ROOM_DEFAULT_TURN_FIND_CORNER, wide=True, sliding=True)
@@ -492,7 +491,7 @@ class BlackRoomMission(RoomMission):
         elif mode == Mode.DROP_BOX:
             if cls.drop_box():
                 cls.mode = Mode.FIND_CONRER
-                cls.robot.curr_head4find_corner = deque([55, 45, 35])
+
 
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
