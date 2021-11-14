@@ -191,15 +191,16 @@ class ImageProcessor:
             canvas = src.copy()
         alphabet_info = None
         candidates = []
-        blur = cv2.GaussianBlur(src, (5, 5), 0)
-        hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
-        h, l, s = cv2.split(hls)
+        src = cv2.GaussianBlur(src, (5, 5), 0)
+        #hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
+        #h, l, s = cv2.split(hls)
         #_, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
-        _, mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV+ cv2.THRESH_OTSU)
-        red_mask = ColorPreProcessor.get_red_mask4hue(h)
-        blue_mask = ColorPreProcessor.get_blue_mask4hue(h)
+        #_, mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV+ cv2.THRESH_OTSU)
+        red_mask = ColorPreProcessor.get_red_mask(src)
+        blue_mask = ColorPreProcessor.get_blue_mask(src)
         color_mask = cv2.bitwise_or(blue_mask, red_mask)
-        mask = cv2.bitwise_and(mask, color_mask)
+        #mask = cv2.bitwise_and(mask, color_mask)
+        mask = color_mask
 
         if method == "LABEL":
             _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
