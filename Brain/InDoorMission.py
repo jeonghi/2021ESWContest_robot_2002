@@ -77,7 +77,8 @@ class InDoorMission:
 
         elif mode == Mode.DETECT_ALPHABET:
             if cls.detect_alphabet():
-                cls.robot._motion.walk('FORWARD', loop=17, open_door=True)
+                cls.robot._motion.walk('FORWARD', loop=15, open_door=True)
+                #cls.robot._motion.walk('FORWARD', loop=7, open_door=True, width=False)
                 cls.mode = Mode.IN_DOOR
         
         elif mode == Mode.IN_DOOR:

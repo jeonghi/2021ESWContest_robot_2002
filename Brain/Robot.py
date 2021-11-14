@@ -13,8 +13,8 @@ class Robot:
         self.curr_head4find_corner: deque
         self.color: LineColor = LineColor.YELLOW
         self.black_room: list = list()
-        self.line_info: tuple
-        self.edge_info: tuple
+        self.line_info: dict
+        self.edge_info: dict
         self.walk_info: WalkInfo
         self.direction: Direction
 
