@@ -406,7 +406,7 @@ class LineDetector:
                     if c >= 100:
                         line_info["H"] = True
                         line_info["len(H)"] = c
-                    print(compact_horizontal_line[3])
+                    #print(compact_horizontal_line[3])
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
                     line_info["H_X"] = [compact_horizontal_line[0], compact_horizontal_line[2]]  # [min_x, middle, max_x, middle]
@@ -454,8 +454,8 @@ if __name__ == "__main__":
 
         line_info, edge_info, result = line_detector.get_all_lines(src, color='BLACK', line_visualization=True,
                                                                    edge_visualization=False)
-        print(line_info)
-        print(edge_info)
+        #print(line_info)
+        #print(edge_info)
         cv2.imshow('result', result)
         key = cv2.waitKey(1)
         if key == 27:

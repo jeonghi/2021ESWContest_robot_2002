@@ -117,7 +117,7 @@ class Controller:
             cls.robot._motion.set_head(dir='DOWN', angle=10)
             time.sleep(0.5)
         
-            cls.robot._motion.walk('FORWARD', 2, width= False)
+            #cls.robot._motion.walk('FORWARD', 2, width= False)
             cls.robot._motion.walk(cls.robot.direction.name, wide=True, loop = 4)
             cls.robot._motion.turn(cls.robot.direction.name, sliding=True, loop = 4)
             return True
