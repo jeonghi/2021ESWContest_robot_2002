@@ -46,10 +46,12 @@ class ColorPreProcessor():
 
     @classmethod
     def get_color_mask(cls, src:np.array, const:list):
+        k = cv2.getStructuringElement(cv2.MORPH_CROSS, (5,5))
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         lower = np.array(const[0])
         upper = np.array(const[1])
         mask = cv2.inRange(hsv, lower, upper)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         return mask
 
     @classmethod

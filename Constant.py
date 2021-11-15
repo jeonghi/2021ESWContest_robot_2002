@@ -10,16 +10,16 @@ rdr = csv.reader(f)
 for line in rdr:
     h_max = line[1]
     h_min = line[2]
-    
+
     s_max = line[3]
     s_min = line[4]
-    
+
     v_max = line[5]
     v_min = line[6]
-    
+
     lower_range = [h_min, s_min, v_min]
     upper_range = [h_max, s_max, v_max]
-    
+
     #print("color: ", line[0])
     #print(lower_range)
     #print(upper_range)
@@ -69,7 +69,7 @@ const.RED_RANGE2 = [[121, 20, 85], [180, 255, 145]]
 const.GREEN_RANGE = [[29, 80, 30], [76, 255, 255]]
 const.BLUE_RANGE = [[73, 52, 53], [124, 170, 156]]
 const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
-const.YELLOW_RANGE = [[11, 80, 129], [44, 255, 255]]
+const.YELLOW_RANGE = [[11, 70, 70], [44, 255, 255]]
 
 ### DOOR SETTING ###
 const.GRAB_IR = 80
@@ -82,7 +82,7 @@ const.CORNER_FILTER_DISTANCE = 40
 ### GREEN ROOM ###
 const.GREEN_ROOM_TURN_FIND_BOX = 3
 const.GREEN_ROOM_DEFAULT_TURN_FIND_AREA = 2
-const.GREEN_ROOM_DEFAULT_TURN_FIND_CORNER = 4
+const.GREEN_ROOM_DEFAULT_TURN_FIND_CORNER = 5
 const.GREEN_ROOM_TURN_FIND_CORNER = 1
 const.GREEN_ROOM_AREA_LEFT_LIMIT = 200
 const.GREEN_ROOM_AREA_RIGHT_LIMIT = 440
