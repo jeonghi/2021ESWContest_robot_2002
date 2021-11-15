@@ -486,6 +486,7 @@ class BlackRoomMission(RoomMission):
             if cls.find_yellow_line():
                 cls.mode = Mode.GO_OUT_AREA
                 cls.robot._motion.set_head("DOWN", angle=35)
+                time.sleep(0.5)
                 cls.robot._motion.walk(dir="FORWARD", grab=True, loop=const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK)
 
         elif mode == Mode.GO_OUT_AREA:
