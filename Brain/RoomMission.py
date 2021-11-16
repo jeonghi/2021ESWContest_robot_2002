@@ -419,7 +419,7 @@ class BlackRoomMission(RoomMission):
     @classmethod
     def go_to_corner(cls) -> bool :
         head_angle = cls.robot.curr_head4find_corner[0]
-        width = False if head_angle == 35 else True
+        width = False if head_angle in [35,45] else True
         corner = cls.robot._image_processor.get_yellow_line_corner(visualization=DEBUG)
         if corner:
             (dx, dy) = get_distance_from_baseline(pos=corner)
