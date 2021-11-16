@@ -192,11 +192,14 @@ class ImageProcessor:
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, binary = cv2.threshold(l, const.DIRECTION_THRESH_VALUE , 255, cv2.THRESH_BINARY_INV)
+        _, binary = cv2.threshold(l, const.DIRECTION_THRESH_VALUE , 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
         edge = auto_canny(binary)
 
         contours, _ = cv2.findContours(edge, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
+        if len(contours) == 0:
+            return None
+            
         contour = max(contours, key=lambda x:cv2.contourArea(x))
 
         leftmost = tuple(contour[contour[:,:,0].argmin()][0])
@@ -448,7 +451,7 @@ class ImageProcessor:
         mask = ColorPreProcessor.get_green_mask(src=src)
         rate = np.count_nonzero(mask)/(640*480)
         rate *= 100
-        return rate <= const.CHECK_AREA_GREEN_RATE_THRESH
+        return rate >= const.CHECK_AREA_GREEN_RATE_THRESH
 
 
 

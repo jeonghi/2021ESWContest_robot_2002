@@ -25,7 +25,7 @@ class InDoorMission:
         if debug_mode.IS_ON:
             alphabet = debug_mode.DOOR_ALPHABET
         else:
-            alphabet = cls.robot._image_processor.get_door_alphabet(visualization=True)
+            alphabet = cls.robot._image_processor.get_door_alphabet_using_iou(visualization=False)
 
         if alphabet:
             print("alphabet:", alphabet)
@@ -62,7 +62,7 @@ class InDoorMission:
 
             elif cls.robot.walk_info in [ WalkInfo.DIRECTION_LINE, WalkInfo.CORNER_RIGHT, WalkInfo.CORNER_LEFT] :
                 cls.robot._motion.basic_form()
-                cls.robot._motion.set_head(dir='DOWN', angle=85)
+                cls.robot._motion.set_head(dir='DOWN', angle=60)
                 time.sleep(2)
                 return True
 

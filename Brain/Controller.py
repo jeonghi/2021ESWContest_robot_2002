@@ -36,6 +36,8 @@ class Controller:
     def set_test_mode(cls, mode: Mode) -> None:
         cls.mode = mode
         if cls.mode == Mode.DETECT_DIRECTION:
+            cls.robot._motion.set_head(dir='DOWN', angle=60)
+            time.sleep(2)
             cls.ROI = False
             cls.robot.color=LineColor.YELLOW
         elif cls.mode == Mode.CHECK_AREA_COLOR:
@@ -45,7 +47,7 @@ class Controller:
             cls.robot._motion.set_head("DOWN", 10)
             cls.ROI = True
             cls.robot.color=LineColor.YELLOW
-            cls.robot.direction = Direction.LEFT
+            cls.robot.direction = Direction.RIGHT
         elif cls.mode == Mode.OUT:
             cls.ROI = True
             cls.robot.color=LineColor.YELLOW
