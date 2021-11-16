@@ -432,8 +432,7 @@ class LineDetector:
                     b = edge_fit_line_DOWN[0] - edge_fit_line_DOWN[2]
                     c = math.sqrt((a * a) + (b * b))
                     #print('length:  ', c)
-                    if c >= 350:
-                        edge_info["len(EDGE)"] = c
+                    edge_info["len(EDGE)"] = c
                         
                     if edge_visualization is True:
                         self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
