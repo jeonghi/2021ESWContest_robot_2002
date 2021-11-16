@@ -4,9 +4,9 @@ from Actuator.Motion import Motion
 def main():
     _motion = Motion()
     while True:
-        rx = _motion.RX_data()
-        print(rx)
-        if rx == 1:
+        rx = _motion.RX_data2()
+        if rx == 15:
+            print(rx)
             break
 
     while not Controller.run():
