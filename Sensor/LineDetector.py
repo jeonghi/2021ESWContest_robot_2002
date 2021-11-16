@@ -360,7 +360,7 @@ class LineDetector:
 
             elif color == 'GREEN':
                 line_info = {'ALL': False,'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, "len(H)":0, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
-                edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
+                edge_info = {'EDGE_DOWN': False, 'len(EDGE)': 0, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
                 if len(edge_lines) != 0:
                     size = int(edge_lines.shape[0] * edge_lines.shape[2] / 2)
@@ -424,9 +424,16 @@ class LineDetector:
                     edge_fit_line_DOWN = self.get_fitline(src, edge_lines, size, 'edge_DOWN')
                     edge_info["EDGE_UP_X"] = int((edge_fit_line_UP[0] + edge_fit_line_UP[2])/2)
                     edge_info["EDGE_UP_Y"] = edge_fit_line_UP[1]
+                    
                     edge_info["EDGE_DOWN"] = True
                     edge_info["EDGE_DOWN_X"] = int((edge_fit_line_DOWN[0] + edge_fit_line_DOWN[2]) / 2)
                     edge_info["EDGE_DOWN_Y"] = edge_fit_line_DOWN[1]
+                    a = edge_fit_line_DOWN[1] - edge_fit_line_DOWN[3]
+                    b = edge_fit_line_DOWN[0] - edge_fit_line_DOWN[2]
+                    c = math.sqrt((a * a) + (b * b))
+                    #print('length:  ', c)
+                    edge_info["len(EDGE)"] = c
+                        
                     if edge_visualization is True:
                         self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
                         self.draw_lines(temp, edge_fit_line_DOWN, 'edge', 'fit')
