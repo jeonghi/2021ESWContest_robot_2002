@@ -139,8 +139,15 @@ class Controller:
         cls.robot.set_line_and_edge_info(ROI=cls.ROI)
         print(mode.name)
         if mode == Mode.START:
+            cnt = 0
+            while cnt < 3:
+                dist = cls.robot._motion.get_IR()
+                print("Current dist:", dist)
+                if dist > 90:
+                    cnt += 1
+                time.sleep(1)
             cls.mode = Mode.IN
-            cls.ROI = True
+            cls.ROI = False
 
         elif mode == Mode.IN:
             if InDoorMission.run():

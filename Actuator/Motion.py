@@ -53,12 +53,6 @@ class Motion:
             return RX
         else:
             return 0
-    
-    def RX_data2(self):
-        if self.serial_port.inWaiting() > 0:
-            result = self.serial_port.read(1)
-            RX = ord(result)
-            return RX
 
     def Receiving(self, ser):
         self.receiving_exit = 1

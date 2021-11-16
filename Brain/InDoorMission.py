@@ -17,24 +17,24 @@ class InDoorMission:
     @classmethod
     def set_robot(cls, robot: Robot):
         cls.robot = robot
-    
-    @classmethod 
+
+    @classmethod
     def detect_alphabet(cls) -> bool:
         cls.robot._motion.set_head(dir="DOWN", angle=cls.robot.curr_head4door_alphabet[0])
-        
+
         if debug_mode.IS_ON:
             alphabet = debug_mode.DOOR_ALPHABET
         else:
-            alphabet = cls.robot._image_processor.get_door_alphabet()
-        
+            alphabet = cls.robot._image_processor.get_door_alphabet(visualization=True)
+
         if alphabet:
             print("alphabet:", alphabet)
-            cls.robot._motion.notice_direction(dir=alphabet)   
+            cls.robot._motion.notice_direction(dir=alphabet)
             cls.robot._motion.set_head(dir="DOWN", angle=10)
             time.sleep(1)
             return True
-        
-        cls.robot.curr_head4door_alphabet.rotate(-1)    
+
+        cls.robot.curr_head4door_alphabet.rotate(-1)
         return False
 
     @classmethod
@@ -59,22 +59,22 @@ class InDoorMission:
                 cls.robot._motion.open_door_turn('LEFT', 1)
             elif cls.robot.walk_info == WalkInfo.MODIFY_RIGHT:
                 cls.robot._motion.open_door_turn('RIGHT', 1)
-            
+
             elif cls.robot.walk_info in [ WalkInfo.DIRECTION_LINE, WalkInfo.CORNER_RIGHT, WalkInfo.CORNER_LEFT] :
                 cls.robot._motion.basic_form()
                 cls.robot._motion.set_head(dir='DOWN', angle=85)
                 time.sleep(2)
                 return True
-                    
+
             else: # WalkInfo.BACKWARD
                 cls.robot._motion.open_door_walk('BACKWARD', 1)
 
         return False
-    
+
     @classmethod
     def run(cls) -> bool:
         mode = cls.mode
-        
+
         if mode == Mode.START:
             cls.mode = Mode.DETECT_ALPHABET
 
@@ -83,12 +83,12 @@ class InDoorMission:
                 #cls.robot._motion.walk('FORWARD', loop=15, open_door=True)
                 cls.robot._motion.walk('FORWARD', loop=7, open_door=True, width=False) #6
                 cls.mode = Mode.IN_DOOR
-        
+
         elif mode == Mode.IN_DOOR:
             if cls.in_door():
                 cls.mode = Mode.END
 
         if mode == Mode.END:
             return True
-        
+
         return False

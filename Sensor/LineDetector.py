@@ -307,7 +307,7 @@ class LineDetector:
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
                     #print(c)
-                    if c >= 350:
+                    if c >= 100:
                         line_info["compact_H"] = True
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
@@ -404,7 +404,7 @@ class LineDetector:
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
                     #print('length:  ', c)
-                    if c >= 100:
+                    if c >= 350:
                         line_info["H"] = True
                         line_info["len(H)"] = c
                     #print(compact_horizontal_line[3])
