@@ -276,6 +276,7 @@ class GreenRoomMission(RoomMission):
         head_angle = cls.robot.curr_head4find_corner[0]
         corner = cls.robot._image_processor.get_yellow_line_corner()
         corner = corner if corner_filtering(corner=corner, line_info=cls.robot.line_info) else None
+
         if corner :
             return True
         else:
@@ -403,7 +404,6 @@ class BlackRoomMission(RoomMission):
 
     @classmethod
     def find_yellow_line(cls) -> bool:
-        print(cls.robot.line_info["ALL_Y"][1] , cls.robot.line_info["ALL_Y"][0])
         if cls.robot.line_info["ALL_Y"][1] + cls.robot.line_info["ALL_Y"][0] :
             return True
         cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, loop=2)

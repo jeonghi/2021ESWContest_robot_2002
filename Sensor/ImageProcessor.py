@@ -109,8 +109,8 @@ class ImageProcessor:
         #gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
         _, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-        #cv2.imshow("mask",mask)
-        #_, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV)
+        cv2.imshow("mask",mask)
+        #_, mask = cv2.threshold(l, 20, 255, cv2.THRESH_BINARY_INV)
 
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -151,7 +151,7 @@ class ImageProcessor:
                 setLabel(canvas, cnt, "canny", color=(0,0,255))
 
 
-        target = Target.non_maximum_suppression4targets(canny_targets, no_canny_targets, threshold=0.7)
+        target = Target.non_maximum_suppression4targets(canny_targets, no_canny_targets, threshold=0.4)
 
         if visualization:
             cv2.imshow("src", cv2.hconcat([canvas, roi_canvas]))
@@ -168,7 +168,7 @@ class ImageProcessor:
 
         roi_h, roi_l, roi_s = cv2.split(roi_hls)
         #_, roi_mask = cv2.threshold(roi_l, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        roi_mask = cv2.inRange(roi_hsv, np.array([0, 0, 0]), np.array([180, 255, 30]))
+        roi_mask = cv2.inRange(roi_hsv, np.array([0, 0, 0]), np.array([180, 255, const.DOOR_THRESH_VALUE]))
 
         if visualization:
             pos = target.get_pts()
@@ -458,8 +458,8 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    #imageProcessor = ImageProcessor(video_path="src/1116/black_room_B.mp4")
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="src/1116/N.mp4")
+    #imageProcessor = ImageProcessor(video_path="")
     while True:
 
         #imageProcessor.get_milk_info(color="RED", visualization=True)
@@ -471,4 +471,4 @@ if __name__ == "__main__":
         #imageProcessor.is_out_of_black(visualization=True)
        #print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
         #print(imageProcessor.get_alphabet_info4room(visualization=True))
-        print(imageProcessor.get_door_alphabet(visualization=True))
+        print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
