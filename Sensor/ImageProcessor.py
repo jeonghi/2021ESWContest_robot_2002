@@ -75,7 +75,8 @@ class ImageProcessor:
         h, l, s =cv2.split(hls)
         #gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(l, 20, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        #_, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV)
         #cv2.imshow("mask",mask)
 
         canny = auto_canny(mask)
@@ -153,7 +154,7 @@ class ImageProcessor:
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, binary = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
+        _, binary = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
         edge = auto_canny(binary)
 

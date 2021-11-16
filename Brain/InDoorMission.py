@@ -62,7 +62,7 @@ class InDoorMission:
             
             elif cls.robot.walk_info in [ WalkInfo.DIRECTION_LINE, WalkInfo.CORNER_RIGHT, WalkInfo.CORNER_LEFT] :
                 cls.robot._motion.basic_form()
-                cls.robot._motion.set_head(dir='DOWN', angle=90)
+                cls.robot._motion.set_head(dir='DOWN', angle=85)
                 time.sleep(2)
                 return True
                     
@@ -81,7 +81,7 @@ class InDoorMission:
         elif mode == Mode.DETECT_ALPHABET:
             if cls.detect_alphabet():
                 #cls.robot._motion.walk('FORWARD', loop=15, open_door=True)
-                cls.robot._motion.walk('FORWARD', loop=7, open_door=True, width=False)
+                cls.robot._motion.walk('FORWARD', loop=7, open_door=True, width=False) #6
                 cls.mode = Mode.IN_DOOR
         
         elif mode == Mode.IN_DOOR:

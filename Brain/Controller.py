@@ -3,7 +3,6 @@ from enum import Enum, auto
 from Brain.InDoorMission import InDoorMission
 from Brain.OutDoorMission import OutDoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
-#from Brain.RoomMission_hard import RoomMission, GreenRoomMission, BlackRoomMission
 from Constant import Direction, AreaColor, LineColor, WalkInfo, debug_mode
 
 import time
@@ -41,7 +40,7 @@ class Controller:
             cls.robot.color=LineColor.YELLOW
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
-            cls.robot.direction = Direction.LEFT
+            cls.robot.direction = Direction.RIGHT
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             cls.robot._motion.set_head("DOWN", 10)
             cls.ROI = True
@@ -138,7 +137,7 @@ class Controller:
     def run(cls):
         mode = cls.mode
         cls.robot.set_line_and_edge_info(ROI=cls.ROI)
-        #print(mode.name)
+        print(mode.name)
         if mode == Mode.START:
             cls.mode = Mode.IN
             cls.ROI = True

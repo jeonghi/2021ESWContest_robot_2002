@@ -24,7 +24,7 @@ class ColorPreProcessor():
     @classmethod
     def get_blue_mask4hue(cls, hue: np.array) -> np.array:
         blue_upper = 124
-        blue_lower = 85
+        blue_lower = 90
         if hue.dtype != np.uint8:
             hue = hue.astype(dtype=np.uint8)
         blue_mask = np.where(hue > blue_lower, hue, 0)
@@ -34,8 +34,8 @@ class ColorPreProcessor():
 
     @classmethod
     def get_red_mask4hue(cls, hue: np.array) -> np.array:
-        red_upper = 160
-        red_lower = 20
+        red_upper = 155
+        red_lower = 30
         if hue.dtype != np.uint8:
             hue = hue.astype(dtype=np.uint8)
         red_mask_a = np.where(hue > red_upper, hue, 0)
@@ -46,10 +46,12 @@ class ColorPreProcessor():
 
     @classmethod
     def get_color_mask(cls, src:np.array, const:list):
+        k = cv2.getStructuringElement(cv2.MORPH_CROSS, (5,5))
         hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
         lower = np.array(const[0])
         upper = np.array(const[1])
         mask = cv2.inRange(hsv, lower, upper)
+        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
         return mask
 
     @classmethod

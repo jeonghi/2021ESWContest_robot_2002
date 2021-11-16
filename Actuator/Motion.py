@@ -227,7 +227,7 @@ class Motion:
                 self.TX_data_py2(55)
                 self.TX_data_py2(10)
                 return False
-            else: 
+            else:
                 return True
 
     def get_head(self):
@@ -283,4 +283,5 @@ if __name__ == '__main__':
     #motion.open_door_turn(dir='LEFT', loop=6)
     #motion.walk(dir='FORWARD')
     #motion.open_door(dir='LEFT', loop=15)
-    motion.turn(dir='LEFT', loop=1)
+    #motion.notice_direction('S')
+    motion.notice_area("GREEN")
