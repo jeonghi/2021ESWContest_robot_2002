@@ -90,8 +90,8 @@ class RoomMission:
         cls.robot.color = LineColor.GREEN
         cls.robot.set_line_and_edge_info()
 
-        print(cls.robot.edge_info)
-        print(cls.robot.line_info)
+        #print(cls.robot.edge_info)
+        #print(cls.robot.line_info)
 
         if not debug_mode.IS_ON:
             cls.area_color = AreaColor.GREEN if cls.robot.edge_info["EDGE_DOWN"] else AreaColor.BLACK
@@ -104,7 +104,7 @@ class RoomMission:
 
     @classmethod
     def detect_alphabet(cls) -> bool:
-        if cls.area_color.name == AreaColor.GREEN:
+        if cls.area_color == AreaColor.GREEN:
             cls.alphabet_color = "RED"
             return True
         else:
