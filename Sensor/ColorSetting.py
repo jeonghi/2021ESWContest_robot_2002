@@ -454,7 +454,7 @@ if __name__ == '__main__':
 
     # cleanup the camera and close any open windows
     receiving_exit = 0
-    time.sleep(0.5)
+    #time.sleep(0.5)
 
     camera.release()
     cv2.destroyAllWindows()

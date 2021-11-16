@@ -7,3 +7,6 @@ def main():
 
 if __name__ == "__main__":
     main()
+    #while True:
+        #line, edge, _ = Controller.robot._image_processor.line_tracing(color = 'YELLOW', edge_visualization = True)
+        #print(line)

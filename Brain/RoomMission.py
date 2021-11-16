@@ -394,9 +394,11 @@ class BlackRoomMission(RoomMission):
 
     @classmethod
     def find_yellow_line(cls) -> bool:
+        print(cls.robot.line_info["ALL_Y"][1] , cls.robot.line_info["ALL_Y"][0])
         if cls.robot.line_info["ALL_Y"][1] + cls.robot.line_info["ALL_Y"][0] :
             return True
         cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=1)
+        time.sleep(0.5)
         return False
 
 
@@ -443,7 +445,11 @@ class BlackRoomMission(RoomMission):
                     head_angle = cls.robot.curr_head4find_corner[0]
                     cls.robot._motion.set_head("DOWN", angle=head_angle)
         else:
-            cls.mode = Mode.FIND_CONRER
+            if cls.robot.line_info['ALL_Y'][1] < 400:
+                cls.mode = Mode.FIND_CONRER
+            else:
+                cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
+                return True
         return False
 
 

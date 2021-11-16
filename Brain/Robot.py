@@ -26,6 +26,6 @@ class Robot:
 
 
     def set_line_and_edge_info(self, line_visualization=False, edge_visualization=False, ROI= False):
-        self.line_info, self.edge_info, _ = self._image_processor.line_tracing(color=self.color.name, line_visualization = line_visualization, edge_visualization=edge_visualization, ROI=ROI)
+        self.line_info, self.edge_info, _ = self._image_processor.line_tracing(color=self.color.name, line_visualization = line_visualization, edge_visualization=True, ROI=ROI)
         if self.color == LineColor.YELLOW:
             self.walk_info = self._image_processor.line_checker(self.line_info)

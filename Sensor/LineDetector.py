@@ -75,7 +75,7 @@ class LineDetector:
 
     def get_lines(self, src, color='YELLOW'):
         mask = self.mask_color(src, color)
-        #cv2.imshow("mask", mask)
+        cv2.imshow("mask", mask)
         if color == 'BLACK':
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             return contours

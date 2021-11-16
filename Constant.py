@@ -64,12 +64,12 @@ class Constant:
 
 ### COLOR SETTING ###
 const = Constant()
-const.RED_RANGE1 = [[0, 53, 36], [30, 144, 99]]
+const.RED_RANGE1 = [[0, 53, 36], [30, 180, 99]]
 const.RED_RANGE2 = [[156, 53, 36], [180, 144, 99]]
-const.GREEN_RANGE = [[38, 76, 25], [91, 255, 255]]
-const.BLUE_RANGE = [[92, 87, 51], [124, 170, 111]]
-const.BLACK_RANGE = [[0, 0, 0], [180, 255, 81]]
-const.YELLOW_RANGE = [[11, 66, 110], [44, 255, 255]]
+const.GREEN_RANGE = [[39, 55, 30], [91, 255, 255]]
+const.BLUE_RANGE = [[92, 100, 48], [128, 220, 112]]
+const.BLACK_RANGE = [[0, 0, 0], [180, 255, 112]]
+const.YELLOW_RANGE = [[11, 62, 112], [44, 255, 237]]
 
 ### DOOR SETTING ###
 const.GRAB_IR = 80
