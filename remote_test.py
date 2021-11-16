@@ -4,13 +4,16 @@ import time
 
 def main():
     
+    _motion = Motion()
+    prx = _motion.RX_data()
     while True:
-        _motion_ = Motion()
-        rx = _motion_.RX_data()
-        print(rx)
+        rx = _motion.RX_data()
+        if prx == rx:
+            continue
+        prx = rx
         if rx == 15:
             print(rx)
-            time.sleep(2)
+            time.sleep(1)
             break
     
     while not Controller.run():
