@@ -40,7 +40,7 @@ class Controller:
             cls.robot.color=LineColor.YELLOW
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
-            cls.robot.direction = Direction.LEFT
+            cls.robot.direction = Direction.RIGHT
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             cls.robot._motion.set_head("DOWN", 10)
             cls.ROI = True
