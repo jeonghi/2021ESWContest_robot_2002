@@ -66,6 +66,7 @@ class ImageProcessor:
             cv2.waitKey(1)
         return src
 
+
     def get_door_alphabet(self, visualization: bool = False) -> str :
         src = self.get_image()
         if visualization:
@@ -450,6 +451,12 @@ class ImageProcessor:
 
         return rate <= 60
 
+    def check_area_color(self):
+        src = self.get_image()
+        mask = ColorPreProcessor.get_green_mask(src=src)
+        rate = np.count_nonzero(mask)/(640*480)
+        rate *= 100
+        return rate <= const.CHECK_AREA_GREEN_RATE_THRESH
 
 
 
