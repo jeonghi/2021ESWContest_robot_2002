@@ -10,14 +10,14 @@ def get_color_mask(src:np.array, const:list):
     mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
     return mask
 
-video = cv2.VideoCapture("Sensor/src/1116/black_room_B.mp4")
+video = cv2.VideoCapture("Sensor/src/1116_slow0.5/black_B.mp4")
 while True:
     ret, src = video.read()
     if not ret:
-        video = cv2.VideoCapture("Sensor/src/1116/black_room_B.mp4")
+        video = cv2.VideoCapture("Sensor/src/1116_slow0.5/black_B.mp4")
         continue
     src = cv2.resize(src, dsize=(640, 480))
-    const = [ [92, 87, 0], [124, 170, 255] ] # H S V
+    const = [ [92, 0, 0], [124, 255, 50] ] # H S V
     mask = get_color_mask(src=src, const=const)
     cv2.imshow('src', src)
     cv2.imshow('result', mask)
