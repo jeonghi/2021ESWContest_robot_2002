@@ -92,12 +92,6 @@ class ImageProcessor:
             return None
 
 
-
-
-
-
-
-
     def get_door_alphabet_using_iou(self, visualization: bool = False) -> str:
         src = self.get_image()
         if visualization:
@@ -281,7 +275,6 @@ class ImageProcessor:
             canvas = src.copy()
         candidates = []
         selected = None
-        color_mask = None
 
         ### 색상 이진화를 이용한 마스킹 과정 ###
         if color == "BLUE":
