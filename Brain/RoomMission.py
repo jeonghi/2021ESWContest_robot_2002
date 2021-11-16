@@ -456,11 +456,16 @@ class BlackRoomMission(RoomMission):
                     head_angle = cls.robot.curr_head4find_corner[0]
                     cls.robot._motion.set_head("DOWN", angle=head_angle)
         else:
-            if cls.robot.line_info['ALL_Y'][1] < 400:
-                cls.mode = Mode.FIND_CONRER
-            else:
+            if head_angle == 35 and cls.robot.line_info['ALL_Y'][1] > 400:
+                print('코너 진입 중 35', cls.robot.line_info['ALL_Y'][1])
                 cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
                 return True
+            elif head_angle == 45 and cls.robot.line_info['ALL_Y'][1] > 475:
+                print('코너 진입 중 45', cls.robot.line_info['ALL_Y'][1])
+                cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
+                return True
+            else:
+                cls.mode = Mode.FIND_CONRER
         return False
 
 

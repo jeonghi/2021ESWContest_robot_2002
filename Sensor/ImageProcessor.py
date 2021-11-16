@@ -25,6 +25,7 @@ else:
     from Sensor.CornerFinder import CornerFinder
     from Constant import WalkInfo, LineColor, const
 
+import pytesseract
 class ImageProcessor:
 
 
@@ -165,8 +166,12 @@ class ImageProcessor:
             return None
         roi = target.get_target_roi(src=src)
         roi_hls = cv2.cvtColor(roi, cv2.COLOR_BGR2HLS)
+        roi_hsv = cv2.cvtColor(roi, cv2.COLOR_BGR2HSV)
+
         roi_h, roi_l, roi_s = cv2.split(roi_hls)
-        _, roi_mask = cv2.threshold(roi_l, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        #_, roi_mask = cv2.threshold(roi_l, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        roi_mask = cv2.inRange(roi_hsv, np.array([0, 0, 0]), np.array([180, 255, 30]))
+
         if visualization:
             pos = target.get_pts()
             setLabel(roi_canvas, target.get_pts(), label="roi", color=(255,0,0))
@@ -176,7 +181,14 @@ class ImageProcessor:
                 [canvas, roi_canvas]))
             cv2.imshow('mask', mask)
             cv2.waitKey(1)
-        answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask, threshold=0.6)
+        
+        config = ('-l eng --psm 10') #
+        print(pytesseract.image_to_string(roi_mask,config=config))
+        
+        #answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask, threshold=0.6)
+
+        config = ('-l eng --psm 10') #
+        answer = pytesseract.image_to_string(roi_mask,config=config)
         return answer
 
     def get_arrow_direction(self, visualization: bool = False):

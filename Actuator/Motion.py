@@ -71,7 +71,10 @@ class Motion:
                     self.receiving_exit = 0
                     break
                 elif RX == 200:
-                    self.lock.release()
+                    try:
+                        self.lock.release()
+                    except:
+                        continue
                 elif RX != 200:
                     self.distance = RX
 
