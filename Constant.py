@@ -1,30 +1,5 @@
 from enum import Enum, auto
 from collections import namedtuple
-import csv
-
-
-
-f = open('Cts5_v1.csv', 'r', encoding='utf-8')
-rdr = csv.reader(f)
-
-for line in rdr:
-    h_max = line[1]
-    h_min = line[2]
-
-    s_max = line[3]
-    s_min = line[4]
-
-    v_max = line[5]
-    v_min = line[6]
-
-    lower_range = [h_min, s_min, v_min]
-    upper_range = [h_max, s_max, v_max]
-
-    #print("color: ", line[0])
-    #print(lower_range)
-    #print(upper_range)
-
-
 
 class Direction(Enum):
     LEFT = auto()
@@ -62,40 +37,52 @@ class Constant:
         if name in self.__dict__:
             raise Exception('변수를 삭제할 수 없습니다.')
 
-### COLOR SETTING ###
+
 const = Constant()
-const.RED_RANGE1 = [[0, 53, 36], [30, 180, 99]]
-const.RED_RANGE2 = [[156, 53, 36], [180, 144, 99]]
-const.GREEN_RANGE = [[39, 55, 30], [91, 255, 255]]
-const.BLUE_RANGE = [[92, 100, 48], [128, 220, 112]]
+### COLOR SETTING ###
+const.RED_ALPHABET_RANGE1 = [[0, 53, 36], [30, 144, 99]]
+const.RED_ALPHABET_RANGE2 = [[156, 53, 36], [180, 144, 99]]
+const.BLUE_ALPHABET_RANGE = [[92, 100, 48], [128, 220, 112]]
+
+### BOX
+const.RED_BOX_RANGE1 = [[166, 138, 0], [180, 255, 186]]
+const.RED_BOX_RANGE2 = [[0, 77, 0], [36, 255, 189]]
+const.BLUE_BOX_RANGE = [[92, 106, 41], [128, 255, 172]]
+
+### AREA ###
+const.GREEN_RANGE = [[39, 55, 0], [91, 255, 150]]
 const.BLACK_RANGE = [[0, 0, 0], [180, 255, 112]]
+
+## LINE
 const.YELLOW_RANGE = [[11, 62, 112], [44, 255, 237]]
 
 ### DOOR SETTING ###
-const.GRAB_IR = 80
-const.IN_DOOR_WALK = 5
-const.IN_DOOR_TURN = 4
+const.IN_DOOR_WALK = 7
+const.DEFAULT_WALK_AFTER_DETECT_DIRECTION = 4
+const.DEFAULT_TURN_AFTER_DETECT_DIRECTION = 4
+const.OUT_DOOR_WALK = 8
+const.DOOR_THRESH_VALUE = 17
+
+## DIRECTION ##
+const.DIRECTION_THRESH_VALUE = 17
 
 ### CORNER FILTERING ###
 const.CORNER_FILTER_DISTANCE = 40
 
 ### GREEN ROOM ###
+## 1) BOX -> AREA
 const.GREEN_ROOM_TURN_FIND_BOX = 3
 const.GREEN_ROOM_DEFAULT_TURN_FIND_AREA = 2
-const.GREEN_ROOM_DEFAULT_TURN_FIND_CORNER = 3
-const.GREEN_ROOM_TURN_FIND_CORNER = 1
-const.GREEN_ROOM_AREA_LEFT_LIMIT = 200
-const.GREEN_ROOM_AREA_RIGHT_LIMIT = 440
+const.GREEN_ROOM_DEFAULT_WALK_BEFORE_DROP_BOX = 3
 const.GREEN_ROOM_AREA_IN_LIMIT = 460
-
+## 2) AREA -> CORNER
+const.GREEN_ROOM_DEFAULT_TURN_FIND_CORNER = 2
+const.GREEN_ROOM_TURN_FIND_CORNER = 1
 
 ### BLACK ROOM ###
 const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX = 3
 const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER = 1
-const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK = 4
-const.ROOM_MISSION_DEBUG = False
-const.DEBUG = True
-
+const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK = 3
 
 
 ### DEBUG MODE ###

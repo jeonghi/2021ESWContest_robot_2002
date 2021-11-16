@@ -3,7 +3,7 @@ from enum import Enum, auto
 from Brain.InDoorMission import InDoorMission
 from Brain.OutDoorMission import OutDoorMission
 from Brain.RoomMission import RoomMission, GreenRoomMission, BlackRoomMission
-from Constant import Direction, AreaColor, LineColor, WalkInfo, debug_mode
+from Constant import Direction, AreaColor, LineColor, WalkInfo, debug_mode, const
 
 import time
 
@@ -113,12 +113,7 @@ class Controller:
         
         if direction:
             cls.robot.direction = Direction.LEFT if direction == "LEFT" else Direction.RIGHT
-            cls.robot._motion.set_head(dir='DOWN', angle=10)
-            time.sleep(0.5)
-        
-            #cls.robot._motion.walk('FORWARD', 2, width= False)
-            cls.robot._motion.walk(cls.robot.direction.name, wide=True, loop = 4)
-            cls.robot._motion.turn(cls.robot.direction.name, sliding=True, loop = 4)
+
             return True
         
         cls.robot._motion.walk("BACKWARD", 1)
@@ -149,6 +144,10 @@ class Controller:
 
         elif mode == Mode.DETECT_DIRECTION:
             if cls.detect_direction():
+                cls.robot._motion.set_head(dir='DOWN', angle=10)
+                time.sleep(0.5)
+                cls.robot._motion.walk(cls.robot.direction.name, wide=True, loop=const.DEFAULT_WALK_AFTER_DETECT_DIRECTION)
+                cls.robot._motion.turn(cls.robot.direction.name, sliding=True, loop=const.DEFAULT_TURN_AFTER_DETECT_DIRECTION)
                 cls.mode = Mode.GO_TO_NEXT_ROOM
                 cls.ROI = True
         

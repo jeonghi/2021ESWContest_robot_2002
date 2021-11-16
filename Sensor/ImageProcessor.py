@@ -15,6 +15,7 @@ if __name__ == "__main__":
     from LineDetector import LineDetector
     from ColorPreProcessor import ColorPreProcessor
     from CornerFinder import CornerFinder
+    from Constant import const, AreaColor
 
 else:
     from Sensor.HashDetector import HashDetector
@@ -38,6 +39,7 @@ class ImageProcessor:
         # 개발때 알고리즘 fps 체크하기 위한 모듈. 실전에서는 필요없음
         self.fps = FPS()
         if __name__ == "__main__":
+            self.hash_detector4door = HashDetector(file_path='EWSN/')
             self.hash_detector4room = HashDetector(file_path='ABCD/')
             self.hash_detector4arrow = HashDetector(file_path='src/arrow/')
 
@@ -62,8 +64,40 @@ class ImageProcessor:
             cv2.waitKey(1)
         return src
 
+    def get_door_alphabet(self, visualization: bool = False) -> str :
+        src = self.get_image()
+        if visualization:
+            canvas = src.copy()
+        candidates: list = []
+        selected: Target = None
+        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
+        h, s, v = cv2.split(hsv)
+        _, mask = cv2.threshold(v, const.DOOR_THRESH_VALUE, 255, cv2.THRESH_BINARY_INV)
+        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for cnt in cnts:
+            area = cv2.contourArea(cnt)
+            if not ( 3000 < area ):
+                continue
+            target = Target(contour=cnt)
+            candidates.append(target)
+        if candidates:
+            selected = max(candidates, key=lambda candidate: candidate.get_area())
+            roi = selected.get_target_roi(src=mask)
+            cv2.imshow("roi", roi)
+            cv2.waitKey(1)
+            answer, _ = self.hash_detector4door.detect_alphabet_hash(roi, threshold=0.6)
+            return answer
+        else:
+            return None
 
-    def get_door_alphabet(self, visualization: bool = False) -> str:
+
+
+
+
+
+
+
+    def get_door_alphabet_using_iou(self, visualization: bool = False) -> str:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
@@ -75,9 +109,9 @@ class ImageProcessor:
         h, l, s =cv2.split(hls)
         #gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        #_, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
-        _, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV)
+        _, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
         #cv2.imshow("mask",mask)
+        #_, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV)
 
         canny = auto_canny(mask)
         cnts1, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
@@ -136,7 +170,7 @@ class ImageProcessor:
         if visualization:
             pos = target.get_pts()
             setLabel(roi_canvas, target.get_pts(), label="roi", color=(255,0,0))
-            mask = HashDetector.image_resize_with_pad(img=roi_mask, size=HashDetector.dim)
+            mask = HashDetector.image_resize_with_pad(src=roi_mask, size=HashDetector.dim)
             #roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("src", cv2.hconcat(
                 [canvas, roi_canvas]))
@@ -154,7 +188,7 @@ class ImageProcessor:
         gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
         h, l, s = cv2.split(hls)
-        _, binary = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV)
+        _, binary = cv2.threshold(l, const.DIRECTION_THRESH_VALUE , 255, cv2.THRESH_BINARY_INV)
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
         edge = auto_canny(binary)
 
@@ -186,118 +220,39 @@ class ImageProcessor:
 
         return direction
 
-    def get_alphabet_info4room(self, edge_info={}, method="CONTOUR", visualization=False) -> tuple:
+    def get_alphabet_info4room(self, visualization=False) -> tuple:
         src = self.get_image()
         if visualization:
             canvas = src.copy()
         alphabet_info = None
         candidates = []
         src = cv2.GaussianBlur(src, (5, 5), 0)
-        #hls = cv2.cvtColor(blur, cv2.COLOR_BGR2HLS)
-        #h, l, s = cv2.split(hls)
-        #_, mask = cv2.threshold(s, 20, 255, cv2.THRESH_BINARY)
-        #_, mask = cv2.threshold(l, 0, 255, cv2.THRESH_BINARY_INV+ cv2.THRESH_OTSU)
-        red_mask = ColorPreProcessor.get_red_mask(src)
-        blue_mask = ColorPreProcessor.get_blue_mask(src)
-        color_mask = cv2.bitwise_or(blue_mask, red_mask)
-        #mask = cv2.bitwise_and(mask, color_mask)
-        mask = color_mask
+        mask = ColorPreProcessor.get_blue_mask4alphabet(src=src)
+        contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
+        for contour in contours:  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
 
-        if method == "LABEL":
-            _, _, stats, centroids = cv2.connectedComponentsWithStats(mask, connectivity=8)
-            for idx, centroid in enumerate(centroids):  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
-                if stats[idx][0] == 0 and stats[idx][1] == 0:
-                    continue
+            (_, _, width, height) = cv2.boundingRect(contour)
+            area = cv2.contourArea(contour)
 
-                if np.any(np.isnan(centroid)): # 배열에 하나이상의 원소라도 참이라면 true (즉, 하나이상의 중심점이 숫자가 아니면)
-                    continue
-                _, _, width, height, area = stats[idx]
-
-                # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
-                area_ratio = width / height if height < width else height / width
-                area_ratio = round(area_ratio, 2)
-                if not (800 < area < 8000 and area_ratio <= 1.7):
-                    continue
-
-                candidate = Target(stats=stats[idx], centroid=centroid)
-                roi = candidate.get_target_roi(src, pad=15)
-                candidate.set_color(ColorPreProcessor.get_red_or_blue4hue(roi))
-                ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
-                y, cr, cb = cv2.split(ycrcb)
-                if candidate.get_color() == "RED":
-                    thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
-
-                else:
-                    thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
-                _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-                ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.4)
-                ####################################
-
-                #if visualization:
-                #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
-
-                if candidate_alphabet is None:
-                    continue
-                candidate.set_name(candidate_alphabet)
-                if visualization:
-
-                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
-                candidates.append(candidate)
-        else:
-            contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-            for contour in contours:  # enumerate 함수는 순서가 있는 자료형을 받아 인덱스와 데이터를 반환한다.
-
-                (_, _, width, height) = cv2.boundingRect(contour)
-                area = cv2.contourArea(contour)
-
-                # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
-                area_ratio = width / height if height < width else height / width
-                area_ratio = round(area_ratio, 2)
-                if not (800 < area and area_ratio <= 1.4):
-                    continue
-
-                candidate = Target(contour=contour)
-                roi = candidate.get_target_roi(src, pad=10)
-                candidate.set_color(ColorPreProcessor.get_red_or_blue4hue(roi))
-                ycrcb = cv2.cvtColor(roi, cv2.COLOR_BGR2YCrCb)
-                y, cr, cb = cv2.split(ycrcb)
-                if candidate.get_color() == "RED":
-                    thresholding = cv2.normalize(cr, None, 0, 255, cv2.NORM_MINMAX)
-
-                else:
-                    thresholding = cv2.normalize(cb, None, 0, 255, cv2.NORM_MINMAX)
-                _, roi_mask = cv2.threshold(thresholding, 0, 255, cv2.THRESH_BINARY_INV + cv2.THRESH_OTSU)
-
-                ### 정확도 향상을 위해 아래 함수 수정 요망 ###
-                candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.8)
-                ####################################
-
-                # if visualization:
-                #   cv2.imshow("thresh", cv2.hconcat([thresholding, roi_mask]))
-
-                if candidate_alphabet is None:
-                    continue
-                candidate.set_name(candidate_alphabet)
-                if visualization:
-                    setLabel(canvas, candidate.get_pts(), label=f"{candidate.get_name()}", color=(255, 255, 255))
-                candidates.append(candidate)
-
-        if candidates:
-            if edge_info:
-                if edge_info["EDGE_UP"] :
-                    #print("필터 적용전", candidates)
-                    candidates = list(filter(lambda candidate: candidate.y + candidate.height < edge_info["EDGE_UP_Y"], candidates))
-                    #print("적용 후", candidates)
+            # roi의 가로 세로 종횡비를 구한 뒤 1:1의 비율에 근접한 roi만 통과
+            area_ratio = width / height if height < width else height / width
+            area_ratio = round(area_ratio, 2)
+            if not (1000 < area and area_ratio <= 1.5):
+                continue
 
 
-        if candidates:
-            selected = max(candidates, key=lambda candidate: candidate.get_center_pos()[1])
-            alphabet_info = (selected.get_color(), selected.get_name())
+            candidate = Target(contour=contour)
             if visualization:
-                setLabel(canvas, selected.get_pts(), label=f"{selected.get_name()}:{selected.get_color()}", color=(0, 0, 255))
-
+                setLabel(canvas, candidate.get_pts(), label=f" POS x:{candidate.x}, y:{candidate.y}", color=(255, 255, 255))
+            candidates.append(candidate)
+        if candidates:
+            selected = min(candidates, key=lambda candidate: candidate.get_center_pos()[1])
+            roi_mask = selected.get_target_roi(mask, pad=10)
+            if visualization:
+                cv2.imshow("roi_mask", roi_mask)
+            candidate_alphabet, _ = self.hash_detector4room.detect_alphabet_hash(roi_mask, threshold=0.8)
+            if candidate_alphabet and candidate_alphabet in ["B", "D"] :
+                alphabet_info = candidate_alphabet
         if visualization:
             mask = cv2.cvtColor(mask, cv2.COLOR_GRAY2BGR)
             debug = cv2.hconcat([mask, canvas])
@@ -314,25 +269,15 @@ class ImageProcessor:
             canvas = src.copy()
         candidates = []
         selected = None
-        hls = cv2.cvtColor(src, cv2.COLOR_BGR2HLS)
-        h, l, s = cv2.split(hls)
-        k = cv2.getStructuringElement(cv2.MORPH_RECT, (5,5))
-        _, mask = cv2.threshold(s, 50, 255, cv2.THRESH_BINARY)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_OPEN, k)
-        mask = cv2.morphologyEx(mask, cv2.MORPH_CLOSE, k)
         color_mask = None
 
         ### 색상 이진화를 이용한 마스킹 과정 ###
         if color == "BLUE":
-            color_mask = ColorPreProcessor.get_blue_mask4hue(h)
-        elif color == "RED":
-            color_mask = ColorPreProcessor.get_red_mask4hue(h)
+            color_mask = ColorPreProcessor.get_blue_mask4box(src=src)
         else:
-            color_mask = mask
+            color_mask = ColorPreProcessor.get_red_mask4box(src=src)
 
-        color_mask = cv2.morphologyEx(color_mask, cv2.MORPH_OPEN, k)
-        color_mask = cv2.morphologyEx(color_mask, cv2.MORPH_CLOSE, k)
-        mask = cv2.bitwise_and(mask, color_mask)
+        mask = color_mask
         ###############################
         ###############################
 
@@ -504,22 +449,16 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/old/black_area.mp4")
-    #imageProcessor = ImageProcessor("")
+    imageProcessor = ImageProcessor(video_path="src/1116/black_room_B.mp4")
     #imageProcessor = ImageProcessor(video_path="")
-    # imageProcessor.fps.start()
     while True:
-        #imageProcessor.get_arrow_direction()
-        #line, info, _ = imageProcessor.line_tracing(color ="YELLOW", line_visualization=True, edge_visualization=False, ROI=True)
-        #result = imageProcessor.line_checker(line)
-        #print(result)
-        #alphabet = imageProcessor.get_door_alphabet(visualization=True)
-        #print(alphabet)
-        #src = imageProcessor.get_image(visualization=True)
-        imageProcessor.get_milk_info(color="RED", edge_info=info, visualization=True)
+
+        #imageProcessor.get_milk_info(color="RED", visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
         #imageProcessor.line_tracing(color="GREEN", edge_visualization=True)
         #result = imageProcessor.get_alphabet_info4room(edge_info = info, visualization=True)
         #imageProcessor.room_test()
         #imageProcessor.get_yellow_line_corner(visualization=True)
         #imageProcessor.is_out_of_black(visualization=True)
+       #print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
+        print(imageProcessor.get_alphabet_info4room(visualization=True))

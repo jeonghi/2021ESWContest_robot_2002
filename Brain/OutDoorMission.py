@@ -1,7 +1,7 @@
 from Brain.Robot import Robot
 from enum import Enum, auto
 import time
-from Constant import Direction
+from Constant import Direction, const
 import numpy as np
 
 class Mode(Enum):
@@ -31,9 +31,9 @@ class OutDoorMission:
     @classmethod
     def out_door(cls) -> bool:
         if cls.robot.direction == Direction.LEFT:
-            cls.robot._motion.open_door(dir='LEFT', loop=10)
+            cls.robot._motion.open_door(dir='LEFT', loop=const.OUT_DOOR_WALK)
         else:
-            cls.robot._motion.open_door(dir='RIGHT', loop=10)
+            cls.robot._motion.open_door(dir='RIGHT', loop=const.OUT_DOOR_WALK)
 
         cls.robot._motion.notice_alpha(cls.robot.black_room)
         
