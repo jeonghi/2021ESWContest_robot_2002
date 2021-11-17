@@ -464,6 +464,9 @@ class BlackRoomMission(RoomMission):
             if head_angle == 35:
                 cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
                 return True
+            elif head_angle == 45:
+                cls.robot._motion.walk(dir="FORWARD", loop=2, width=width)
+                return True
             else:
                 cls.mode = Mode.FIND_CONRER
         return False

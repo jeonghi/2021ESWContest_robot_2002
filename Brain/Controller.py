@@ -7,7 +7,7 @@ from Constant import Direction, AreaColor, LineColor, WalkInfo, debug_mode, cons
 
 import time
 
-CLEAR_LIMIT: int = 2
+CLEAR_LIMIT: int = 3
 class Mode(Enum):
     START = auto()
     IN = auto()
@@ -37,13 +37,13 @@ class Controller:
     def set_test_mode(cls, mode: Mode) -> None:
         cls.mode = mode
         if cls.mode == Mode.DETECT_DIRECTION:
-            cls.robot._motion.set_head(dir='DOWN', angle=60)
+            cls.robot._motion.set_head(dir='DOWN', angle=70)
             time.sleep(2)
             cls.ROI = False
             cls.robot.color=LineColor.YELLOW
         elif cls.mode == Mode.CHECK_AREA_COLOR:
             cls.ROI = False
-            cls.robot.direction = Direction.RIGHT
+            cls.robot.direction = Direction.LEFT
         elif cls.mode == Mode.GO_TO_NEXT_ROOM:
             cls.robot._motion.set_head("DOWN", 10)
             cls.ROI = True
@@ -119,7 +119,7 @@ class Controller:
 
             return True
 
-        cls.robot._motion.walk("BACKWARD", 1)
+        #cls.robot._motion.walk("BACKWARD", 1)
         time.sleep(1.0)
         return False
 

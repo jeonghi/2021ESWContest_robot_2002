@@ -53,11 +53,12 @@ const.BLUE_BOX_RANGE = [[92, 87, 30], [170, 255, 120]] #
 const.GREEN_RANGE = [[38, 54, 0], [91, 255, 98]] #
 const.BLACK_RANGE = [[0, 0, 0], [180, 255, 80]] #
 # LINE
-const.YELLOW_RANGE = [[11, 80, 120], [44, 255, 237]]#
+const.YELLOW_RANGE = [[11, 83, 36], [48, 255, 255]]
+#
 
 
 ### DOOR SETTING ###
-const.IN_DOOR_WALK = 7
+const.IN_DOOR_WALK = 8
 const.DEFAULT_WALK_AFTER_DETECT_DIRECTION = 4
 const.DEFAULT_TURN_AFTER_DETECT_DIRECTION = 4
 const.DEFAULT_DIRECTION = Direction.LEFT
@@ -85,8 +86,8 @@ const.GREEN_ROOM_TURN_FIND_CORNER = 1
 
 ### BLACK ROOM ###
 const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX = 3
-const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER = 3
-const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK = 3
+const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER = 4
+const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK = 0
 
 
 ### DEBUG MODE ###
@@ -96,6 +97,6 @@ Room = namedtuple('Room', 'area_color room_name name_color')
 first_room = Room(AreaColor.GREEN, "B", "RED")
 second_room = Room(AreaColor.BLACK, "B", "BLUE")
 third_room = Room(AreaColor.GREEN, "D", "BLUE")
-debug_mode.DOOR_ALPHABET = "E"
-debug_mode.DIRECTION = "RIGHT"
+debug_mode.DOOR_ALPHABET = "S"
+debug_mode.DIRECTION = "LEFT"
 debug_mode.ROOMS = [first_room, second_room, third_room]

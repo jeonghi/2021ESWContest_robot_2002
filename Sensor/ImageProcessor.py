@@ -418,9 +418,9 @@ class ImageProcessor:
             cv2.imshow("roi", cv2.rectangle(src, begin, end, (0, 0, 255), 3))
             cv2.imshow("mask", mask)
             cv2.waitKey(1)
-        #print(rate)
+        print(rate)
 
-        return rate <= 60
+        return rate <= 40
 
     def check_area_color(self):
         src = self.get_image()
