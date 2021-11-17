@@ -65,35 +65,6 @@ class ImageProcessor:
         return src
 
 
-    def get_door_alphabet(self, visualization: bool = False) -> str :
-        src = self.get_image()
-        if visualization:
-            canvas = src.copy()
-        candidates: list = []
-        selected: Target = None
-        hsv = cv2.cvtColor(src, cv2.COLOR_BGR2HSV)
-        h, s, v = cv2.split(hsv)
-        _, mask = cv2.threshold(v, const.DOOR_THRESH_VALUE, 255, cv2.THRESH_BINARY_INV)
-        cnts, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
-        for cnt in cnts:
-            area = cv2.contourArea(cnt)
-            if not ( 3000 < area ):
-                continue
-            target = Target(contour=cnt)
-            candidates.append(target)
-        if candidates:
-            selected = max(candidates, key=lambda candidate: candidate.get_area())
-            roi = selected.get_target_roi(src=mask, pad=40)
-            cv2.imshow("roi", roi)
-            cv2.waitKey(1)
-            answer = pytesseract.image_to_string(mask, lang='eng', config='--psm 10 -c preserve_interword_spaces=1')
-            print(answer)
-            if answer not in ["E","W","S","N","e","w","s","n"] :
-                answer = None
-            #answer, _ = self.hash_detector4door.detect_alphabet_hash(roi, threshold=0.6)
-            return answer
-        else:
-            return None
 
 
     def get_door_alphabet_using_iou(self, visualization: bool = False) -> str:
@@ -464,9 +435,11 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    #imageProcessor = ImageProcessor(video_path="src/1116/N.mp4")
-    imageProcessor = ImageProcessor(video_path="")
+    imageProcessor = ImageProcessor(video_path="src/1116/black_room_B.mp4")
+    #imageProcessor = ImageProcessor(video_path="")
     while True:
+        imageProcessor.get_image(visualization=True)
+        print(imageProcessor.check_area_color())
 
         #imageProcessor.get_milk_info(color="RED", visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
@@ -475,6 +448,6 @@ if __name__ == "__main__":
         #imageProcessor.room_test()
         #imageProcessor.get_yellow_line_corner(visualization=True)
         #imageProcessor.is_out_of_black(visualization=True)
-       #print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
+        #print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
         #print(imageProcessor.get_alphabet_info4room(visualization=True))
-        print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
+        #print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
