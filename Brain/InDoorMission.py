@@ -21,9 +21,8 @@ class InDoorMission:
 
     @classmethod
     def detect_alphabet(cls) -> bool:
-
         cls.robot._motion.set_head(dir="DOWN", angle=cls.robot.curr_head4door_alphabet[0])
-
+        time.sleep(1.5)
         if not debug_mode.IS_ON:
             alphabet = debug_mode.DOOR_ALPHABET
         else:

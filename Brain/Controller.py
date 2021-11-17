@@ -145,7 +145,7 @@ class Controller:
                 cls.ROI = False
 
         elif mode == Mode.DETECT_DIRECTION:
-            if cls.fail_count > 4:
+            if cls.fail_count > 1:
                 cls.robot.direction = const.DEFAULT_DIRECTION
                 cls.robot._motion.set_head(dir='DOWN', angle=10)
                 time.sleep(0.5)
