@@ -7,7 +7,7 @@ from Constant import Direction, AreaColor, LineColor, WalkInfo, debug_mode, cons
 
 import time
 
-CLEAR_LIMIT: int = 3
+CLEAR_LIMIT: int = 2
 class Mode(Enum):
     START = auto()
     IN = auto()
@@ -22,6 +22,7 @@ class Controller:
     robot: Robot = Robot()
     mode: Mode = Mode.START
     mission_done: int = 0
+    fail_count: int = 0
     InDoorMission.set_robot(robot)
     OutDoorMission.set_robot(robot)
     RoomMission.set_robot(robot)
@@ -144,7 +145,20 @@ class Controller:
                 cls.ROI = False
 
         elif mode == Mode.DETECT_DIRECTION:
-            if cls.detect_direction():
+            if cls.fail_count > 4:
+                cls.robot.direction = Direction.RIGHT
+                cls.robot._motion.set_head(dir='DOWN', angle=10)
+                time.sleep(0.5)
+                # cls.robot._motion.walk("FORWARD", width=False, loop=1) # 업어야됨 인식 문제로 후진할 때 주석해제
+                cls.robot._motion.walk(cls.robot.direction.name, wide=True,
+                                       loop=const.DEFAULT_WALK_AFTER_DETECT_DIRECTION)
+                cls.robot._motion.turn(cls.robot.direction.name, sliding=True,
+                                       loop=const.DEFAULT_TURN_AFTER_DETECT_DIRECTION)
+                cls.fail_count = 0
+                cls.mode = Mode.GO_TO_NEXT_ROOM
+                cls.ROI = True
+            elif cls.detect_direction():
+                cls.fail_count = 0
                 cls.robot._motion.set_head(dir='DOWN', angle=10)
                 time.sleep(0.5)
                 #cls.robot._motion.walk("FORWARD", width=False, loop=1) # 업어야됨 인식 문제로 후진할 때 주석해제
@@ -152,6 +166,8 @@ class Controller:
                 cls.robot._motion.turn(cls.robot.direction.name, sliding=True, loop=const.DEFAULT_TURN_AFTER_DETECT_DIRECTION)
                 cls.mode = Mode.GO_TO_NEXT_ROOM
                 cls.ROI = True
+            else:
+                cls.fail_count += 1
 
         elif mode == Mode.GO_TO_NEXT_ROOM:
             if cls.go_to_next_room():

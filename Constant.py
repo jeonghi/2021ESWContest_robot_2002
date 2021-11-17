@@ -57,14 +57,14 @@ const.YELLOW_RANGE = [[11, 80, 120], [44, 255, 237]]#
 
 
 ### DOOR SETTING ###
-const.IN_DOOR_WALK = 8
+const.IN_DOOR_WALK = 7
 const.DEFAULT_WALK_AFTER_DETECT_DIRECTION = 4
 const.DEFAULT_TURN_AFTER_DETECT_DIRECTION = 4
 const.OUT_DOOR_WALK = 8
 const.DOOR_THRESH_VALUE = 66
 
 ## DIRECTION ##
-const.DIRECTION_THRESH_VALUE = 66
+const.DIRECTION_THRESH_VALUE = 30
 
 ### CORNER FILTERING ###
 const.CORNER_FILTER_DISTANCE = 40
@@ -95,6 +95,6 @@ Room = namedtuple('Room', 'area_color room_name name_color')
 first_room = Room(AreaColor.GREEN, "B", "RED")
 second_room = Room(AreaColor.BLACK, "B", "BLUE")
 third_room = Room(AreaColor.GREEN, "D", "BLUE")
-debug_mode.DOOR_ALPHABET = "N"
+debug_mode.DOOR_ALPHABET = "E"
 debug_mode.DIRECTION = "RIGHT"
 debug_mode.ROOMS = [first_room, second_room, third_room]
