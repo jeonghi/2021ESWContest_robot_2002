@@ -135,7 +135,7 @@ class RoomMission:
         if box_info:
             (dx, dy) = get_distance_from_baseline(pos=box_info)
 
-            Y_LIMIT = 10 if head_angle is not 35 else 0
+            Y_LIMIT = 10 if head_angle is not 35 else 10
 
             if dy > Y_LIMIT:  # 기준선 보다 위에 있다면
                 if -40 <= dx <= 40:
@@ -311,14 +311,18 @@ class GreenRoomMission(RoomMission):
                     cls.robot._motion.turn(dir='LEFT', loop=1)
             else:
                 if head_angle == 35:
-                    #cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
+                    cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
                     return True
                 else:
                     cls.robot.curr_head4find_corner.rotate(-1)
                     head_angle = cls.robot.curr_head4find_corner[0]
                     cls.robot._motion.set_head("DOWN", angle=head_angle)
         else:
-            cls.mode = Mode.FIND_CONRER
+            if head_angle == 35:
+                cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
+                return True
+            else:
+                cls.mode = Mode.FIND_CONRER
         return False
 
 
@@ -406,7 +410,7 @@ class BlackRoomMission(RoomMission):
     def find_yellow_line(cls) -> bool:
         if cls.robot.line_info["ALL_Y"][1] + cls.robot.line_info["ALL_Y"][0] :
             return True
-        cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, loop=2)
+        cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, sliding=True, loop=2)
         time.sleep(0.5)
         return False
 
@@ -454,14 +458,9 @@ class BlackRoomMission(RoomMission):
                     head_angle = cls.robot.curr_head4find_corner[0]
                     cls.robot._motion.set_head("DOWN", angle=head_angle)
         else:
-            if head_angle == 35 and cls.robot.line_info['ALL_Y'][1] > 400:
-                print('코너 진입 중 35', cls.robot.line_info['ALL_Y'][1])
-                cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
-                return True
-            elif head_angle == 45 and cls.robot.line_info['ALL_Y'][1] > 475:
-                print('코너 진입 중 45', cls.robot.line_info['ALL_Y'][1])
-                cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
-                return True
+            if head_angle == 35:
+                    cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
+                    return True
             else:
                 cls.mode = Mode.FIND_CONRER
         return False

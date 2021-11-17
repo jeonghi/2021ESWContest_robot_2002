@@ -39,22 +39,22 @@ class Constant:
 
 
 const = Constant()
-### COLOR SETTING ###
-const.RED_ALPHABET_RANGE1 = [[0, 53, 36], [30, 144, 99]]
-const.RED_ALPHABET_RANGE2 = [[156, 53, 36], [180, 144, 99]]
-const.BLUE_ALPHABET_RANGE = [[92, 100, 48], [128, 220, 112]]
 
-### BOX
-const.RED_BOX_RANGE1 = [[166, 138, 0], [180, 255, 186]]
-const.RED_BOX_RANGE2 = [[0, 77, 0], [36, 255, 189]]
-const.BLUE_BOX_RANGE = [[92, 106, 41], [128, 255, 172]]
+# ---------- 대회 ---------- ##
+## COLOR SETTING ###
+const.RED_ALPHABET_RANGE1 = [[166, 77, 30], [180, 255, 189]]#
+const.RED_ALPHABET_RANGE2 = [[0, 77, 30], [36, 255, 189]] #
+const.BLUE_ALPHABET_RANGE = [[92, 87, 30], [170, 255, 120]] #
+## BOX
+const.RED_BOX_RANGE1 = [[166, 77, 30], [180, 255, 189]]#
+const.RED_BOX_RANGE2 = [[0, 77, 30], [36, 255, 189]] #
+const.BLUE_BOX_RANGE = [[92, 87, 30], [170, 255, 120]] #
+## AREA ###
+const.GREEN_RANGE = [[38, 54, 0], [91, 255, 98]] #
+const.BLACK_RANGE = [[0, 0, 0], [180, 255, 80]] #
+# LINE
+const.YELLOW_RANGE = [[11, 80, 120], [44, 255, 237]]#
 
-### AREA ###
-const.GREEN_RANGE = [[39, 55, 0], [91, 255, 150]]
-const.BLACK_RANGE = [[0, 0, 0], [180, 255, 112]]
-
-## LINE
-const.YELLOW_RANGE = [[11, 62, 112], [44, 255, 237]]
 
 ### DOOR SETTING ###
 const.IN_DOOR_WALK = 8
@@ -70,7 +70,7 @@ const.DIRECTION_THRESH_VALUE = 66
 const.CORNER_FILTER_DISTANCE = 40
 
 ## AREA ##
-const.CHECK_AREA_GREEN_RATE_THRESH = 40
+const.CHECK_AREA_GREEN_RATE_THRESH = 20
 
 ### GREEN ROOM ###
 ## 1) BOX -> AREA
@@ -84,7 +84,7 @@ const.GREEN_ROOM_TURN_FIND_CORNER = 1
 
 ### BLACK ROOM ###
 const.BLACK_ROOM_DEFAULT_TURN_FIND_BOX = 3
-const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER = 1
+const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER = 3
 const.BLACK_ROOM_DEFAULT_OUT_ROOM_WALK = 3
 
 

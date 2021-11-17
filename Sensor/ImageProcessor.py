@@ -108,7 +108,7 @@ class ImageProcessor:
         h, l, s =cv2.split(hls)
         #gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(l, 69, 255, cv2.THRESH_BINARY_INV+cv2.THRESH_OTSU)
+        _, mask = cv2.threshold(l, 25, 255, cv2.THRESH_BINARY_INV)
         cv2.imshow("mask",mask)
         #_, mask = cv2.threshold(l, 20, 255, cv2.THRESH_BINARY_INV)
 
@@ -168,7 +168,9 @@ class ImageProcessor:
 
         roi_h, roi_l, roi_s = cv2.split(roi_hls)
         #_, roi_mask = cv2.threshold(roi_l, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        roi_mask = cv2.inRange(roi_hsv, np.array([0, 0, 0]), np.array([180, 255, const.DOOR_THRESH_VALUE]))
+        #roi_mask = cv2.inRange(roi_hsv, np.array([0, 0, 0]), np.array([180, 255, const.DOOR_THRESH_VALUE]))
+        roi_mask = cv2.inRange(roi_hsv, np.array([0, 0, 0]), np.array([180, 255, 30]))
+        roi_mask = cv2.bitwise_not(roi_mask)
 
         if visualization:
             pos = target.get_pts()
@@ -177,9 +179,9 @@ class ImageProcessor:
             #roi_canvas[pos[1]:pos[1]+pos[3],pos[0]:pos[0]+pos[2]] = cv2.cvtColor(roi_mask, cv2.COLOR_GRAY2BGR)
             cv2.imshow("src", cv2.hconcat(
                 [canvas, roi_canvas]))
-            cv2.imshow('mask', mask)
+            cv2.imshow('mask', roi_mask)
             cv2.waitKey(1)
-        
+
         answer, _ = self.hash_detector4door.detect_alphabet_hash(roi_mask, threshold=0.6)
         return answer
 
@@ -199,7 +201,7 @@ class ImageProcessor:
         contours, _ = cv2.findContours(edge, cv2.RETR_CCOMP, cv2.CHAIN_APPROX_NONE)
         if len(contours) == 0:
             return None
-            
+
         contour = max(contours, key=lambda x:cv2.contourArea(x))
 
         leftmost = tuple(contour[contour[:,:,0].argmin()][0])
@@ -364,7 +366,7 @@ class ImageProcessor:
             cv2.imshow("line", dst)
             cv2.waitKey(1)
         return result
-    
+
     def line_checker(self, line_info):
         if line_info["H"]:
             if line_info["H_Y"][1] < 240 :
@@ -374,7 +376,7 @@ class ImageProcessor:
                     walk_info = WalkInfo.CORNER_RIGHT
                 else:
                     walk_info = WalkInfo.CORNER_LEFT
-                            
+
             else:
                 if 80 < line_info["DEGREE"] < 100:
                     if 290 < np.mean(line_info["V_X"]) < 350:
@@ -388,7 +390,7 @@ class ImageProcessor:
                     walk_info = WalkInfo.MODIFY_LEFT
                 else:
                     walk_info = WalkInfo.MODIFY_RIGHT
-    
+
         else:
             if 80 < line_info["DEGREE"] < 100:
                 if 290 < np.mean(line_info["V_X"]) < 350:
@@ -404,7 +406,7 @@ class ImageProcessor:
                 walk_info = WalkInfo.BACKWARD
             else:
                 walk_info = WalkInfo.MODIFY_RIGHT
-            
+
         return walk_info
 
     def get_yellow_line_corner(self, visualization=False):
@@ -416,7 +418,7 @@ class ImageProcessor:
         corner = CornerFinder.get_yellow_line_corner_pos(src=src, visualization=visualization)
 
         return corner
-    
+
     def get_yellow_line_corner_3view(self, visualization=False):
         """
 
@@ -451,6 +453,7 @@ class ImageProcessor:
         mask = ColorPreProcessor.get_green_mask(src=src)
         rate = np.count_nonzero(mask)/(640*480)
         rate *= 100
+        print(rate)
         return rate >= const.CHECK_AREA_GREEN_RATE_THRESH
 
 
@@ -461,8 +464,8 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/1116/N.mp4")
-    #imageProcessor = ImageProcessor(video_path="")
+    #imageProcessor = ImageProcessor(video_path="src/1116/N.mp4")
+    imageProcessor = ImageProcessor(video_path="")
     while True:
 
         #imageProcessor.get_milk_info(color="RED", visualization=True)
