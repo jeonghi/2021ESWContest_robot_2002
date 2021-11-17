@@ -146,7 +146,7 @@ class Controller:
 
         elif mode == Mode.DETECT_DIRECTION:
             if cls.fail_count > 4:
-                cls.robot.direction = Direction.RIGHT
+                cls.robot.direction = const.DEFAULT_DIRECTION
                 cls.robot._motion.set_head(dir='DOWN', angle=10)
                 time.sleep(0.5)
                 # cls.robot._motion.walk("FORWARD", width=False, loop=1) # 업어야됨 인식 문제로 후진할 때 주석해제
@@ -191,7 +191,7 @@ class Controller:
                 cls.ROI = True
                 cls.mode = Mode.GO_TO_NEXT_ROOM
                 cls.robot._motion.set_head("DOWN", angle=10)
-                time.sleep(0.3)
+                time.sleep(0.5)
 
         elif mode == Mode.OUT:
             cls.robot.color=LineColor.YELLOW

@@ -79,7 +79,7 @@ class ImageProcessor:
         h, l, s =cv2.split(hls)
         #gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
         # ostu이진화, 어두운 부분이 true(255) 가 되도록 THRESH_BINARY_INV
-        _, mask = cv2.threshold(l, 25, 255, cv2.THRESH_BINARY_INV)
+        _, mask = cv2.threshold(l, 60, 255, cv2.THRESH_BINARY_INV)
         cv2.imshow("mask",mask)
         #_, mask = cv2.threshold(l, 20, 255, cv2.THRESH_BINARY_INV)
 
@@ -438,11 +438,11 @@ class ImageProcessor:
 
 if __name__ == "__main__":
 
-    imageProcessor = ImageProcessor(video_path="src/1116/black_room_B.mp4")
+    imageProcessor = ImageProcessor(video_path="src/1117/direction.h264")
     #imageProcessor = ImageProcessor(video_path="")
     while True:
-        imageProcessor.get_image(visualization=True)
-        print(imageProcessor.check_area_color())
+        #imageProcessor.get_image(visualization=True)
+        #print(imageProcessor.check_area_color())
 
         #imageProcessor.get_milk_info(color="RED", visualization=True)
         #print(imageProcessor.get_green_area_corner(visualization=True))
@@ -454,3 +454,4 @@ if __name__ == "__main__":
         #print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
         #print(imageProcessor.get_alphabet_info4room(visualization=True))
         #print(imageProcessor.get_door_alphabet_using_iou(visualization=True))
+        imageProcessor.get_arrow_direction(visualization=True)

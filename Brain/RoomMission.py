@@ -349,6 +349,7 @@ class GreenRoomMission(RoomMission):
             if cls.track_box():
                 cls.mode = Mode.TURN_TO_AREA
                 cls.robot._motion.turn(dir=cls.fast_turn.name, grab=True, wide=True, sliding=True, loop=const.GREEN_ROOM_DEFAULT_TURN_FIND_AREA)
+                time.sleep(0.5)
 
         elif mode == Mode.TURN_TO_AREA:
             if cls.turn_to_area():
@@ -364,16 +365,18 @@ class GreenRoomMission(RoomMission):
                 cls.robot._motion.set_head("DOWN", angle=cls.robot.curr_head4find_corner[0])
                 cls.robot.color = LineColor.YELLOW
                 cls.robot._motion.turn(dir=cls.fast_turn.name, loop=const.GREEN_ROOM_DEFAULT_TURN_FIND_CORNER, wide=True, sliding=True)
+                time.sleep(0.5)
 
         elif mode == Mode.FIND_CONRER:
             if cls.find_corner():
                 cls.mode = Mode.GO_TO_CORNER
-
+            time.sleep(0.2)
         elif mode == Mode.GO_TO_CORNER:
             if cls.go_to_corner():
                 cls.mode = cls.mode = Mode.OUT_ROOM
                 loop: int = 4 if cls.fast_turn == Direction.RIGHT else 2
                 cls.robot._motion.turn(dir=cls.robot.direction.name, loop=loop)
+            time.sleep(0.2)
 
         elif mode == Mode.OUT_ROOM:
             if cls.out_room():
@@ -459,8 +462,8 @@ class BlackRoomMission(RoomMission):
                     cls.robot._motion.set_head("DOWN", angle=head_angle)
         else:
             if head_angle == 35:
-                    cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
-                    return True
+                cls.robot._motion.walk(dir='FORWARD', loop=1, width=width)
+                return True
             else:
                 cls.mode = Mode.FIND_CONRER
         return False
@@ -503,6 +506,7 @@ class BlackRoomMission(RoomMission):
                 cls.robot.color = LineColor.YELLOW
                 cls.robot._motion.set_head("DOWN", angle=60)
                 cls.robot._motion.turn(dir=cls.robot.direction.name, grab=True, wide=True, sliding=True, loop=const.BLACK_ROOM_DEFAULT_TURN_FIND_CORNER)
+                time.sleep(0.5)
 
         elif mode == Mode.FIND_YELLOW_LINE:
             if cls.find_yellow_line():
