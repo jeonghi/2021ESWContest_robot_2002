@@ -174,7 +174,10 @@ class ImageProcessor:
             return None
 
         contour = max(contours, key=lambda x:cv2.contourArea(x))
-
+        
+        if cv2.contourArea(contour) < 2000:
+            return None
+        
         leftmost = tuple(contour[contour[:,:,0].argmin()][0])
         rightmost = tuple(contour[contour[:,:,0].argmax()][0])
         topmost = tuple(contour[contour[:,:,1].argmin()][0])
