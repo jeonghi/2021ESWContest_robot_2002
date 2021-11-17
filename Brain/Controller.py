@@ -7,7 +7,7 @@ from Constant import Direction, AreaColor, LineColor, WalkInfo, debug_mode, cons
 
 import time
 
-CLEAR_LIMIT: int = 3
+CLEAR_LIMIT: int = 2
 class Mode(Enum):
     START = auto()
     IN = auto()
