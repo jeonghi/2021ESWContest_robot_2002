@@ -112,7 +112,7 @@ class Controller:
         if debug_mode.IS_ON:
             direction = debug_mode.DIRECTION
         else:
-            direction = cls.robot._image_processor.get_arrow_direction(visualization=True)
+            direction = cls.robot._image_processor.get_arrow_direction(visualization=False)
 
         if direction:
             cls.robot.direction = Direction.LEFT if direction == "LEFT" else Direction.RIGHT
