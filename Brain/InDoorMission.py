@@ -13,6 +13,7 @@ class InDoorMission:
 
     mode: Mode = Mode.START
     robot: Robot = Robot
+    detect_miss: int = 0
 
     @classmethod
     def set_robot(cls, robot: Robot):
@@ -20,6 +21,7 @@ class InDoorMission:
 
     @classmethod
     def detect_alphabet(cls) -> bool:
+
         cls.robot._motion.set_head(dir="DOWN", angle=cls.robot.curr_head4door_alphabet[0])
 
         if not debug_mode.IS_ON:
@@ -33,7 +35,7 @@ class InDoorMission:
             cls.robot._motion.set_head(dir="DOWN", angle=10)
             time.sleep(1)
             return True
-
+        cls.detect_miss += 1
         cls.robot.curr_head4door_alphabet.rotate(-1)
         return False
 
