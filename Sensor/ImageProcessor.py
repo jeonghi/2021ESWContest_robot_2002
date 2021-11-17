@@ -420,7 +420,7 @@ class ImageProcessor:
             cv2.waitKey(1)
         print(rate)
 
-        return rate <= 40
+        return rate <= 30
 
     def check_area_color(self):
         src = self.get_image()

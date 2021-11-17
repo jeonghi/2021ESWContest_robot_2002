@@ -53,7 +53,7 @@ class Controller:
             cls.ROI = True
             cls.robot.color=LineColor.YELLOW
             cls.robot.direction = Direction.LEFT
-            cls.mission_done = 3
+            cls.mission_done = 2
 
 
     @classmethod

@@ -109,8 +109,8 @@ class RoomMission:
             if alphabet_info:
                 cls.alphabet_color, cls.alphabet = "BLUE", alphabet_info
                 return True
-            elif cls.detect_miss > 8 :
-                cls.alphabet_color, cls.alphabet = "BLUE", "B"
+            elif cls.detect_miss > 4 :
+                cls.alphabet_color, cls.alphabet = "BLUE", "D"
                 return True
             else:
                 cls.robot.curr_head4room_alphabet.rotate(-1)
