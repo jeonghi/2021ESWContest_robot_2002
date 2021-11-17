@@ -95,6 +95,6 @@ Room = namedtuple('Room', 'area_color room_name name_color')
 first_room = Room(AreaColor.GREEN, "B", "RED")
 second_room = Room(AreaColor.BLACK, "B", "BLUE")
 third_room = Room(AreaColor.GREEN, "D", "BLUE")
-debug_mode.DOOR_ALPHABET = "N"
+debug_mode.DOOR_ALPHABET = "E"
 debug_mode.DIRECTION = "RIGHT"
 debug_mode.ROOMS = [first_room, second_room, third_room]

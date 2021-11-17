@@ -15,7 +15,7 @@ class HashDetector:
         if '.DS_Store' in self.file_lst:
             self.file_lst.remove('.DS_Store')
         for direction in self.file_lst:
-            self.directions_hash.append(1 - self.image_to_hash(cv2.imread(file_path + direction)))
+            self.directions_hash.append(self.image_to_hash(cv2.imread(file_path + direction)))
             self.directions.append(direction.rsplit('.')[0])
         print(file_path + direction)
         print(self.directions)
