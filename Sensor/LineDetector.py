@@ -75,6 +75,7 @@ class LineDetector:
 
     def get_lines(self, src, color='YELLOW'):
         mask = self.mask_color(src, color)
+        cv2.imshow("mask", mask)
         if color == 'BLACK':
             contours, _ = cv2.findContours(mask, cv2.RETR_EXTERNAL, cv2.CHAIN_APPROX_SIMPLE)
             return contours
@@ -306,7 +307,7 @@ class LineDetector:
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
                     #print(c)
-                    if c >= 350:
+                    if c >= 100:
                         line_info["compact_H"] = True
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
@@ -359,7 +360,7 @@ class LineDetector:
 
             elif color == 'GREEN':
                 line_info = {'ALL': False,'ALL_X': [0, 0], 'ALL_Y': [0, 0], 'V': False, 'V_X': [0, 0], 'V_Y': [0, 0], 'H': False, "len(H)":0, 'H_DEGREE': 0 , 'H_X': [0, 0], 'H_Y': [0, 0]}
-                edge_info = {'EDGE_DOWN': False, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
+                edge_info = {'EDGE_DOWN': False, 'len(EDGE)': 0, 'EDGE_DOWN_X': 0, 'EDGE_DOWN_Y': 0, 'EDGE_UP_Y': 0, 'EDGE_UP':False, 'EDGE_UP_X':0}
 
                 if len(edge_lines) != 0:
                     size = int(edge_lines.shape[0] * edge_lines.shape[2] / 2)
@@ -403,10 +404,10 @@ class LineDetector:
                     b = compact_horizontal_line[0] - compact_horizontal_line[2]
                     c = math.sqrt((a * a) + (b * b))
                     #print('length:  ', c)
-                    if c >= 100:
+                    if c >= 350:
                         line_info["H"] = True
                         line_info["len(H)"] = c
-                    print(compact_horizontal_line[3])
+                    #print(compact_horizontal_line[3])
                     #H_degree = (np.arctan2(horizontal_fit_line[1] - horizontal_fit_line[3], horizontal_fit_line[0] - horizontal_fit_line[2]) * 180) / np.pi
                     #line_info["H_DEGREE"] = H_degree
                     line_info["H_X"] = [compact_horizontal_line[0], compact_horizontal_line[2]]  # [min_x, middle, max_x, middle]
@@ -423,9 +424,16 @@ class LineDetector:
                     edge_fit_line_DOWN = self.get_fitline(src, edge_lines, size, 'edge_DOWN')
                     edge_info["EDGE_UP_X"] = int((edge_fit_line_UP[0] + edge_fit_line_UP[2])/2)
                     edge_info["EDGE_UP_Y"] = edge_fit_line_UP[1]
+                    
                     edge_info["EDGE_DOWN"] = True
                     edge_info["EDGE_DOWN_X"] = int((edge_fit_line_DOWN[0] + edge_fit_line_DOWN[2]) / 2)
                     edge_info["EDGE_DOWN_Y"] = edge_fit_line_DOWN[1]
+                    a = edge_fit_line_DOWN[1] - edge_fit_line_DOWN[3]
+                    b = edge_fit_line_DOWN[0] - edge_fit_line_DOWN[2]
+                    c = math.sqrt((a * a) + (b * b))
+                    #print('length:  ', c)
+                    edge_info["len(EDGE)"] = np.abs(b)
+                        
                     if edge_visualization is True:
                         self.draw_lines(temp, edge_fit_line_UP, 'edge', 'fit')
                         self.draw_lines(temp, edge_fit_line_DOWN, 'edge', 'fit')
@@ -454,8 +462,8 @@ if __name__ == "__main__":
 
         line_info, edge_info, result = line_detector.get_all_lines(src, color='BLACK', line_visualization=True,
                                                                    edge_visualization=False)
-        print(line_info)
-        print(edge_info)
+        #print(line_info)
+        #print(edge_info)
         cv2.imshow('result', result)
         key = cv2.waitKey(1)
         if key == 27:

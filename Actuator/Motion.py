@@ -6,6 +6,7 @@ import serial
 import time
 import sys
 from threading import Thread, Lock
+from Constant import const
 
 
 # -----------------------------------------------
@@ -70,7 +71,10 @@ class Motion:
                     self.receiving_exit = 0
                     break
                 elif RX == 200:
-                    self.lock.release()
+                    try:
+                        self.lock.release()
+                    except:
+                        continue
                 elif RX != 200:
                     self.distance = RX
 
@@ -128,11 +132,6 @@ class Motion:
         else:
             self.TX_data_py2(dir_list[dir][angle])
         time.sleep(0.3)
-
-    def is_grab(self) -> bool:
-        if self.get_IR() > 65:
-            return True
-        return False
 
     def walk(self, dir, loop=1, sleep=0.1, wide=False, grab=False, open_door=False, IR=False, width=True):
         """
@@ -224,9 +223,15 @@ class Motion:
         tx = 65 if switch else 66
         self.TX_data_py2(tx)
         if IR:
-            if self.get_IR() > 65:
+            time.sleep(3)
+            distance = self.get_IR()
+            print(f"IR Value: {distance}")
+            if distance < const.GRAB_IR:
+                self.TX_data_py2(55)
+                self.TX_data_py2(10)
+                return False
+            else:
                 return True
-            return False
 
     def get_head(self):
         """Return vertical, horizontal head angle
@@ -237,6 +242,19 @@ class Motion:
         self.TX_data_py2(46)
         self.TX_data_py2(55)
         self.TX_data_py2(10)
+
+    def move_arm(self, dir='HIGH',walk=False, loop=1):
+        """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
+        팔을 위로 하면 머리는 아래로 숙임.
+        """
+        angle_list = [35, 90, 60]
+        level = {'HIGH':1, 'MIDDLE':2, 'LOW':3}
+        self.TX_data_py2(76+level[dir])
+        time.sleep(0.1)
+        self.set_head(dir='DOWN', angle=angle_list[level[dir]-1])
+        if walk:
+            for _ in range(loop):
+                self.TX_data_py2(112 + level[dir])
 
     def move_arm(self, arm='HIGH', walk=False, turn=False, dir='FORWARD', loop=1):
         """dir list = ['HIGH', 'MIDDLE', 'LOW'] dir='HIGH'면 팔의 위치 가장 위로, 'LOW'면 팔의 위치 가장 아래로.
@@ -268,4 +286,5 @@ if __name__ == '__main__':
     #motion.open_door_turn(dir='LEFT', loop=6)
     #motion.walk(dir='FORWARD')
     #motion.open_door(dir='LEFT', loop=15)
-    motion.turn(dir='LEFT', loop=1)
+    #motion.notice_direction('S')
+    motion.notice_area("GREEN")

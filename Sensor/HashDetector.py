@@ -75,7 +75,7 @@ class HashDetector:
         if is_arrow:
             img = cv2.resize(src=img, dsize=HashDetector.dim)
         else:  
-            img = HashDetector.image_resize_with_pad(src=img, size=HashDetector.dim)
+            img = cv2.resize(src=img, dsize=HashDetector.dim)
             
         avg = img.mean()
         bin = 1 * (img > avg)
@@ -106,6 +106,7 @@ class HashDetector:
 
     def detect_alphabet_hash(self, img : np.ndarray, threshold=0.3) -> str:
         img_hash = self.image_to_hash(img)
+        #print(img_hash)
         hdist_dict = {}
         
         for i in range(len(self.directions)):
@@ -114,10 +115,12 @@ class HashDetector:
             hdist_dict[direction] = self.hamming_distance(img_hash, hash)
         
         result = min(hdist_dict.keys(), key=(lambda k:hdist_dict[k]))
-
+        #print()
+        #print(self.directions_hash[1])
         if hdist_dict[result] > threshold:
             return None, None
         
+        #print(hdist_dict)
         return result, hdist_dict[result]
 
     def detect_arrow(self, img : np.ndarray, thresh=0.6):

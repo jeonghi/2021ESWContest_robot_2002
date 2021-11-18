@@ -125,10 +125,10 @@ class Target:
                 return None
 
         elif targets1:
-            return max(targets1, key=lambda target: target.y)
+            return max(targets1, key=lambda target: target.get_area())
 
         elif targets2:
-            return max(targets2, key=lambda target: target.y)
+            return max(targets2, key=lambda target: target.get_area())
 
         else:
             return None
