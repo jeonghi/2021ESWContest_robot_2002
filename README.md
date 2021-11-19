@@ -1,6 +1,6 @@
 # 거북팀
 
-| <img src="LOGO.png" style="zoom:40%;" /> | <br />대회명: [제 19회 임베디드 소프트웨어 경진대회](https://eswcontest.or.kr/main/main.php)<br />참가부문: 지능형 휴머노이드<br />주최: [산업통상자원부](http://www.motie.go.kr/www/main.do)<br />주관: [임베디드소프트웨어 · 시스템산업협회 (KESSIA)](https://www.kessia.kr/main/main.php)<br />참가번호: 2002<br />팀명: 거북<br />소속: [국민대학교](https://www.kookmin.ac.kr/user/index.do)<br /><br /> |
+| <img src="LOGO.PNG" style="zoom:40%;" /> | <br />대회명: [제 19회 임베디드 소프트웨어 경진대회](https://eswcontest.or.kr/main/main.php)<br />참가부문: 지능형 휴머노이드<br />주최: [산업통상자원부](http://www.motie.go.kr/www/main.do)<br />주관: [임베디드소프트웨어 · 시스템산업협회 (KESSIA)](https://www.kessia.kr/main/main.php)<br />참가번호: 2002<br />팀명: 거북<br />소속: [국민대학교](https://www.kookmin.ac.kr/user/index.do)<br /><br /> |
 | ---------------------------------------- | ------------------------------------------------------------ |
 
 
