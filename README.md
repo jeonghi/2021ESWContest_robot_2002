@@ -1,18 +1,13 @@
 # 거북팀
 
----
-
 **🥇 제 19회 임베디드 소프트웨어 경진대회 지능형 휴머노이드 부문 최우수상 수상**
 
 ## 결선 경기 영상
-
----
 
 [https://youtu.be/s4C9KIk877U](https://youtu.be/s4C9KIk877U)
 
 ## 언론보도
 
----
 
 [[조선에듀] 국민대, ‘제19회 임베디드 소프트웨어 경진대회’ 최우수상 수상](http://edu.chosun.com/site/data/html_dir/2021/12/31/2021123100966.html)
 
@@ -21,8 +16,6 @@
 [[비지니스코리아] 국민대 거북, ‘제19회 임베디드 S/W 경진대회’ 최우수상 받아](http://www.businesskorea.co.kr/news/articleView.html?idxno=85183)
 
 ## 기여자
-
----
 
 | 팀원 | 기여 |
 | --- | --- |
