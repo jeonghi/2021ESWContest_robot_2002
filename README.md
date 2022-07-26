@@ -16,12 +16,13 @@
 [[비지니스코리아] 국민대 거북, ‘제19회 임베디드 S/W 경진대회’ 최우수상 받아](http://www.businesskorea.co.kr/news/articleView.html?idxno=85183)
 
 ## 방위인식
-| ![](gif/동쪽.gif)| ![](gif/서쪽.gif)|
+| ![동쪽](https://user-images.githubusercontent.com/50570113/180924057-ce58c32e-c4d3-4fdb-977d-92bd18d1aef5.gif)| ![서쪽](https://user-images.githubusercontent.com/50570113/180923863-2f761b64-05e1-4031-b936-c39a25c37526.gif)|
 | --- | --- |
-| ![](gif/남쪽.gif)| ![](gif/북쪽.gif)|
+| ![남쪽](https://user-images.githubusercontent.com/50570113/180924124-9f68458a-c392-488b-a62d-b4c00c562125.gif)| ![북쪽](https://user-images.githubusercontent.com/50570113/180924005-8249cc03-c28a-40f9-935e-2dfe52bc6846.gif)|
 
 ## 박스 옮기기
-![](gif/박스옮기기.gif)
+![박스옮기기](https://user-images.githubusercontent.com/50570113/180924184-869ebe64-007a-478b-9d6a-a030fcacfcc3.gif)
+
 
 ## 기여자
 
