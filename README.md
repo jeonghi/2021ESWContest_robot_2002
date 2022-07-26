@@ -16,7 +16,11 @@
 [[비지니스코리아] 국민대 거북, ‘제19회 임베디드 S/W 경진대회’ 최우수상 받아](http://www.businesskorea.co.kr/news/articleView.html?idxno=85183)
 
 ## 방위인식
-| ![동쪽](https://user-images.githubusercontent.com/50570113/180924057-ce58c32e-c4d3-4fdb-977d-92bd18d1aef5.gif)| ![서쪽](https://user-images.githubusercontent.com/50570113/180923863-2f761b64-05e1-4031-b936-c39a25c37526.gif)|
+| 동쪽 | 서쪽 |
+| --- | --- |
+| ![동쪽](https://user-images.githubusercontent.com/50570113/180924057-ce58c32e-c4d3-4fdb-977d-92bd18d1aef5.gif)| ![서쪽](https://user-images.githubusercontent.com/50570113/180925341-096636ca-a62a-41ac-966f-fef5f07cff08.gif)|
+
+| 남쪽 | 북쪽 |
 | --- | --- |
 | ![남쪽](https://user-images.githubusercontent.com/50570113/180924124-9f68458a-c392-488b-a62d-b4c00c562125.gif)| ![북쪽](https://user-images.githubusercontent.com/50570113/180924005-8249cc03-c28a-40f9-935e-2dfe52bc6846.gif)|
 
