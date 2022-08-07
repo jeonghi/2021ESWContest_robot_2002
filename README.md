@@ -17,10 +17,6 @@ Team Project Name : 지능형 휴머노이드
  
   </tr>
 </table>
-
-# 거북팀
-
-
 ## 결선 경기 영상
 [![결선영상](https://user-images.githubusercontent.com/50570113/181140055-4df0982b-72bb-43cd-96d9-a559251e6e0c.gif)](https://youtu.be/s4C9KIk877U)
 
@@ -44,3 +40,6 @@ Team Project Name : 지능형 휴머노이드
 
 ## 박스 옮기기
 ![박스옮기기](https://user-images.githubusercontent.com/50570113/180924184-869ebe64-007a-478b-9d6a-a030fcacfcc3.gif)
+
+
+[![Footer](https://capsule-render.vercel.app/api?type=waving&color=auto&customColorList=4&height=200&section=footer)](https://github.com/jeonghi/2021ESWContest_robot_2002)
