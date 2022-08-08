@@ -18,6 +18,7 @@ Team Project Name : 지능형 휴머노이드
  
   </tr>
 </table>
+
 ## 결선 경기 영상
 [![결선영상](https://user-images.githubusercontent.com/50570113/181140055-4df0982b-72bb-43cd-96d9-a559251e6e0c.gif)](https://youtu.be/s4C9KIk877U)
 
