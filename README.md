@@ -22,15 +22,6 @@ Team Project Name : 지능형 휴머노이드
 ## 결선 경기 영상
 [![결선영상](https://user-images.githubusercontent.com/50570113/181140055-4df0982b-72bb-43cd-96d9-a559251e6e0c.gif)](https://youtu.be/s4C9KIk877U)
 
-## 언론보도
-
-
-[[조선에듀] 국민대, ‘제19회 임베디드 소프트웨어 경진대회’ 최우수상 수상](http://edu.chosun.com/site/data/html_dir/2021/12/31/2021123100966.html)
-
-[[데일리경제] 국민대 재학생팀 거북, ‘제19회 임베디드 소프트웨어 경진대회’ 최우수상 수상](http://www.kdpress.co.kr/news/articleView.html?idxno=109675)
-
-[[비지니스코리아] 국민대 거북, ‘제19회 임베디드 S/W 경진대회’ 최우수상 받아](http://www.businesskorea.co.kr/news/articleView.html?idxno=85183)
-
 ## 방위인식
 | 동쪽 | 서쪽 |
 | --- | --- |
